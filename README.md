@@ -3,7 +3,7 @@
 
 ### Editable Documents
 1. [Proposal Document (Editable)](Documents/ProposalLink.md)
-2. [Requirements Document (Editable)](Documents/RequirementsLink.md)
+2. [Requirements Document and Slides (Editable)](Documents/RequirementsLink.md)
 3. [Design Document (Editable)](Documents/DesignLink.md)
 
 ### PDFs
