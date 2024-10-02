@@ -13,3 +13,4 @@
 
 ### Slides/PowerPoint
 6. [Requirements Slides PDF](./Documents/Requirements%20Slides%20(AllEvently).pdf)
+7. [Design Document Slides PDF](./Documents/AllEvently%20Design%20(Slides).pdf)
