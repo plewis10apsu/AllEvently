@@ -1,0 +1,6 @@
+# Ignore WebStorm/IntelliJ project files
+.idea/
+*.iml
+
+# Ignore macOS system files
+.DS_Store
