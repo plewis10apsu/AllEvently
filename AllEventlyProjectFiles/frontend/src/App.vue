@@ -1,22 +1,11 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import ApiTest from './components/ApiTest.vue'
+import Login from './components/Login.vue'
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <!-- Existing HelloWorld Component -->
-  <HelloWorld msg="Vite + Vue" />
 
-  <!-- New ApiTest Component -->
-  <ApiTest />
+  <!-- Login Component as Landing Page -->
+  <Login />
 
 </template>
 
