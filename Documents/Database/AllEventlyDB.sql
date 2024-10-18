@@ -100,6 +100,8 @@ CREATE TABLE Guests {
     invite_sent BOOLEAN DEFAULT FALSE,
     accepted BOOLEAN,
     child_count INT,
-    guest_count INT
-    
+    guest_count INT,
+    PRIMARY KEY (guest_email, event_id),
+    FOREIGN KEY (guest_email) REFERENCES People(email),
+    FOREIGN KEY (event_id) REFERENCES Events(event_id)
 };
