@@ -1,32 +1,23 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
 
 const email = ref('')
 const password = ref('')
+const router = useRouter();
 
-const login = () => {
-  console.log('Email:', email.value)
-  console.log('Password:', password.value)
-  // Add your login logic here
-}
+const handleLogin = () => {
+  // Add your authentication logic here, then redirect on success
+  router.push('/events');   // Redirect to the Events page
+};
 </script>
 
 <template>
-  <div class="login-container">
-    <h2>Login</h2>
-    <form @submit.prevent="login">
-      <div class="input-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" v-model="email" required />
-      </div>
-
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-
-      <button type="submit">Login</button>
-    </form>
+  <div>
+    <!-- Login Form -->
+    <input type="email" placeholder="Email" />
+    <input type="password" placeholder="Password" />
+    <button @click="handleLogin">Login</button>
   </div>
 </template>
 

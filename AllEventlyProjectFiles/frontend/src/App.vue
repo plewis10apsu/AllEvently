@@ -4,8 +4,8 @@ import Login from './components/Login.vue'
 
 <template>
 
-  <!-- Login Component as Landing Page -->
-  <Login />
+  <!-- This will display the page according to the route (Login, Events, etc.) -->
+  <router-view />
 
 </template>
 
