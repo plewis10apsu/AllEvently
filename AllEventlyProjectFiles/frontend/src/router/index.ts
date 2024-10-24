@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from '../components/Login.vue';   // Adjust path if needed
-import Events from '../components/Events.vue'; // Adjust path if needed
+import Login from '../components/Login.vue';
+import Events from '../components/Events.vue';
 
 const routes = [
     {

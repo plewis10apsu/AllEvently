@@ -4,3 +4,6 @@
 
 # Ignore macOS system files
 .DS_Store
+
+# Pinegrow temp folders
+_pg*
