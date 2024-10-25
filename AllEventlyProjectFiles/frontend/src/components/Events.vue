@@ -59,11 +59,11 @@ const filteredEvents = computed(() => {
   return events.value; // Return all events
 });
 
-const viewInvitation = (event) => {
+const viewInvitation = () => { //event parameter
   // Handle viewing an invitation
 };
 
-const editInvitation = (event) => {
+const editInvitation = () => { //event parameter
   // Handle editing an invitation
 };
 </script>
