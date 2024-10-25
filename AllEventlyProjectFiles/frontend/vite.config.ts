@@ -12,13 +12,13 @@ export default defineConfig({
       },
     }),
     Vue(),
-    //...
+    //
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '~': fileURLToPath(new URL('./src', import.meta.url)),
-      '~~': fileURLToPath(new URL('./', import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url).href),
+      '~': fileURLToPath(new URL('./src', import.meta.url).href),
+      '~~': fileURLToPath(new URL('./', import.meta.url).href),
     },
   },
 });
