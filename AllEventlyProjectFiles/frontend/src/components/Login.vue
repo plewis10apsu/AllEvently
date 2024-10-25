@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 import GoogleSSO from './GoogleSSO.vue';
 
@@ -51,12 +51,12 @@ const handleLogin = () => {
           <a href="/reset-password" class="reset-password-link">Reset Password</a>
 
           <!-- Separator -->
-          <div class="separator">
+          <div class="separator" :class="{ 'hidden': switchToSignup }">
             <span>OR</span>
           </div>
 
           <!-- Google Login Button -->
-          <div class="google-signup-container">
+          <div class="google-signup-container" :class="{ 'hidden': switchToSignup }">
           <GoogleSSO buttonText="Login with Google" />
           </div>
 
@@ -101,12 +101,12 @@ const handleLogin = () => {
           <button type="submit" class="btn-signup">Sign Up</button>
 
           <!-- Separator -->
-          <div class="separator">
+          <div class="separator" :class="{ 'hidden': !switchToSignup }">
             <span>OR</span>
           </div>
 
           <!-- Google Sign Up Button -->
-          <div class="google-signup-container">
+          <div class="google-signup-container" :class="{ 'hidden': !switchToSignup }">
           <GoogleSSO buttonText="Sign Up with Google" />
           </div>
 
@@ -170,6 +170,10 @@ body {
 .logo {
   width: 200px;
   margin-bottom: 20px; /* Space below the logo */
+}
+
+.hidden {
+  display: none !important;
 }
 
 .forms-section {
