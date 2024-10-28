@@ -1,25 +1,27 @@
-<template> 
-    <div class="event-card"> 
-        <h2>{{ event.title }} <span>({{ event.type }})</span></h2> 
-        <div class="event-details"> 
-            <div>{{ event.date }} at {{ event.time }}</div>             
-            <div>{{ event.location }}</div>             
-            <div>Hosted by: {{ event.host }}</div>             
-        </div>         
-        <div class="event-actions"> 
-            <button @click="$emit('viewInvitation')">View Invitation</button>             
-            <button v-if="event.host === 'You'" @click="$emit('editInvitation')">Edit Invitation</button>             
-        </div>         
-    </div>     
-</template> 
+<template>
+  <div class="event-card" v-if="event">
+    <h2>{{ event.title }} <span>({{ event.type }})</span></h2>
+    <div class="event-details">
+      <div>{{ event.date }} at {{ event.time }}</div>
+      <div>{{ event.location }}</div>
+      <div>Hosted by: {{ event.host }}</div>
+    </div>
+    <div class="event-actions">
+      <button @click="$emit('viewInvitation')">View Invitation</button>
+      <button v-if="event.host === 'You'" @click="$emit('editInvitation')">Edit Invitation</button>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
-defineProps({
-  event: Object
-});
-</script> 
+defineProps<{
+  event?: Record<string, any>;
+}>();
+</script>
+
 <style scoped>
 .event-card {
-  background-color: #fdf5c4; /* Use your preferred colors */
+  background-color: #fdf5c4;
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
