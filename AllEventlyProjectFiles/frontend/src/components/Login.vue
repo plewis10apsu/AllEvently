@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 import GoogleSSO from './GoogleSSO.vue';
+import logo from '@/assets/AllEventlyLogo(2).png';
 
 const firstName = ref('')
 const lastName = ref('')
@@ -22,7 +23,7 @@ const handleLogin = () => {
 
 <template>
   <section class="forms-section">
-    <img src="../../AllEventlyLogo(2).png" alt="AllEvently Logo" class="logo">
+    <img :src="logo" alt="AllEvently Logo" class="logo">
     <div class="forms">
       <div :class="['form-wrapper', { 'is-active': !switchToSignup }]">
         <button @click="toggleForm('login')" type="button" class="switcher switcher-login">

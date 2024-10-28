@@ -59,13 +59,15 @@ const filteredEvents = computed(() => {
   return events.value; // Return all events
 });
 
-const viewInvitation = () => { //event parameter
+
+const viewInvitation = (_event: any) => {
   // Handle viewing an invitation
 };
 
-const editInvitation = () => { //event parameter
+const editInvitation = (_event: any) => {
   // Handle editing an invitation
 };
+
 </script>
 
 <style scoped>
