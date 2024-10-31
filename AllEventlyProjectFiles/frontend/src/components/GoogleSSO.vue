@@ -35,12 +35,12 @@ onMounted(() => {
         },
       });
       google.accounts.id.renderButton(googleButtonRef.value, {
-        theme: 'outline',
+        theme: 'filled_blue', // Options: 'outline', 'filled_blue', 'filled_black'
         size: 'large',
         type: 'icon',
-        shape: 'pill',
+        shape: 'circle',
         logo_alignment: 'center',
-        width: '250',
+        width: '300',
       });
     }
   };

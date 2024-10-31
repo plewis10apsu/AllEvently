@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 import GoogleSSO from './GoogleSSO.vue';
-import logo from '@/assets/AllEventlyLogo(2).png';
+import logo from '@/assets/AllEventlyLogo.png';
 import visibleIcon from '@/assets/Visible_Icon.png';
 import invisibleIcon from '@/assets/Invisible_Icon.png';
 
@@ -202,11 +202,38 @@ const handleLogin = () => {
   </section>
 </template>
 
+<style scoped>
+.forms-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 5rem;
+  text-align: center;
+}
+
+.logo {
+  position: absolute;
+  top: 1rem; /* Distance from the top */
+  width: 200px;
+  margin-bottom: 20px; /* Space below the logo */
+}
+
+</style>
+
 <style>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
-  background: #14213D;
+  background: #0d1821;
 }
 
 .separator {
@@ -243,14 +270,6 @@ body {
   justify-content: center;
   margin-top: 20px;
 }
-</style>
-
-<style scoped>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
 
 .error-message {
   color: red;
@@ -272,11 +291,6 @@ body {
   cursor: pointer;
   width: 20px;
   height: 20px;
-}
-
-.logo {
-  width: 200px;
-  margin-bottom: 20px; /* Space below the logo */
 }
 
 .hidden {
@@ -499,7 +513,7 @@ body {
 }
 
 .input-block {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .input-block label {
@@ -515,7 +529,7 @@ body {
   padding-left: 15px;
   font-size: 16px;
   line-height: 40px;
-  color: #14213D;
+  color: #0d1821;
   background: #eef9fe;
   border: 1px solid #cddbef;
   border-radius: 2px;
@@ -542,7 +556,7 @@ body {
 .reset-password-link {
   display: block;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 15px;
   color: #007bff;
   text-decoration: none;
   font-size: 14px;
@@ -552,17 +566,16 @@ body {
   text-decoration: underline;
 }
 
-
 .btn-login {
   color: #fbfdff;
-  background: #e96a70;
+  background: #E63946;
   transform: translateX(-30%);
 }
 
 .btn-signup {
-  color: #e96a70;
+  color: #E63946;
   background: #fbfdff;
-  box-shadow: inset 0 0 0 2px #e96a70;
+  box-shadow: inset 0 0 0 2px #E63946;
   transform: translateX(30%);
 }
 </style>
