@@ -126,7 +126,7 @@ const handleLogin = () => {
 
           <!-- Google Login Button (Login) -->
           <div class="google-signup-container" :class="{ 'hidden': switchToSignup }">
-          <GoogleSSO buttonText="Login with Google" />
+            <GoogleSSO buttonText="Login with Google" />
           </div>
 
         </form>
@@ -193,7 +193,7 @@ const handleLogin = () => {
 
           <!-- Google Sign Up Button (Sign Up) -->
           <div class="google-signup-container" :class="{ 'hidden': !switchToSignup }">
-          <GoogleSSO buttonText="Sign Up with Google" />
+            <GoogleSSO buttonText="Sign Up with Google" />
           </div>
 
         </form>
@@ -204,26 +204,35 @@ const handleLogin = () => {
 
 <style scoped>
 .forms-section {
+  padding-bottom: 20px;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 5rem;
   text-align: center;
 }
 
 .logo {
   position: absolute;
-  top: 1rem; /* Distance from the top */
+  top: 0;
   width: 200px;
-  margin-bottom: 20px; /* Space below the logo */
+  margin-bottom: 10px;
 }
 
 </style>
 
 <style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 *,
 *::before,
 *::after {
@@ -233,7 +242,7 @@ const handleLogin = () => {
 body {
   margin: 0;
   font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
-  background: #0d1821;
+  background: #083d77;
 }
 
 .separator {
@@ -268,7 +277,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .error-message {
@@ -285,8 +294,8 @@ body {
 
 .toggle-password {
   position: absolute;
-  right: 10px; /* Position the icon inside the input */
-  top: 60%; /* Vertically center the icon */
+  right: 10px;
+  top: 60%;
   transform: translateY(-50%);
   cursor: pointer;
   width: 20px;
@@ -298,12 +307,16 @@ body {
 }
 
 .forms-section {
+  padding-top: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  box-sizing: border-box;
 }
-
 
 .forms {
   display: flex;
@@ -338,6 +351,7 @@ body {
 }
 
 .switcher {
+  margin-top: 10px;
   position: relative;
   cursor: pointer;
   display: block;
@@ -401,9 +415,9 @@ body {
 }
 
 .form {
+  margin-top: 85px;
   overflow: hidden;
   min-width: 260px;
-  margin-top: 50px;
   padding: 30px 25px;
   border-radius: 5px;
   transform-origin: top;
@@ -513,7 +527,7 @@ body {
 }
 
 .input-block {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .input-block label {
@@ -524,8 +538,7 @@ body {
 .input-block input {
   display: block;
   width: 100%;
-  margin-top: 8px;
-  padding-right: 15px;
+  padding-right: 8px;
   padding-left: 15px;
   font-size: 16px;
   line-height: 40px;
