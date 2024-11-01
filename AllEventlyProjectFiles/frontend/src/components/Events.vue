@@ -6,6 +6,14 @@ import logo from '@/assets/AllEventlyLogo.png';
 const activeTab = ref('attending');
 const searchQuery = ref('');
 const filterOption = ref('Upcoming Events');
+const isSidebarVisible = ref(window.innerWidth > 768);
+
+window.addEventListener('resize', () => {
+  isSidebarVisible.value = window.innerWidth > 768;
+});
+
+isSidebarVisible.value = window.innerWidth > 768;
+
 const events = ref([
   { id: 1, title: 'Event 1', date: '2024-10-19', time: '10:00 AM', location: 'Venue A', host: 'John' },
   { id: 2, title: 'Event 2', date: '2024-10-20', time: '11:00 AM', location: 'Venue B', host: 'Alice' },
@@ -36,12 +44,12 @@ const editInvitation = (_event: any) => {
     </header>
 
     <!-- Sidebar navigation panel -->
-    <aside class="sidebar">
+    <aside v-if="isSidebarVisible" class="sidebar">
       <!-- Place your navigation icons here -->
     </aside>
 
     <!-- Main content area -->
-    <main class="events-content">
+    <main class="events-content" >
       <div class="content-header">
         <h1 class="main-title">Events</h1>
         <div class="tabs">
@@ -72,6 +80,14 @@ const editInvitation = (_event: any) => {
 
 <style scoped>
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f3fa; /* Set the default background color */
+}
+
+
 .main-title {
   font-size: 5rem; /* Larger for H1 */
   font-weight: bold;
@@ -81,8 +97,10 @@ const editInvitation = (_event: any) => {
 
 .events-page {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  flex-direction: row;
+  min-height: 100vh; /* Ensures it extends to full viewport height */
+  width: 100%;
+  background-color: #f0f3fa; /* Set background to match content */
 }
 
 .top-panel {
@@ -114,6 +132,7 @@ const editInvitation = (_event: any) => {
 }
 
 .sidebar {
+  flex-shrink: 0;
   width: 15%;
   min-width: 200px;
   background-color: #0d1821;
@@ -121,22 +140,16 @@ const editInvitation = (_event: any) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
-  left: 0;
-  top: 60px;
-  height: calc(100vh - 60px);
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .events-content {
-  margin-left: 15%; /* Space for the sidebar */
-  margin-top: 60px; /* Space for the top panel */
+  margin-top: 90px; /* Space for the top panel */
   padding: 20px;
-  flex-grow: 1; /* Allows it to take up the remaining space */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align content to the left */
+  flex-grow: 1;
   background-color: #f0f3fa;
+  transition: margin-left 0.3s; /* Smooth transition for sidebar toggle */
+  min-height: calc(100vh - 90px); /* Smooth transition for sidebar toggle */
 }
 
 .event-listings {
@@ -190,5 +203,17 @@ const editInvitation = (_event: any) => {
     background-color: #14213D; /* Dark blue for background */
   }
 }
+
+@media (max-width: 768px) {
+  .events-content {
+    margin-left: 0;
+    min-width: 100%;
+  }
+
+  .sidebar {
+    display: none; /* Hide the sidebar when the screen is too small */
+  }
+}
+
 
 </style>
