@@ -1,10 +1,12 @@
 <script setup lang="ts">
 
-</script> 
+</script>
+
 <template> 
     <!-- This will display the page according to the route (Login, Events, etc.) -->     
     <router-view/> 
-</template> 
+</template>
+
 <style scoped>
 
 </style>

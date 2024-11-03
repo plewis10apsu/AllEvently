@@ -1,18 +1,29 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import EventCard from './EventCard.vue';
+import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const activeTab = ref('attending');
 const searchQuery = ref('');
 const filterOption = ref('Upcoming Events');
-const isSidebarVisible = ref(window.innerWidth > 768);
+const isSidebarVisible = ref(true);
 
 window.addEventListener('resize', () => {
-  isSidebarVisible.value = window.innerWidth > 768;
+  // Only close the sidebar if the screen is resized to a small width and it is currently visible
+  if (window.innerWidth <= 768 && isSidebarVisible.value) {
+    isSidebarVisible.value = false;
+  }
+  // Do nothing when resizing to larger widths if the sidebar is closed by the user
 });
 
-isSidebarVisible.value = window.innerWidth > 768;
+const toggleSidebar = () => {
+  // Toggle the sidebar visibility regardless of screen size
+  isSidebarVisible.value = !isSidebarVisible.value;
+};
+
 
 const events = ref([
   { id: 1, title: 'Event 1', date: '2024-10-19', time: '10:00 AM', location: 'Venue A', host: 'John' },
@@ -36,20 +47,22 @@ const editInvitation = (_event: any) => {
 
 <template>
   <div class="events-page">
-    <!-- Top panel with logo -->
+    <!-- Top panel with toggle button and logo -->
     <header class="top-panel">
+      <button class="toggle-sidebar" @click="toggleSidebar">
+        <FontAwesomeIcon :icon="isSidebarVisible ? faTimes : faBars" />
+      </button>
       <div class="logo">
         <img :src="logo" alt="AllEvently Logo" class="logo-img" />
       </div>
     </header>
 
     <!-- Sidebar navigation panel -->
-    <aside v-if="isSidebarVisible" class="sidebar">
-      <!-- Place your navigation icons here -->
-    </aside>
+    <Sidebar :isVisible="isSidebarVisible" />
+
 
     <!-- Main content area -->
-    <main class="events-content" >
+    <main class="events-content" :style="{ marginLeft: isSidebarVisible ? '0' : '-200px' }">
       <div class="content-header">
         <h1 class="main-title">Events</h1>
         <div class="tabs">
@@ -67,11 +80,11 @@ const editInvitation = (_event: any) => {
 
       <section class="event-listings">
         <EventCard
-            v-for="event in filteredEvents"
-            :key="event.id"
-            :event="event"
-            @viewInvitation="viewInvitation(event)"
-            @editInvitation="editInvitation(event)"
+          v-for="event in filteredEvents"
+          :key="event.id"
+          :event="event"
+          @viewInvitation="viewInvitation(event)"
+          @editInvitation="editInvitation(event)"
         />
       </section>
     </main>
@@ -80,31 +93,24 @@ const editInvitation = (_event: any) => {
 
 <style scoped>
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #f0f3fa; /* Set the default background color */
-}
-
-
 .main-title {
-  font-size: 5rem; /* Larger for H1 */
+  font-size: 5rem;
   font-weight: bold;
   color: #0D1821;
-  margin-bottom: 20px; /* Space below title */
+  margin-bottom: 20px;
 }
 
 .events-page {
   display: flex;
   flex-direction: row;
-  min-height: 100vh; /* Ensures it extends to full viewport height */
   width: 100%;
-  background-color: #f0f3fa; /* Set background to match content */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .top-panel {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -112,51 +118,51 @@ html, body {
   background-color: #f0f3fa;
   color: white;
   display: flex;
-  align-items: center; /* Center vertically */
-  justify-content: flex-start; /* Align content to the left */
+  align-items: center;
+  justify-content: flex-start;
   padding: 0 20px;
   z-index: 10;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.toggle-sidebar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #0D1821;
+  margin-left: 0;
+}
+
 .logo {
   display: flex;
+  justify-content: center;
   align-items: center;
+  width: 100%;
+  margin: 20px 0;
 }
 
 .logo-img {
-  height: 90px;
+  height: 120px;
   width: auto;
-  margin-right: 0;
-  margin-top: 0; /* Ensure no top margin */
-}
-
-.sidebar {
-  flex-shrink: 0;
-  width: 15%;
-  min-width: 200px;
-  background-color: #0d1821;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  margin-top: -20px;
 }
 
 .events-content {
-  margin-top: 90px; /* Space for the top panel */
+  margin-left: 0;
+  margin-top: 60px;
   padding: 20px;
   flex-grow: 1;
   background-color: #f0f3fa;
-  transition: margin-left 0.3s; /* Smooth transition for sidebar toggle */
-  min-height: calc(100vh - 90px); /* Smooth transition for sidebar toggle */
+  transition: margin-left 0.3s, width 0.3s;
+  min-height: calc(100vh - 90px);
 }
 
 .event-listings {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  width: 100%; /* Make listings take full width */
+  width: 100%;
 }
 
 .tabs {
@@ -166,54 +172,43 @@ html, body {
 }
 
 .tabs button {
-  padding: 15px 30px; /* Increase padding for a larger button */
-  font-size: 1.2rem; /* Increase font size */
+  padding: 15px 30px; /* Height(px), Width(px) */
+  font-size: 1.2rem;
   font-weight: bold;
-  background-color: #1A659E;
+  background-color: #FF6B35;
   color: white;
   border: none;
   cursor: pointer;
-  border-radius: 5px; /* Optional: Rounded corners for a modern look */
+  border-radius: 5px;
 }
 
 .tabs button.active {
-  background-color: #0D1821;
+  background-color: #E63946;
   color: white;
-  font-size: 1.2rem; /* Ensure font size is consistent when active */
+  font-size: 1.2rem;
+  box-shadow: 0 0 10px 1px rgba(230, 57, 70, 0.6);
 }
 
 .filters input[type="text"],
 .filters select {
-  font-size: 1.1rem; /* Increase font size for readability */
-  padding: 10px 15px; /* Increase padding for a larger input field */
+  font-size: 1.1rem;
+  padding: 10px 15px; /* {Search Bar} Height(px), Width(px) */
   border-radius: 4px;
   border: 1px solid #ccc;
 }
 
 .filters {
   display: flex;
-  gap: 20px; /* Increase space between filter components */
+  gap: 20px;
   align-items: center;
   margin-bottom: 20px;
 }
 
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #14213D; /* Dark blue for background */
-  }
-}
-
 @media (max-width: 768px) {
   .events-content {
+    width: 100%;
     margin-left: 0;
-    min-width: 100%;
-  }
-
-  .sidebar {
-    display: none; /* Hide the sidebar when the screen is too small */
   }
 }
-
 
 </style>

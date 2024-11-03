@@ -74,154 +74,134 @@ const handleLogin = () => {
 </script>
 
 <template>
-  <section class="forms-section">
-    <img :src="logo" alt="AllEvently Logo" class="logo">
-    <div class="forms">
-      <div :class="['form-wrapper', { 'is-active': !switchToSignup }]">
-        <button @click="toggleForm('login')" type="button" class="switcher switcher-login">
-          Login<span class="underline"></span>
-        </button>
+  <section class="login-page">
+    <section class="forms-section">
+      <img :src="logo" alt="AllEvently Logo" class="logo">
+      <div class="forms">
+        <div :class="['form-wrapper', { 'is-active': !switchToSignup }]">
+          <button @click="toggleForm('login')" type="button" class="switcher switcher-login">
+            Login<span class="underline"></span>
+          </button>
 
-        <form class="form form-login">
-          <fieldset>
-            <legend>Please, enter your email and password for login.</legend>
+          <form class="form form-login">
+            <fieldset>
+              <legend>Please, enter your email and password for login.</legend>
 
-            <!-- Email Field (Login) -->
-            <div class="input-block">
-              <label for="login-email">E-mail</label>
-              <input id="login-email" v-model="email" type="email">
-              <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
-            </div>
-
-
-            <!-- Password Field (Login) -->
-            <div class="input-block">
-              <label for="password">Password</label>
-              <div class="password-input-wrapper">
-                <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password"
-                />
-                <!-- Icon for toggling password visibility (Login) -->
-                <img
-                    :src="currentIcon"
-                    alt="Toggle Password Visibility"
-                    class="toggle-password"
-                    @click="togglePasswordVisibility"
-                />
+              <!-- Email Field (Login) -->
+              <div class="input-block">
+                <label for="login-email">E-mail</label>
+                <input id="login-email" v-model="email" type="email">
+                <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
               </div>
-              <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
-            </div>
 
 
-
-          </fieldset>
-          <button @click="handleLogin" type="submit" class="btn-login">Login</button>
-
-          <!-- Reset Password Link (Login) -->
-          <a href="/reset-password" class="reset-password-link">Reset Password</a>
-
-          <!-- Separator -->
-          <div class="separator" :class="{ 'hidden': switchToSignup }">
-            <span>OR</span>
-          </div>
-
-          <!-- Google Login Button (Login) -->
-          <div class="google-signup-container" :class="{ 'hidden': switchToSignup }">
-            <GoogleSSO buttonText="Login with Google" />
-          </div>
-
-        </form>
-      </div>
-
-      <div :class="['form-wrapper', { 'is-active': switchToSignup }]">
-        <button @click="toggleForm('signup')" type="button" class="switcher switcher-signup">
-          Sign Up<span class="underline"></span>
-        </button>
-
-        <form @submit.prevent="handleSignup" class="form form-signup" novalidate>
-          <fieldset>
-            <legend>Please, enter your details for sign up.</legend>
-
-            <!-- First Name Field (Sign Up) -->
-            <div class="input-block">
-              <label for="signup-first-name">First Name</label>
-              <input id="signup-first-name" v-model="firstName" type="text">
-              <span v-if="errorMessageFirstName" class="error-message">{{ errorMessageFirstName }}</span>
-            </div>
-
-            <!-- Last Name Field (Sign Up) -->
-            <div class="input-block">
-              <label for="signup-last-name">Last Name</label>
-              <input id="signup-last-name" v-model="lastName" type="text">
-              <span v-if="errorMessageLastName" class="error-message">{{ errorMessageLastName }}</span>
-            </div>
-
-            <!-- Email Field (Sign Up) -->
-            <div class="input-block">
-              <label for="signup-email">Email</label>
-              <input id="signup-email" v-model="email" type="email">
-              <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
-            </div>
-
-
-            <!-- Password Field (Sign Up) -->
-            <div class="input-block">
-              <label for="signup-password">Password</label>
-              <div class="password-input-wrapper">
-                <input id="signup-password" :type="showPassword ? 'text' : 'password'" v-model="password"
-                />
-
-                <!-- Eye icon for toggling visibility (Sign Up) -->
-                <img
-                    :src="currentIcon"
-                    alt="Toggle Password Visibility"
-                    class="toggle-password"
-                    @click="togglePasswordVisibility"
-                />
+              <!-- Password Field (Login) -->
+              <div class="input-block">
+                <label for="password">Password</label>
+                <div class="password-input-wrapper">
+                  <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password"
+                  />
+                  <!-- Icon for toggling password visibility (Login) -->
+                  <img
+                      :src="currentIcon"
+                      alt="Toggle Password Visibility"
+                      class="toggle-password"
+                      @click="togglePasswordVisibility"
+                  />
+                </div>
+                <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
               </div>
-              <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
+
+
+            </fieldset>
+            <button @click="handleLogin" type="submit" class="btn-login">Login</button>
+
+            <!-- Reset Password Link (Login) -->
+            <a href="/reset-password" class="reset-password-link">Reset Password</a>
+
+            <!-- Separator -->
+            <div class="separator" :class="{ 'hidden': switchToSignup }">
+              <span>OR</span>
             </div>
 
+            <!-- Google Login Button (Login) -->
+            <div class="google-signup-container" :class="{ 'hidden': switchToSignup }">
+              <GoogleSSO buttonText="Login with Google"/>
+            </div>
 
-          </fieldset>
+          </form>
+        </div>
 
-          <button type="submit" class="btn-signup">Sign Up</button>
+        <div :class="['form-wrapper', { 'is-active': switchToSignup }]">
+          <button @click="toggleForm('signup')" type="button" class="switcher switcher-signup">
+            Sign Up<span class="underline"></span>
+          </button>
 
-          <!-- Separator (Sign Up) -->
-          <div class="separator" :class="{ 'hidden': !switchToSignup }">
-            <span>OR</span>
-          </div>
+          <form @submit.prevent="handleSignup" class="form form-signup" novalidate>
+            <fieldset>
+              <legend>Please, enter your details for sign up.</legend>
 
-          <!-- Google Sign Up Button (Sign Up) -->
-          <div class="google-signup-container" :class="{ 'hidden': !switchToSignup }">
-            <GoogleSSO buttonText="Sign Up with Google" />
-          </div>
+              <!-- First Name Field (Sign Up) -->
+              <div class="input-block">
+                <label for="signup-first-name">First Name</label>
+                <input id="signup-first-name" v-model="firstName" type="text">
+                <span v-if="errorMessageFirstName" class="error-message">{{ errorMessageFirstName }}</span>
+              </div>
 
-        </form>
+              <!-- Last Name Field (Sign Up) -->
+              <div class="input-block">
+                <label for="signup-last-name">Last Name</label>
+                <input id="signup-last-name" v-model="lastName" type="text">
+                <span v-if="errorMessageLastName" class="error-message">{{ errorMessageLastName }}</span>
+              </div>
+
+              <!-- Email Field (Sign Up) -->
+              <div class="input-block">
+                <label for="signup-email">Email</label>
+                <input id="signup-email" v-model="email" type="email">
+                <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
+              </div>
+
+
+              <!-- Password Field (Sign Up) -->
+              <div class="input-block">
+                <label for="signup-password">Password</label>
+                <div class="password-input-wrapper">
+                  <input id="signup-password" :type="showPassword ? 'text' : 'password'" v-model="password"
+                  />
+
+                  <!-- Eye icon for toggling visibility (Sign Up) -->
+                  <img
+                      :src="currentIcon"
+                      alt="Toggle Password Visibility"
+                      class="toggle-password"
+                      @click="togglePasswordVisibility"
+                  />
+                </div>
+                <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
+              </div>
+
+
+            </fieldset>
+
+            <button type="submit" class="btn-signup">Sign Up</button>
+
+            <!-- Separator (Sign Up) -->
+            <div class="separator" :class="{ 'hidden': !switchToSignup }">
+              <span>OR</span>
+            </div>
+
+            <!-- Google Sign Up Button (Sign Up) -->
+            <div class="google-signup-container" :class="{ 'hidden': !switchToSignup }">
+              <GoogleSSO buttonText="Sign Up with Google"/>
+            </div>
+
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   </section>
 </template>
-
-<style scoped>
-.forms-section {
-  padding-bottom: 20px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  text-align: center;
-}
-
-.logo {
-  position: absolute;
-  top: 0;
-  width: 200px;
-  margin-bottom: 10px;
-}
-
-</style>
 
 <style>
 html, body {
@@ -230,19 +210,37 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
+</style>
 
+<style scoped>
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
+.login-page {
+  position: relative;
   font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
-  background: #083d77;
+  background-color: #1A659E;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+.logo {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: top 0.3s ease;
+  width: 200px;
+  margin-bottom: 10px;
 }
 
 .separator {
@@ -307,14 +305,12 @@ body {
 }
 
 .forms-section {
-  padding-top: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 100vw;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
