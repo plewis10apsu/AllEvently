@@ -26,9 +26,13 @@ const toggleSidebar = () => {
 
 
 const events = ref([
-  { id: 1, title: 'Event 1', date: '2024-10-19', time: '10:00 AM', location: 'Venue A', host: 'John' },
-  { id: 2, title: 'Event 2', date: '2024-10-20', time: '11:00 AM', location: 'Venue B', host: 'Alice' },
-  { id: 3, title: 'Event 3', date: '2024-10-21', time: '12:00 PM', location: 'Venue C', host: 'Bob' }
+  { id: 1, title: 'Lisa\'s Baby Shower', type: 'public', venue: 'Wilma Rudolph Event Center',
+    date: 'Sep 28, 2024', time: '3:00 PM CDT',  host: 'John', imageUrl: 'https://img.freepik.com/premium-photo/chameleon-with-red-spot-its-head_924629-217761.jpg', venueLink: 'www.google.com',
+  venueAddress: '8 Champion\'s Wy, Clarksville, TN 37040' },
+  { id: 2, title: 'Jonie\'s Birthday', type: 'public', venue: 'Smith-Trahern Mansion',
+    date: 'Oct 5, 2024', time: '6:00 PM CDT',  host: 'Alice' },
+  { id: 3, title: 'Carson\'s Bounce Party', type: 'public', venue: 'Sky Zone',
+    date: '2024-10-21', time: '12:00 PM',  host: 'Bob' }
 ]);
 
 const filteredEvents = computed(() => {
@@ -43,54 +47,41 @@ const viewInvitation = (_event: any) => {
 const editInvitation = (_event: any) => {
   // Handle editing an invitation
 };
-</script>
-
-<template>
-  <div class="events-page">
-    <!-- Top panel with toggle button and logo -->
-    <header class="top-panel">
-      <button class="toggle-sidebar" @click="toggleSidebar">
-        <FontAwesomeIcon :icon="isSidebarVisible ? faTimes : faBars" />
-      </button>
-      <div class="logo">
-        <img :src="logo" alt="AllEvently Logo" class="logo-img" />
-      </div>
-    </header>
-
-    <!-- Sidebar navigation panel -->
-    <Sidebar :isVisible="isSidebarVisible" />
-
-
-    <!-- Main content area -->
-    <main class="events-content" :style="{ marginLeft: isSidebarVisible ? '0' : '-200px' }">
-      <div class="content-header">
-        <h1 class="main-title">Events</h1>
-        <div class="tabs">
-          <button :class="{ active: activeTab === 'attending' }" @click="activeTab = 'attending'">Attending</button>
-          <button :class="{ active: activeTab === 'hosting' }" @click="activeTab = 'hosting'">Hosting</button>
-        </div>
-
-        <div class="filters">
-          <input type="text" placeholder="Search Events..." v-model="searchQuery" />
-          <select v-model="filterOption">
-            <option>Upcoming Events</option>
-          </select>
-        </div>
-      </div>
-
-      <section class="event-listings">
-        <EventCard
-          v-for="event in filteredEvents"
-          :key="event.id"
-          :event="event"
-          @viewInvitation="viewInvitation(event)"
-          @editInvitation="editInvitation(event)"
-        />
-      </section>
-    </main>
-  </div>
-</template>
-
+</script> 
+<template> 
+    <div class="events-page"> 
+        <!-- Top panel with toggle button and logo -->         
+        <header class="top-panel"> 
+            <button class="toggle-sidebar" @click="toggleSidebar"> 
+                <FontAwesomeIcon :icon="isSidebarVisible ? faTimes : faBars"/> 
+            </button>             
+            <div class="logo"> 
+                <img :src="logo" alt="AllEvently Logo" class="logo-img"/> 
+            </div>             
+        </header>         
+        <!-- Sidebar navigation panel -->         
+        <Sidebar :isVisible="isSidebarVisible"/> 
+        <!-- Main content area -->         
+        <main class="events-content" :style="{ marginLeft: isSidebarVisible ? '0' : '-200px' }"> 
+            <div class="content-header"> 
+                <h1 class="main-title">Events</h1> 
+                <div class="tabs">                      
+                    <button :class="{ active: activeTab === 'attending' }" @click="activeTab = 'attending'">Attending</button>
+                    <button :class="{ active: activeTab === 'hosting' }" @click="activeTab = 'hosting'">Hosting</button>                     
+                </div>                 
+                <div class="filters"> 
+                    <input type="text" placeholder="Search Events..." v-model="searchQuery"/> 
+                    <select v-model="filterOption"> 
+                        <option>Upcoming Events</option>                         
+                    </select>                     
+                </div>                 
+            </div>             
+            <section class="event-listings"> 
+                <EventCard v-for="event in filteredEvents" :key="event.id" :event="event" @viewInvitation="viewInvitation(event)" @editInvitation="editInvitation(event)"/> 
+            </section>             
+        </main>         
+    </div>     
+</template> 
 <style scoped>
 
 .main-title {
