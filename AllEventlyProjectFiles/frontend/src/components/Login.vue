@@ -71,6 +71,10 @@ const handleLogin = () => {
   router.push('/events');   // Redirect to the Events page
 };
 
+const handleResetPasswordLink = () => {
+  router.push('/password-reset'); // Redirect to the Password Reset page
+};
+
 </script>
 
 <template>
@@ -117,7 +121,7 @@ const handleLogin = () => {
             <button @click="handleLogin" type="submit" class="btn-login">Login</button>
 
             <!-- Reset Password Link (Login) -->
-            <a href="/reset-password" class="reset-password-link">Reset Password</a>
+            <a href="/reset-password" @click="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
 
             <!-- Separator -->
             <div class="separator" :class="{ 'hidden': switchToSignup }">

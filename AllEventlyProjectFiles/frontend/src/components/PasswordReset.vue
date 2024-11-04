@@ -24,8 +24,8 @@ const handleResetPassword = () => {
 };
 
 const handleOkButtonClick = () => {
-  showSuccessDialog.value = false; // Close the dialog
-  router.push({ name: 'PasswordUpdate' }); // Use the route name for navigation
+  showSuccessDialog.value = false; //
+  router.push({ name: 'UpdatePassword' });
 };
 
 </script>
