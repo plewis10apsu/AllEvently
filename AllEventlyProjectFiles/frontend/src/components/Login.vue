@@ -121,7 +121,7 @@ const handleResetPasswordLink = () => {
             <button @click="handleLogin" type="submit" class="btn-login">Login</button>
 
             <!-- Reset Password Link (Login) -->
-            <a href="/reset-password" @click="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
+            <a @click.prevent="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
 
             <!-- Separator -->
             <div class="separator" :class="{ 'hidden': switchToSignup }">
