@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import EventCard from './EventCard.vue';
+import TopPanel from "@/components/TopPanel.vue";
 import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
+import SearchBar from "@/components/SearchBar.vue";
+import EventCard from './EventCard.vue';
 import { Event } from '@/types/EventInterface';
 
 const activeTab = ref('attending');
-const searchQuery = ref('');
 const filterOption = ref('Upcoming Events');
 const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200); // Default width
@@ -77,26 +78,19 @@ const editInvitation = (_event: any) => {
 };
 </script> 
 <template> 
-    <div class="events-page"> 
-        <!-- Top panel with toggle button and logo -->         
-        <header class="top-panel"> 
-
-            <div class="logo"> 
-                <img :src="logo" alt="AllEvently Logo" class="logo-img"/> 
-            </div>             
-        </header>         
-        <!-- Sidebar navigation panel -->
+    <div class="page-layout events-page">
+      <TopPanel :logo="logo" />
         <Sidebar :isVisible="isSidebarVisible"/> 
         <!-- Main content area -->         
-        <main class="events-content">
+        <main class="content-area events-content">
             <div class="content-header"> 
-                <h1 class="main-title">Events</h1> 
+              <h1 class="main-title">Events</h1>
                 <div class="tabs">                      
                     <button :class="{ active: activeTab === 'attending' }" @click="activeTab = 'attending'">Attending</button>
                     <button :class="{ active: activeTab === 'hosting' }" @click="activeTab = 'hosting'">Hosting</button>                     
                 </div>                 
-                <div class="filters"> 
-                    <input type="text" placeholder="Search Events..." v-model="searchQuery"/> 
+                <div class="filters">
+                  <SearchBar />
                     <select v-model="filterOption"> 
                         <option>Upcoming Events</option>                         
                     </select>                     
@@ -114,65 +108,7 @@ const editInvitation = (_event: any) => {
     </div>     
 </template> 
 <style scoped>
-
-.main-title {
-  font-size: 5rem;
-  font-weight: bold;
-  color: #0D1821;
-  margin-bottom: 20px;
-}
-
-.events-page {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  height: 100vh; /* Full viewport height */
-  overflow: hidden;
-}
-
-.top-panel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 90px;
-  background-color: #f0f3fa;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0 20px;
-  z-index: 10;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin: 20px 0;
-}
-
-.logo-img {
-  height: 120px;
-  width: auto;
-  margin-top: -20px;
-}
-
-.events-content {
-  margin-left: 0;
-  margin-top: 60px;
-  padding: 20px;
-  flex-grow: 1;
-  background-color: #f0f3fa;
-  min-height: calc(100vh - 90px);
-  overflow-y: auto;
-  transition: margin-left 0.3s;
-}
+@import '@/styles/common.css';
 
 .event-listings {
   display: flex;

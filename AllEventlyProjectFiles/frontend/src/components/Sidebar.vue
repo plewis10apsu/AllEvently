@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, PropType } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import router from "@/router";
 
 type NavItem = {
   label: string;
@@ -16,17 +17,16 @@ defineProps({
   navItems: {
     type: Array as PropType<NavItem[]>,
     default: () => [
-      { label: 'Account', path: '/profile', icon: ['fas', 'user'] },
-      { label: 'Public Events', path: '/dashboard', icon: ['fas', 'users'] },
+      { label: 'Account', path: '/account', icon: ['fas', 'user'] },
+      { label: 'Public Events', path: '/public', icon: ['fas', 'users'] },
       { label: 'Events', path: '/events', icon: ['fas', 'calendar-alt'] },
-      { label: 'Logout', path: '/login', icon: ['fas', 'right-from-bracket'] },
+      { label: 'Logout', path: '/', icon: ['fas', 'right-from-bracket'] },
     ],
   },
 });
 
 const navigateTo = (path: string) => {
-  // Logic for navigation, e.g., using Vue Router
-  window.location.href = path;
+  router.push(path);
 };
 </script>
 
