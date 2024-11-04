@@ -239,7 +239,7 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   transition: top 0.3s ease;
-  width: 200px;
+  width: 250px;
   margin-bottom: 10px;
 }
 

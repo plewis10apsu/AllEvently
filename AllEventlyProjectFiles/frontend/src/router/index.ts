@@ -3,12 +3,24 @@ import Login from '../components/Login.vue';
 import Events from '../components/Events.vue';
 import Account from "@/components/Account.vue";
 import Public from "@/components/Public.vue";
+import PasswordReset from "@/components/PasswordReset.vue";
+import PasswordUpdate from "@/components/UpdatePassword.vue";
 
 const routes = [
     {
         path: '/',
         name: 'Login',
         component: Login
+    },
+    {
+        path: '/reset-password',
+        name: 'PasswordReset',
+        component: PasswordReset,
+    },
+    {
+        path: '/update-password',
+        name: 'PasswordUpdate',
+        component: PasswordUpdate,
     },
     {
         path: '/events',
