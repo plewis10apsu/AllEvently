@@ -87,4 +87,26 @@ const navigateTo = (path: string) => {
 .nav-label {
   flex-grow: 1;
 }
+
+/* Adjustments for small screens */
+@media (max-width: 809px) {
+  .events-content {
+    transition: margin-left 0.3s ease;
+  }
+  .sidebar{
+    min-width: 80px;
+    max-width: 80px;
+  }
+  .nav-label {
+    display: none;
+  }
+
+  .nav-icon {
+    font-size: 1.8rem; /* Optionally, make the icon slightly larger */
+  }
+
+  .nav-button {
+    justify-content: center; /* Center the icon in the button */
+  }
+}
 </style>
