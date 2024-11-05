@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 
 defineProps<{
   event?: Record<string, any>;
   isHost?: boolean;
   isGuest?: boolean;
 }>();
+
+const router = useRouter();
+
+function navigateToChat(eventId: string) {
+  router.push({ name: 'Chat', params: { eventId } });
+}
 
 </script>
 <template> 
@@ -35,7 +42,8 @@ defineProps<{
           <button v-if="event.isHost" @click="$emit('editInvitation')">Edit Invitation</button>
           <button v-if="event.isHost" @click="$emit('guestList')">Guest List</button>
           <button v-if="event.isHost" @click="$emit('print')">Print</button>
-          <button v-if="event.isGuest || event.isHost" @click="$emit('eventChat')">Event Chat</button></div>
+          <button v-if="event.isGuest || event.isHost" @click="navigateToChat(event.id)">Event Chat</button>
+        </div>
     </div>     
 </template>
 <style scoped>

@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../components/Login.vue';
-import Events from '../components/Events.vue';
-import Account from "@/components/Account.vue";
-import Public from "@/components/Public.vue";
 import PasswordReset from "@/components/PasswordReset.vue";
 import UpdatePassword from "@/components/UpdatePassword.vue";
+import Events from '../components/Events.vue';
+import Chat from "@/components/Chat.vue";
+import Account from "@/components/Account.vue";
+import Public from "@/components/Public.vue";
 
 const routes = [
     {
@@ -26,6 +27,12 @@ const routes = [
         path: '/events',
         name: 'Events',
         component: Events
+    },
+    {
+        path: '/chat/:eventId',
+        name: 'Chat',
+        component: Chat,
+        props: true, // Allows route params to be passed as props
     },
     {
         path: '/account',
