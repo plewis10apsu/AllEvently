@@ -1,4 +1,14 @@
-<script>
+<script lang="ts">
+interface Guest {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  inviteSent: boolean;
+  status: string;
+  inviteDate: string;
+}
+
 export default {
   data() {
     return {
@@ -10,9 +20,9 @@ export default {
       guests: [
         { id: 1, firstName: 'John', lastName: 'Smith', email: 'johnsmith@gmail.com', inviteSent: true, status: 'Attending', inviteDate: '09/15/2024' },
         { id: 2, firstName: 'Ashley', lastName: 'Williams', email: 'ashley@example.com', inviteSent: false, status: 'Waiting', inviteDate: '' }
-      ],
+      ] as Guest[],
       searchTerm: '',
-      selectedGuest: null,
+      selectedGuest: null as Guest | null,
       counts: {
         attending: 1,
         waiting: 1,
@@ -21,7 +31,7 @@ export default {
     };
   },
   computed: {
-    filteredGuests() {
+    filteredGuests(): Guest[] {
       return this.guests.filter(guest =>
           `${guest.firstName} ${guest.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
@@ -38,11 +48,11 @@ export default {
           inviteDate: ''
         });
         this.updateCounts();
-        this.newGuest = {firstName: '', lastName: '', email: ''};
+        this.newGuest = { firstName: '', lastName: '', email: '' };
       }
     },
-    viewGuest(guestId) {
-      this.selectedGuest = this.guests.find(guest => guest.id === guestId);
+    viewGuest(guestId: number) {
+      this.selectedGuest = this.guests.find(guest => guest.id === guestId) || null;
     },
     sendEmailInvite() {
       if (this.selectedGuest) {
@@ -63,13 +73,17 @@ export default {
       }
     },
     saveGuest() {
-      // Logic to save guest information
-      console.log('Guest information saved:', this.selectedGuest);
+      if (this.selectedGuest) {
+        // Logic to save guest information
+        console.log('Guest information saved:', this.selectedGuest);
+      }
     },
     deleteGuest() {
-      this.guests = this.guests.filter(guest => guest.id !== this.selectedGuest.id);
-      this.updateCounts();
-      this.selectedGuest = null;
+      if (this.selectedGuest) {
+        this.guests = this.guests.filter(guest => guest.id !== this.selectedGuest!.id);
+        this.updateCounts();
+        this.selectedGuest = null;
+      }
     },
     updateCounts() {
       this.counts.attending = this.guests.filter(guest => guest.status === 'Attending').length;

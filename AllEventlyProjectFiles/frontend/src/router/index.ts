@@ -17,12 +17,12 @@ const routes = [
     {
         path: '/password-reset',
         name: 'PasswordReset',
-        component: PasswordReset,
+        component: PasswordReset
     },
     {
         path: '/update-password',
         name: 'UpdatePassword',
-        component: UpdatePassword,
+        component: UpdatePassword
     },
     {
         path: '/events',
