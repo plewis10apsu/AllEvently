@@ -13,16 +13,20 @@ function navigateToChat(eventId: string) {
   router.push({ name: 'Chat', params: { eventId } });
 }
 
+function navigateToGuestList() {
+  router.push({ name: 'GuestList' });
+}
+
 </script>
-<template> 
-    <div class="event-card" v-if="event"> 
-        <div class="event-header"> 
-            <div class="event-title-section"> 
+<template>
+    <div class="event-card" v-if="event">
+        <div class="event-header">
+            <div class="event-title-section">
                 <h2 class="event-title">{{ event.title }}</h2>
               <span class="event-type">{{ event.type === 'public' ? '(Public event)' : '(Private event)' }}</span>
-            </div>             
+            </div>
             <div class="event-host">Hosted By: {{ event.host }}</div>
-        </div>         
+        </div>
         <div class="event-main-content">
           <div class="event-invitation-section">
           <img class="invitation-image" :src="event.imageUrl" alt="Event Invitation"/>
@@ -31,20 +35,20 @@ function navigateToChat(eventId: string) {
                 <div class="event-time">{{ event.time }}</div>
             </div>
             </div>
-            <!-- Add the venue container on the same row -->             
+            <!-- Add the venue container on the same row -->
             <div class="event-venue-container">
                 <div class="event-venue">{{ event.venue }}</div>
               <a :href="event.venueLink" target="_blank" class="event-venue-link">{{ event.venueAddress }}</a>
-            </div>             
-        </div>         
+            </div>
+        </div>
         <div class="event-actions">
           <button v-if="event.isGuest" @click="$emit('viewInvitation')">View Invitation</button>
           <button v-if="event.isHost" @click="$emit('editInvitation')">Edit Invitation</button>
-          <button v-if="event.isHost" @click="$emit('guestList')">Guest List</button>
+          <button v-if="event.isHost" @click="navigateToGuestList">Guest List</button>
           <button v-if="event.isHost" @click="$emit('print')">Print</button>
           <button v-if="event.isGuest || event.isHost" @click="navigateToChat(event.id)">Event Chat</button>
         </div>
-    </div>     
+    </div>
 </template>
 <style scoped>
 * {
