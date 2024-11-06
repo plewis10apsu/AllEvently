@@ -5,7 +5,7 @@
 1. [Proposal Document (Editable)](Documents/ProposalLink.md)
 2. [Requirements Document and Slides (Editable)](Documents/RequirementsLink.md)
 3. [Design Document and Slides (Editable)](Documents/DesignLink.md)
-4. [Progress Update (Editable)](Documents/UpdateLink.md) 
+4. [Progress Update and Slides (Editable)](Documents/UpdateLink.md) 
 
 ### PDF/PNG
 5. [Proposal Document PDF](./Documents/Proposal%20Document%20(AllEvently).pdf)
