@@ -1,27 +1,17 @@
 import express from 'express';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
-import cors from 'cors';
 
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
-//const PORT = process.env.PORT || 3000;
 
-// Enable CORS for all routes
-app.use(cors());
-
-// Parse JSON request body
-app.use(express.json());
-
-// Create a PostgreSQL connection pool using environment variables
 const pool = new Pool({
-    user: process.env.POSTGRES_USER,
-    host: process.env.POSTGRES_HOST,
-    database: process.env.POSTGRES_DB,
-    password: process.env.POSTGRES_PASSWORD,
-    port: Number(process.env.POSTGRES_PORT),
+    connectionString: process.env.POSTGRES_URL,
+    ssl: {
+        rejectUnauthorized: false, // Necessary for cloud-hosted databases if SSL is enabled
+    },
 });
 
 // Sample route to test database connection
