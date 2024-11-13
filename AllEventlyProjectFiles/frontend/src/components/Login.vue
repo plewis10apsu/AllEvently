@@ -80,8 +80,9 @@ const handleResetPasswordLink = () => {
 <template>
   <section class="login-page">
     <section class="forms-section">
-      <img :src="logo" alt="AllEvently Logo" class="logo">
+
       <div class="forms">
+        <img :src="logo" alt="AllEvently Logo" class="logo">
         <div :class="['form-wrapper', { 'is-active': !switchToSignup }]">
           <button @click="toggleForm('login')" type="button" class="switcher switcher-login">
             Login<span class="underline"></span>
@@ -226,7 +227,7 @@ html, body {
 }
 
 .login-page {
-  position: relative;
+  margin: 0;
   font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
   background-color: #1A659E;
   width: 100%;
@@ -239,7 +240,7 @@ html, body {
 
 .logo {
   position: absolute;
-  top: 10px;
+  top: 0px;
   left: 50%;
   transform: translateX(-50%);
   transition: top 0.3s ease;
@@ -251,7 +252,7 @@ html, body {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 20px 0;
+  margin: 10px 10px;
 }
 
 .separator::before,
@@ -313,15 +314,12 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
 }
 
 .forms {
+  margin-top: 175px;
   display: flex;
   align-items: flex-start;
-  margin-top: 30px;
 }
 
 .form-wrapper {
@@ -351,7 +349,6 @@ html, body {
 }
 
 .switcher {
-  margin-top: 10px;
   position: relative;
   cursor: pointer;
   display: block;
@@ -415,15 +412,17 @@ html, body {
 }
 
 .form {
-  margin-top: 85px;
   overflow: hidden;
   min-width: 260px;
+  margin-top: 50px;
   padding: 30px 25px;
   border-radius: 5px;
   transform-origin: top;
 }
 
 .form-login {
+  padding: 15px;
+  text-align: center;
   animation: hideLogin .3s ease-out forwards;
 }
 
@@ -460,6 +459,8 @@ html, body {
 }
 
 .form-signup {
+  padding: 15px;
+  text-align: center;
   animation: hideSignup .3s ease-out forwards;
 }
 
@@ -538,7 +539,8 @@ html, body {
 .input-block input {
   display: block;
   width: 100%;
-  padding-right: 8px;
+  margin-top: 8px;
+  padding-right: 15px;
   padding-left: 15px;
   font-size: 16px;
   line-height: 40px;
@@ -580,15 +582,19 @@ html, body {
 }
 
 .btn-login {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   color: #fbfdff;
-  background: #E63946;
+  background: #db5650;
   transform: translateX(-30%);
 }
 
 .btn-signup {
-  color: #E63946;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  color: #db5650;
   background: #fbfdff;
-  box-shadow: inset 0 0 0 2px #E63946;
+  box-shadow: inset 0 0 0 2px #db5650;
   transform: translateX(30%);
 }
 </style>

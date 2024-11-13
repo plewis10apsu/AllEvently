@@ -7,6 +7,7 @@ import Chat from "@/components/Chat.vue";
 import Account from "@/components/Account.vue";
 import Public from "@/components/Public.vue";
 import GuestList from "@/components/GuestList.vue";
+import EventCreation from "@/components/EventCreation.vue";
 
 const routes = [
     {
@@ -28,6 +29,11 @@ const routes = [
         path: '/events',
         name: 'Events',
         component: Events
+    },
+    {
+        path: '/event-creation',
+        name: 'EventCreation',
+        component: EventCreation
     },
     {
         path: '/guest-list',

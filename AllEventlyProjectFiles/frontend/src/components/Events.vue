@@ -76,7 +76,8 @@ const viewInvitation = (_event: any) => {
 const editInvitation = (_event: any) => {
   // Handle editing an invitation
 };
-</script> 
+</script>
+
 <template> 
     <div class="page-layout events-page">
       <TopPanel :logo="logo" />

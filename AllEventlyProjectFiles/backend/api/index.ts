@@ -7,7 +7,7 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+//const PORT = process.env.PORT || 3000;
 
 // Enable CORS for all routes
 app.use(cors());
@@ -25,7 +25,7 @@ const pool = new Pool({
 });
 
 // Sample route to test database connection
-app.get('/', async (req, res) => {
+app.get('/api', async (req, res) => {
     try {
         // Test query to check database connection
         const result = await pool.query('SELECT NOW()');
@@ -36,6 +36,4 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+export default app;

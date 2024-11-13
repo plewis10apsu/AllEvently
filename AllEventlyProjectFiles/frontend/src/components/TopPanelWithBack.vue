@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import logo from '@/assets/AllEventlyLogo.png';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft  } from '@fortawesome/free-solid-svg-icons';
 import router from "@/router";
 
-function navigateToEventCreation() {
-  router.push({ name: 'EventCreation' });
+function navigateToEvents() {
+  router.push({ name: 'Events' });
 }
+
 </script>
 
 <template>
-  <header class="top-panel">
-    <button class="new-event-button" @click="navigateToEventCreation">
-      <FontAwesomeIcon :icon="faPlus" /> NEW
+  <header class="top-panel-with-back">
+    <button class="back-button" @click="navigateToEvents">
+      <FontAwesomeIcon :icon="faArrowLeft" /> Back
     </button>
     <div class="logo">
       <img :src="logo" alt="Logo" class="logo-img" />
@@ -21,7 +22,7 @@ function navigateToEventCreation() {
 </template>
 
 <style scoped>
-.top-panel {
+.top-panel-with-back {
   position: fixed;
   top: 0;
   left: 0;
@@ -53,7 +54,7 @@ function navigateToEventCreation() {
   margin-top: -20px;
 }
 
-.new-event-button {
+.back-button {
   max-width: 150px;
   white-space: nowrap;
   background-color: #F7DDA8;
@@ -68,7 +69,7 @@ function navigateToEventCreation() {
   gap: 8px; /* Adds space between the icon and the text */
 }
 
-.new-event-button:hover {
+.back-button:hover {
   background-color: #FAC55A;
 }
 </style>
