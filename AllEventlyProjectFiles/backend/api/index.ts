@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
+//create express app
 const app = express();
 
 const pool = new Pool({
