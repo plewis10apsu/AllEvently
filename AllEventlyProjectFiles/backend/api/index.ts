@@ -12,9 +12,8 @@ const pool = new Pool({
 });
 
 // Sample route to test database connection
-app.get('/', async (req, res) => {
+app.get('/api', async (req, res) => {
     try {
-        // Test query to check database connection
         const result = await pool.query('SELECT NOW()');
         res.send(`Database connected! Server time: ${result.rows[0].now}`);
     } catch (err) {
@@ -23,8 +22,12 @@ app.get('/', async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
+app.get('/', (req, res) => {
+    res.send('Welcome to the All Evently API!');
+});
+
+app.listen(4000, () => {
+    console.log("Backend server running on http://localhost:4000");
 });
 
 export default app;

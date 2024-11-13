@@ -10,3 +10,4 @@ _pg*
 
 # Environment variables for local development
 .env
+.vercel
