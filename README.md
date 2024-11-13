@@ -2,7 +2,7 @@
 ## Table of Contents
 
 ### Editable Documents
-1. [Proposal Document (Editable)](Documents/Documents/1.%20Proposal_Document.docx)
+1. [Proposal Document (Editable)](Documents/1.%20Proposal_Document.docx)
 2. [Requirements Document and Slides (Editable)](Documents/RequirementsLink.md)
 3. [Design Document and Slides (Editable)](Documents/DesignLink.md)
 4. [Progress Update and Slides (Editable)](Documents/UpdateLink.md)
