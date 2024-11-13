@@ -5,6 +5,7 @@
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/AllEventlyProjectFiles/backend/api/index.ts" }
+    { "source": "/api", "destination": "/AllEventlyProjectFiles/backend/api/index.ts" }
   ]
 }
+

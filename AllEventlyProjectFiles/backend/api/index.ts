@@ -15,7 +15,7 @@ const pool = new Pool({
 });
 
 // Sample route to test database connection
-app.get('/api', async (req, res) => {
+app.get('/', async (req, res) => {
     try {
         // Test query to check database connection
         const result = await pool.query('SELECT NOW()');
