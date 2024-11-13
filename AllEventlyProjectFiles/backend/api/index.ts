@@ -9,9 +9,6 @@ const app = express();
 
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
-    ssl: {
-        rejectUnauthorized: false, // Necessary for cloud-hosted databases if SSL is enabled
-    },
 });
 
 // Sample route to test database connection
@@ -24,6 +21,10 @@ app.get('/', async (req, res) => {
         console.error('Error connecting to database', err);
         res.status(500).send('Error connecting to database');
     }
+});
+
+app.listen(3000, () => {
+    console.log("Server is running on http://localhost:3000");
 });
 
 export default app;

@@ -7,3 +7,6 @@
 
 # Pinegrow temp folders
 _pg*
+
+# Environment variables for local development
+.env
