@@ -2,11 +2,14 @@
 ## Table of Contents
 
 ### Editable Documents
-1. [Proposal Document (Editable)](Documents/1.%20Proposal_Document.docx)
-2. [Requirements Document and Slides (Editable)](Documents/RequirementsLink.md)
-3. [Design Document and Slides (Editable)](Documents/DesignLink.md)
-4. [Progress Update and Slides (Editable)](Documents/UpdateLink.md)
-5. [Poster (Editable)](Documents/AllEvently%20Poster.pptx)
+1. [Proposal Document (Editable)](Documents/Proposal_Document.docx)
+2. [Requirements Document (Editable)](Documents/Requirements_Document.docx)
+3. [Requirements Slides (Editable)](Documents/Requirements_Slides.pptx)
+4. [Design Document (Editable)](Documents/Design_Document.docx)
+5. [Design Slides (Editable)](Documents/Design_Slides.pptx)
+6. [Progress Update Document (Editable)](Documents/Progress_Update_Document.docx)
+7. [Progress Update Slides (Editable)](Documents/Progress_Update_Slides.pptx)
+8. [Poster (Editable)](Documents/AllEvently%20Poster.pptx)
 
 ### PDF/PNG
 5. [Proposal Document PDF](./Documents/Proposal%20Document%20(AllEvently).pdf)
