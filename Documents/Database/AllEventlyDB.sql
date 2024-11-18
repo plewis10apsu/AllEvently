@@ -138,11 +138,13 @@ DECLARE
 BEGIN
     --Get count of people with given address
 	Count_P := (SELECT COUNT(*) FROM People
-    HAVING email = Email_Address);
+    GROUP BY people.email
+    HAVING people.email = Email_Address);
 
 	--Get count of accounts with given address
     Count_A := (SELECT COUNT(*) FROM Accounts
-	HAVING email = Email_Address);
+    GROUP BY accounts.email
+	HAVING accounts.email = Email_Address);
 
     --Check if no account exists
     IF Count_A = 0 THEN
@@ -173,6 +175,8 @@ BEGIN
 	RETURN NULL;
 	
 END $$ LANGUAGE plpgsql;
+
+Select Create_Account ('ben', 'qerhf ewlf', 'ben', 'schwartz');
 
 
 --Create reset credentials
