@@ -1,3 +1,5 @@
+
+
 -------------CREATE TABLES----------------
 --TABLE TO STORE USERS
 CREATE TABLE People (
@@ -138,13 +140,13 @@ DECLARE
 BEGIN
     --Get count of people with given address
 	Count_P := (SELECT COUNT(*) FROM People
-    GROUP BY people.email
-    HAVING people.email = Email_Address);
+    GROUP BY People.email
+    HAVING People.email = Email_Address);
 
 	--Get count of accounts with given address
     Count_A := (SELECT COUNT(*) FROM Accounts
-    GROUP BY accounts.email
-	HAVING accounts.email = Email_Address);
+    GROUP BY Accounts.account_email
+	HAVING Accounts.account_email = Email_Address);
 
     --Check if no account exists
     IF Count_A = 0 THEN
