@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS Guests (
     FOREIGN KEY (event_id) REFERENCES Events(event_id)
 );
 
+
 -----------Create Functions-------------
 --Authenticate Users
 CREATE OR REPLACE FUNCTION Authenticate_User
@@ -147,6 +148,7 @@ BEGIN
 	RETURN NULL;
 	
 END $$ LANGUAGE plpgsql;
+
 
 --Add Account -- COMPLETE DO NOT TOUCH
 CREATE OR REPLACE FUNCTION Create_Account
@@ -194,6 +196,7 @@ BEGIN
 	END IF;
 	
 END $$ LANGUAGE plpgsql;
+
 
 --Create reset credentials
 CREATE OR REPLACE FUNCTION Create_Reset_Credentials
@@ -268,6 +271,7 @@ BEGIN
 		
 END $BODY$ LANGUAGE plpgsql;
 
+
 --Get Hosted Events
 CREATE OR REPLACE FUNCTION Get_Hosted_Events
 (Email_Address varchar(30))
@@ -278,6 +282,7 @@ BEGIN
     WHERE event_host = Email_Address);
 	
 END $BODY$ LANGUAGE plpgsql;
+
 
 --Get Public Events
 CREATE OR REPLACE FUNCTION Get_Public_Events ()
