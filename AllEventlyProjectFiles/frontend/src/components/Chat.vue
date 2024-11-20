@@ -13,7 +13,7 @@ const eventName = ref('');
 // Replace this with actual API call or data retrieval logic
 onMounted(() => {
   if (eventId === '1') {
-    eventName.value = 'Little Suzie’s Birthday Party';
+    eventName.value = 'Jonie\'s Birthday';
   } else {
     eventName.value = 'Unknown Event';
   }
@@ -28,9 +28,9 @@ onUpdated(() => {
 
 // Messages for display
 const messages = ref([
-  { sender: 'Me', time: '09/11/2024 10:35 AM', text: "I'm so excited for the birthday party, I can't even contain myself..." },
-  { sender: 'Emily', time: '09/11/2024 10:37 AM', text: 'We are excited too! Thanks for reaching out...', isHostOnly: true },
-  { sender: 'Me', time: '09/11/2024 10:35 AM', text: 'Thank you so much.' }
+  { sender: 'Me', time: '09/11/2024 10:35 AM', text: "Hi Alice! I’m so excited! I was just about to ask if there’s anything I should bring? 🎁" },
+  { sender: 'Alice', time: '09/11/2024 10:37 AM', text: "That’s so sweet of you! Just your wonderful presence will be enough, but Suzie does love balloons if you want to bring a small surprise. 🎈", isHostOnly: true },
+  { sender: 'Me', time: '09/11/2024 10:35 AM', text: "Perfect, I’ll bring some colorful balloons then. Can’t wait to celebrate! 🥳" }
 ]);
 
 const newMessage = ref('');
