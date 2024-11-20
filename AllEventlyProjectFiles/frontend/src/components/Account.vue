@@ -47,8 +47,22 @@ function saveChanges() {
 
 <style scoped>
 @import '@/styles/common.css';
+
 .account-page {
   display: flex;
+}
+
+.main-title {
+  margin-top: 25px;
+  font-size: 4rem; /* Adjust to your desired size */
+  font-weight: bold; /* Optional: Keep it bold or adjust */
+  margin-bottom: 10px; /* Optional: Add spacing if needed */
+}
+
+.content-area {
+  margin-left: 0; /* Ensure content aligns with the sidebar */
+  padding: 20px; /* Add consistent padding for spacing */
+  flex-grow: 1;
 }
 
 .form-container {
@@ -56,14 +70,46 @@ function saveChanges() {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-width: 400px; /* Set a maximum width for the form */
 }
 
-.action-button, .save-button {
-  margin-top: 10px;
+label {
+  font-weight: bold;
 }
 
 input {
   padding: 5px;
   margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
+.action-button,
+.save-button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #FAC55A; /* Yellow from the palette */
+  color: #0D1821; /* Dark color from the palette for contrast */
+  font-size: 1em;
+  width: auto; /* Allow buttons to size naturally */
+  box-sizing: border-box;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.action-button:hover {
+  color: #fff;
+  background-color: #1A659E; /* Orange from the palette for hover effect */
+}
+
+.save-button:hover {
+  color: #fff;
+  background-color: #1A659E; /* Red from the palette for hover effect */
+}
+
+
 </style>

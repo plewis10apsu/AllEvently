@@ -1,4 +1,7 @@
 <script lang="ts">
+import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
+import logo from "@/assets/AllEventlyLogo.png";
+
 interface Guest {
   id: number;
   firstName: string;
@@ -10,6 +13,7 @@ interface Guest {
 }
 
 export default {
+  components: {TopPanelWithBack},
   data() {
     return {
       newGuest: {
@@ -31,6 +35,9 @@ export default {
     };
   },
   computed: {
+    logo() {
+      return logo
+    },
     filteredGuests(): Guest[] {
       return this.guests.filter(guest =>
           `${guest.firstName} ${guest.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase())
@@ -95,60 +102,64 @@ export default {
 </script>
 
 <template>
+  <TopPanelWithBack :logo="logo" />
   <div class="guest-list-container">
-    <!-- New Guest Section -->
-    <div class="new-guest-section">
-      <h2>New Guest</h2>
-      <p>Let's invite someone!</p>
-      <form @submit.prevent="addGuest">
-        <label for="firstName">First Name</label>
-        <input v-model="newGuest.firstName" type="text" id="firstName" required />
+    <!-- Row for New Guest and Guest List -->
+    <div class="row-container">
+      <!-- New Guest Section -->
+      <div class="new-guest-section">
+        <h2>New Guest</h2>
+        <p>Invite someone to your event:</p>
+        <form @submit.prevent="addGuest">
+          <label for="firstName">First Name</label>
+          <input v-model="newGuest.firstName" type="text" id="firstName" required />
 
-        <label for="lastName">Last Name</label>
-        <input v-model="newGuest.lastName" type="text" id="lastName" required />
+          <label for="lastName">Last Name</label>
+          <input v-model="newGuest.lastName" type="text" id="lastName" required />
 
-        <label for="email">Email</label>
-        <input v-model="newGuest.email" type="email" id="email" required />
+          <label for="email">Email</label>
+          <input v-model="newGuest.email" type="email" id="email" required />
 
-        <button type="submit">Add Guest</button>
-      </form>
-    </div>
-
-    <!-- Guest List Section -->
-    <div class="guest-list-section">
-      <h2>Guest List</h2>
-      <div class="guest-summary">
-        <span>Attending {{ counts.attending }}</span>
-        <span>Waiting {{ counts.waiting }}</span>
-        <span>Regrets {{ counts.regrets }}</span>
+          <button type="submit">Add Guest</button>
+        </form>
       </div>
-      <input v-model="searchTerm" placeholder="Search for Guests" />
 
-      <div class="guest-entry" v-for="guest in filteredGuests" :key="guest.id">
-        <div class="guest-info">
-          <span :class="{ 'sent': guest.inviteSent }">
-            {{ guest.firstName }} {{ guest.lastName }}
-          </span>
-          <span>{{ guest.inviteSent ? 'Sent' : 'Not Sent' }}</span>
+      <!-- Guest List Section -->
+      <div class="guest-list-section">
+        <h2>Guest List</h2>
+        <div class="guest-summary">
+          <span>Attending: {{ counts.attending }}</span>
+          <span>Waiting: {{ counts.waiting }}</span>
+          <span>Regrets: {{ counts.regrets }}</span>
         </div>
-        <button @click="viewGuest(guest.id)">View</button>
+        <input v-model="searchTerm" placeholder="Search for Guests" />
+
+        <div class="guest-entry" v-for="guest in filteredGuests" :key="guest.id">
+          <div class="guest-info">
+            <span :class="{ 'sent': guest.inviteSent }">
+              {{ guest.firstName }} {{ guest.lastName }}
+            </span>
+            <span>{{ guest.inviteSent ? 'Invite Sent' : 'Not Sent' }}</span>
+          </div>
+          <button @click="viewGuest(guest.id)">View</button>
+        </div>
       </div>
     </div>
 
-    <!-- Detailed Guest View Section -->
+    <!-- Guest Details Section -->
     <div v-if="selectedGuest" class="guest-detail-section">
-      <h2>Guest Information</h2>
+      <h2>Guest Details</h2>
       <h3>{{ selectedGuest.firstName }} {{ selectedGuest.lastName }}</h3>
 
       <div class="guest-actions">
-        <button @click="sendEmailInvite">Email Invite</button>
+        <button @click="sendEmailInvite">Send Email Invite</button>
         <button @click="markAsAttending">Mark As Attending</button>
         <button @click="markAsDeclined">Mark As Declined</button>
       </div>
 
       <div class="guest-details">
         <p><strong>Invite Sent:</strong> {{ selectedGuest.inviteSent ? selectedGuest.inviteDate : 'Not Sent' }}</p>
-        <p><strong>Responded:</strong> {{ selectedGuest.status }}</p>
+        <p><strong>Status:</strong> {{ selectedGuest.status }}</p>
 
         <label for="firstName">First Name</label>
         <input v-model="selectedGuest.firstName" type="text" id="firstName" />
@@ -168,23 +179,110 @@ export default {
   </div>
 </template>
 
+
 <style scoped>
-.guest-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+
+h2 {
+  color: #083D77; /* Heading color */
+  font-size: 1.5rem;
+  margin-bottom: 10px;
 }
 
-.new-guest-section,
-.guest-list-section,
-.guest-detail-section {
-  border: 1px solid #ddd;
+p {
+  color: #0D1821; /* Text color */
+}
+
+/* Row container for New-Guest and Guest-List */
+.row-container {
+  display: flex;
+  flex-direction: row; /* Align items horizontally */
+  justify-content: space-between; /* Add space between the two sections */
+  gap: 24px; /* Add spacing between the two sections */
+  flex-wrap: wrap; /* Ensure responsiveness on smaller screens */
+}
+
+.guest-list-container {
+  margin-top: 90px;
+  display: flex;
+  flex-direction: column; /* Stack sections vertically */
+  gap: 24px; /* Add spacing between sections */
+  padding: 20px;
+  background-color: #F7E1D7;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 84vh; /* Full viewport height */
+  overflow-y: auto; /* Enable scrolling for the entire page */
+}
+
+/* Row container for New-Guest and Guest-List */
+.row-container {
+  display: flex;
+  flex-direction: row; /* Align items horizontally */
+  justify-content: space-between; /* Add space between the */
+}
+
+/* New Guest Section */
+  .new-guest-section {
+    min-width: 300px;
+    flex: 0 0 auto; /* Prevent this section from growing */
+    width: 300px; /* Fixed width */
+    background-color: #FFF;
+    border: 2px solid #1A659E;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+/* Guest List Section */
+.guest-list-section {
+  flex: 1; /* Allow this section to take up remaining space */
+  min-width: 300px; /* Match the width of the New Guest section */
+  background-color: #FFF;
+  border: 2px solid #1A659E;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Guest Details Section */
+  .guest-detail-section {
+    min-width: 300px;
+    background-color: #FFF;
+    border: 2px solid #1A659E;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: #0D1821;
+}
+
+input {
+  width: 100%; /* Make input fields responsive within the container */
+  max-width: 400px; /* Set a maximum width for the input fields */
+  margin-bottom: 15px; /* Add spacing between inputs */
+  padding: 8px;
+  border: 1px solid #1A659E;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: #083D77;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
 }
 
 .guest-summary span {
-  margin-right: 15px;
+  color: #1A659E;
+  font-weight: bold;
+  margin-right: 20px;
 }
 
 .guest-entry {
@@ -199,27 +297,53 @@ export default {
   flex-direction: column;
 }
 
+.guest-info span {
+  color: #0D1821;
+}
+
 .sent {
   font-weight: bold;
 }
 
 button {
-  background-color: #007bff;
-  color: #fff;
+  background-color: #FF6B35; /* Primary button color */
+  color: #FFF;
   border: none;
+  padding: 10px 16px;
   border-radius: 5px;
-  padding: 5px 10px;
+  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #E63946; /* Hover effect */
 }
 
 .guest-actions {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
+}
+
+.guest-actions button {
+  background-color: #FAC55A; /* Secondary button color */
+  color: #0D1821;
+}
+
+.guest-actions button:hover {
+  background-color: #FF6B35;
+  color: #FFF;
+}
+
+.detail-buttons button {
+  background-color: #083D77;
+  color: #FFF;
+}
+
+.detail-buttons button:hover {
+  background-color: #1A659E;
 }
 
 .detail-buttons {

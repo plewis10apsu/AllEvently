@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, onUpdated} from 'vue';
+import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
+import logo from "@/assets/AllEventlyLogo.png";
 
 // Use defineProps directly without re-declaring it
 const { eventId } = defineProps<{ eventId: string }>();
@@ -47,6 +49,7 @@ function sendMessage() {
 </script>
 
 <template>
+  <TopPanelWithBack :logo="logo" />
   <div class="chat-page">
     <header class="chat-header">
       <h2>Chat for: {{ eventName }}</h2>
@@ -74,10 +77,11 @@ function sendMessage() {
 
 <style scoped>
 .chat-page {
+  margin-top: 90px;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background-color: #f4f4f9;
+  height: 89vh;
 }
 
 .chat-header {

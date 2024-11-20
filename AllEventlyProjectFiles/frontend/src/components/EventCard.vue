@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 
 defineProps<{
@@ -17,39 +18,62 @@ function navigateToGuestList() {
   router.push({ name: 'GuestList' });
 }
 
+function navigateToInvitation(eventId: string) {
+  router.push({ name: 'Invitation', params: { eventId } });
+}
+
 </script>
 <template>
-    <div class="event-card" v-if="event">
-        <div class="event-header">
-            <div class="event-title-section">
-                <h2 class="event-title">{{ event.title }}</h2>
-              <span class="event-type">{{ event.type === 'public' ? '(Public event)' : '(Private event)' }}</span>
-            </div>
-            <div class="event-host">Hosted By: {{ event.host }}</div>
-        </div>
-        <div class="event-main-content">
-          <div class="event-invitation-section">
-          <img class="invitation-image" :src="event.imageUrl" alt="Event Invitation"/>
-            <div class="event-details">
-                <div class="event-date">{{ event.date }}</div>
-                <div class="event-time">{{ event.time }}</div>
-            </div>
-            </div>
-            <!-- Add the venue container on the same row -->
-            <div class="event-venue-container">
-                <div class="event-venue">{{ event.venue }}</div>
-              <a :href="event.venueLink" target="_blank" class="event-venue-link">{{ event.venueAddress }}</a>
-            </div>
-        </div>
-        <div class="event-actions">
-          <button v-if="event.isGuest" @click="$emit('viewInvitation')">View Invitation</button>
-          <button v-if="event.isHost" @click="$emit('editInvitation')">Edit Invitation</button>
-          <button v-if="event.isHost" @click="navigateToGuestList">Guest List</button>
-          <button v-if="event.isHost" @click="$emit('print')">Print</button>
-          <button v-if="event.isGuest || event.isHost" @click="navigateToChat(event.id)">Event Chat</button>
-        </div>
+  <div class="event-card" v-if="event">
+    <div class="event-header">
+      <div class="event-title-section">
+        <h2 class="event-title">{{ event.title }}</h2>
+        <span class="event-type">{{ event.type === 'public' ? '(Public event)' : '(Private event)' }}</span>
+      </div>
+      <div class="event-host">Hosted By: {{ event.host }}</div>
     </div>
+    <div class="event-main-content">
+      <div class="event-invitation-section">
+        <img class="invitation-image" :src="event.imageUrl" alt="Event Invitation" />
+        <div class="event-details">
+          <div class="event-date">{{ event.date }}</div>
+          <div class="event-time">{{ event.time }}</div>
+        </div>
+      </div>
+      <div class="event-venue-container">
+        <div class="event-venue">{{ event.venue }}</div>
+        <a :href="event.venueLink" target="_blank" class="event-venue-link">{{ event.venueAddress }}</a>
+      </div>
+    </div>
+    <div class="event-actions">
+      <!-- Show only for hosts -->
+      <button
+          v-if="isHost"
+          class="edit-invitation"
+      >
+        <i class="fas fa-edit"></i> Edit Invitation
+      </button>
+      <button v-if="isHost" class="guest-list" @click="navigateToGuestList">
+        <i class="fas fa-users"></i> Guest List
+      </button>
+      <button v-if="isHost" class="print" @click="$emit('print')">
+        <i class="fas fa-print"></i> Print
+      </button>
+
+      <!-- Show for guests -->
+      <button v-if="isGuest" class="view-invitation" @click="navigateToInvitation(event.id)"
+      >
+        <i class="fas fa-eye"></i> View Invitation
+      </button>
+
+      <!-- Show for both hosts and guests -->
+      <button class="event-chat" @click="navigateToChat(event.id)">
+        <i class="fas fa-comments"></i> Event Chat
+      </button>
+    </div>
+  </div>
 </template>
+
 <style scoped>
 * {
   margin: 0;
@@ -60,9 +84,8 @@ function navigateToGuestList() {
 .event-card {
   display: flex;
   flex-direction: column;
+  padding: 5px;
   background-color: #F7E1D7;
-  padding: 20px;
-  margin-bottom: 10px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -164,27 +187,74 @@ function navigateToGuestList() {
 
 .event-actions {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 5px;
-  gap: 10px;
-  width: 100%;
+  justify-content: space-evenly; /* Spread buttons equally across the container */
+  align-items: center; /* Vertically align buttons */
+  gap: 12px; /* Add optional spacing between buttons */
+  padding: 8px 0; /* Add some vertical padding if needed */
+  width: 100%; /* Ensure the container spans the full width of the card */
+  box-sizing: border-box; /* Include padding in width calculations */
 }
 
 .event-actions button {
-  flex: 1;
+  flex: 0 1 auto; /* Prevent buttons from stretching too much */
+  width: auto; /* Size the button based on content */
+  max-width: 150px; /* Optional: Limit the button width */
+  padding: 8px 16px; /* Adjust padding for button size */
   background-color: transparent;
   color: #0D1821;
   border: none;
-  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  transition: text-shadow 0.3s, color 0.3s; /* Smooth transition */
+  transition: text-shadow 0.3s, color 0.3s;
+  font-size: 1rem; /* Adjust font size */
+  font-weight: bold;
+  text-align: center; /* Center text inside buttons */
 }
 
-.event-actions button:hover {
-  text-shadow: 0 0 8px rgba(13, 24, 33, 0.7); /* Glow effect */
-  color: #0D1821;
+
+.event-actions :deep(.edit-invitation) {
+  color: #1A659E;
+}
+
+.event-actions :deep(.edit-invitation:hover) {
+  background-color: #1A659E;
+  color: #fff;
+}
+
+.event-actions :deep(.view-invitation) {
+  color: #1A659E;
+}
+
+.event-actions :deep(.view-invitation:hover) {
+  background-color: #1A659E;
+  color: #fff;
+}
+
+.event-actions :deep(.guest-list) {
+  color: #ff9100;
+}
+
+.event-actions :deep(.guest-list:hover) {
+  background-color: #ff9100;
+  color: #fff;
+}
+
+.event-actions :deep(.print) {
+  color: #FF6B35;
+}
+
+.event-actions :deep(.print:hover) {
+  background-color: #FF6B35;
+  color: #fff;
+}
+
+.event-actions :deep(.event-chat) {
+  color: #E63946;
+}
+
+.event-actions :deep(.event-chat:hover) {
+  background-color: #E63946;
+  color: #fff;
 }
 
 /* Dark Mode */
@@ -209,24 +279,17 @@ function navigateToGuestList() {
   .event-host, .event-venue, .event-details {
     color: #bbb !important;
   }
-  .event-actions button {
-    background-color: transparent;
-    color: #f5f5f5;
-    border: 2px solid #f5f5f5;
-  }
-  .event-actions button:hover {
-    text-shadow: 0 0 20px rgba(255, 0, 0, 1), 0 0 40px rgba(255, 0, 0, 0.7);
-    color: #f5f5f5;
-    border-color: #EDAFB8;
-  }
+
 }
 
 /* Adjustments for smaller screens */
 @media (max-width: 720px) {
   .event-main-content {
-    flex-direction: column; /* Stack items vertically */
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping for better responsiveness */
+    justify-content: space-between;
     align-items: center; /* Center items horizontally */
-    gap: 15px;
+    gap: 10px;
   }
 
   .event-invitation-section {
@@ -258,6 +321,7 @@ function navigateToGuestList() {
   }
 
   .event-actions button {
+    font-size: 1rem;
     padding: 6px 12px; /* Reduce button size */
   }
 }
@@ -265,8 +329,12 @@ function navigateToGuestList() {
 /* Adjustments for very small screens */
 @media (max-width: 480px) {
   .event-header {
-    flex-direction: column;
-    align-items: center;
+    display: flex;
+    flex-direction: row; /* Keep them in a row */
+    justify-content: space-between; /* Add spacing between title and host */
+    align-items: center; /* Vertically align the content */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    gap: 10px; /* Add some space between the elements */
   }
 
   .event-title {
@@ -286,11 +354,10 @@ function navigateToGuestList() {
     color: #333;
     text-align: right;
   }
+
   .invitation-image {
     width: 60px; /* Further reduce image size */
   }
-
-
 
   .event-date,
   .event-time {

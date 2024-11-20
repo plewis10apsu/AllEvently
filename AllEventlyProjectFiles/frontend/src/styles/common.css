@@ -1,3 +1,21 @@
+
+html, body {
+    font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+    font-size: 16px;
+    color: #0D1821;
+    line-height: 1.5;
+}
+
+.logo {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: top 0.3s ease;
+    width: 250px;
+    margin-bottom: 10px;
+}
+
 .main-title {
     font-size: 5rem;
     font-weight: bold;

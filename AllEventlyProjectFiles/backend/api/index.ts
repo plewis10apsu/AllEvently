@@ -1,6 +1,7 @@
-import express from 'express';
+import express = require('express');
 import { Pool } from 'pg';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+import cors from 'cors';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -8,20 +9,32 @@ dotenv.config();
 //create express app
 const app = express();
 
+app.use(cors({
+    origin: 'http://localhost:5173', // Replace with your frontend origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
 
-// Sample route to test database connection
-app.get('/api', async (req, res) => {
+app.get('/api/pet-names', async (req, res) => {
     try {
-        const result = await pool.query('SELECT NOW()');
-        res.send(`Database connected! Server time: ${result.rows[0].now}`);
+        // Query the database to fetch pet names
+        const result = await pool.query('SELECT name FROM pets');
+
+        // Extract the names from the result
+        const names = result.rows.map(row => row.name);
+
+        // Return the names as a JSON response
+        res.json({ names });
     } catch (err) {
-        console.error('Error connecting to database', err);
-        res.status(500).send('Error connecting to database');
+        console.error('Error fetching pet names', err);
+        res.status(500).send('Error fetching pet names');
     }
 });
+
 
 app.get('/', (req, res) => {
     res.send('Welcome to the All Evently API!');

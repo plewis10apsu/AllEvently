@@ -8,6 +8,7 @@ import Account from "@/components/Account.vue";
 import Public from "@/components/Public.vue";
 import GuestList from "@/components/GuestList.vue";
 import EventCreation from "@/components/EventCreation.vue";
+import Invitation from "@/components/Invitation.vue";
 
 const routes = [
     {
@@ -39,6 +40,12 @@ const routes = [
         path: '/guest-list',
         name: 'GuestList',
         component: GuestList
+    },
+    {
+        path: '/invitation/:eventId',
+        name: 'Invitation',
+        component: Invitation,
+        props: true,
     },
     {
         path: '/chat/:eventId',

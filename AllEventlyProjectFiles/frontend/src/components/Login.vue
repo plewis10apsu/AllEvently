@@ -220,11 +220,13 @@ html, body {
 </style>
 
 <style scoped>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@import '@/styles/common.css';
+
+ *,
+ *::before,
+ *::after {
+   box-sizing: border-box;
+ }
 
 .login-page {
   margin: 0;
@@ -240,7 +242,7 @@ html, body {
 
 .logo {
   position: absolute;
-  top: 0px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   transition: top 0.3s ease;
@@ -281,6 +283,7 @@ html, body {
   align-items: center;
   justify-content: center;
   margin-top: 10px;
+  gap: 10px;
 }
 
 .error-message {
@@ -314,12 +317,14 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: -60px;
 }
 
 .forms {
-  margin-top: 175px;
+  margin-top: 50px;
   display: flex;
   align-items: flex-start;
+  max-height: 400px;
 }
 
 .form-wrapper {
@@ -528,7 +533,7 @@ html, body {
 }
 
 .input-block {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .input-block label {
@@ -540,10 +545,10 @@ html, body {
   display: block;
   width: 100%;
   margin-top: 8px;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 10px;
+  padding-left: 10px;
   font-size: 16px;
-  line-height: 40px;
+  line-height: 30px;
   color: #0d1821;
   background: #eef9fe;
   border: 1px solid #cddbef;
@@ -556,7 +561,7 @@ html, body {
   min-width: 120px;
   margin: 30px auto 10px;
   font-size: 18px;
-  line-height: 40px;
+  line-height: 30px;
   border-radius: 25px;
   border: none;
   transition: all .3s ease-out;
@@ -586,15 +591,25 @@ html, body {
   margin-bottom: 0 !important;
   color: #fbfdff;
   background: #db5650;
+  border-radius: 25px;
+  line-height: 30px;
   transform: translateX(-30%);
+}
+
+.btn-login:hover {
+  background-color: #144d75;
 }
 
 .btn-signup {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  color: #db5650;
-  background: #fbfdff;
-  box-shadow: inset 0 0 0 2px #db5650;
+  color: #fbfdff;
+  background: #db5650;
+  border-radius: 25px;
+  line-height: 30px;
   transform: translateX(30%);
+}
+.btn-signup:hover {
+  background-color: #144d75;
 }
 </style>

@@ -63,125 +63,121 @@ function handleOkButtonClick() {
 </script>
 
 <template>
-  <div class="update-password-container">
-    <div class="logo-section">
-      <img :src="logo" alt="AllEvently Logo" class="logo">
-    </div>
-
-    <form @submit.prevent="handlePasswordUpdate">
-      <div class="form-group">
+  <section class="update-password-page">
+    <img :src="logo" alt="AllEvently Logo" class="logo" />
+    <div class="form-container">
+      <h1>Update Password</h1>
+      <div class="input-block">
         <label for="email-code">Emailed Code:</label>
-        <input type="text" id="email-code" v-model="emailCode" required />
+        <input id="email-code" v-model="emailCode" type="text" />
         <span v-if="codeError" class="error-message">The code is incorrect. Please review and try again.</span>
       </div>
-
-      <div class="form-group">
+      <div class="input-block">
         <label for="new-password">New Password:</label>
-        <input type="password" id="new-password" v-model="newPassword" required />
+        <input id="new-password" v-model="newPassword" type="password" />
         <span v-if="passwordError" class="error-message">Please enter a password.</span>
       </div>
-
-      <div class="form-group">
+      <div class="input-block">
         <label for="confirm-password">Confirm Password:</label>
-        <input type="password" id="confirm-password" v-model="confirmPassword" required />
+        <input id="confirm-password" v-model="confirmPassword" type="password" />
         <span v-if="confirmPasswordError" class="error-message">Passwords must match.</span>
       </div>
+      <button @click="handlePasswordUpdate" class="btn-update">Update Password</button>
+      <a @click.prevent="cancelUpdate" href="#" class="cancel-link">Cancel</a>
+    </div>
 
-      <div class="button-group">
-        <button type="submit" class="update-button">Update Password</button>
-        <button type="button" class="cancel-button" @click="cancelUpdate">Cancel</button>
-      </div>
-    </form>
-
-    <!-- Dialog box for success message -->
     <div v-if="showSuccessDialog" class="dialog">
       <h2>Password Updated!</h2>
       <p>Your password has been successfully updated. You can now use your new password to log in.</p>
       <button @click="handleOkButtonClick" class="btn-ok">OK</button>
     </div>
-  </div>
+  </section>
 </template>
 
-
 <style scoped>
-.update-password-container {
+
+.update-password-page {
+  font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
   height: 100vh;
   background-color: #1A659E;
-  padding: 20px;
-  text-align: center;
 }
 
-.logo-section img {
+.logo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: top 0.3s ease;
   width: 250px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
-/* Form container styling */
-form {
-  background-color: #ffffff; /* White background for form */
-  border: 1px solid #ddd; /* Light border */
+.form-container {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   padding: 20px;
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  text-align: left;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
   width: 100%;
-  max-width: 400px; /* Center width */
+  max-width: 300px;
 }
 
-/* Form group styling */
-.form-group {
+.input-block {
   margin-bottom: 15px;
 }
 
-.form-group label {
+.input-block label {
   display: block;
   font-size: 14px;
   margin-bottom: 5px;
 }
 
-.form-group input {
-  width: calc(100% - 12px); /* Full width to match the form */
+.input-block input {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  border: 1px solid #cddbef;
+  border-radius: 4px;
+  background-color: #eef9fe;
+  color: #0d1821;
 }
 
-/* Error message */
-.error-message {
-  color: red;
-  font-size: 14px;
+.btn-update {
+  color: #fbfdff;
+  background: #db5650;
+  border-radius: 25px;
+  line-height: 40px;
+  font-size: 18px;
+  text-align: center;
+  width: 100%;
   margin-bottom: 10px;
 }
 
-/* Button group styling */
-.button-group {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
+.btn-update:hover {
+  background-color: #144d75;
 }
 
-.update-button, .cancel-button {
-  background-color: #1a659e; /* Primary color */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-bottom: 10px; /* Spacing for buttons */
-  width: 100%; /* Full width */
+.cancel-link {
+  display: block;
+  text-align: center;
+  color: #1a659e;
+  text-decoration: none;
+  font-size: 14px;
 }
 
-.update-button:hover, .cancel-button:hover {
-  background-color: #144d75; /* Darker shade for hover */
+.cancel-link:hover {
+  text-decoration: underline;
 }
 
-/* Success dialog styling */
 .dialog {
   position: fixed;
   top: 50%;
@@ -207,17 +203,16 @@ form {
 }
 
 .btn-ok {
-  background-color: #1a659e; /* Button color */
+  background-color: #1a659e;
   color: white;
   border: none;
   border-radius: 5px;
   padding: 10px 20px;
   cursor: pointer;
-  width: 100%; /* Full width */
+  width: 100%;
 }
 
 .btn-ok:hover {
-  background-color: #144d75; /* Darker shade */
+  background-color: #144d75;
 }
-
 </style>

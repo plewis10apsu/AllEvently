@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import logo from '@/assets/AllEventlyLogo.png';
 import router from "@/router";
 
 const email = ref('');
@@ -32,13 +33,13 @@ const handleOkButtonClick = () => {
 
 <template>
   <section class="reset-password-page">
-    <img src="@/assets/AllEventlyLogo.png" alt="AllEvently Logo" class="logo" />
+    <img :src="logo" alt="AllEvently Logo" class="logo" />
     <div class="reset-form-container">
       <h1>Password Reset</h1>
-      <p v-if="showError" class="error-message">Please enter a valid email address.</p>
       <div class="input-block">
         <label for="reset-email">Email:</label>
         <input id="reset-email" v-model="email" type="email" />
+        <span v-if="showError" class="error-message">Please enter a valid email address.</span>
       </div>
       <button @click="handleResetPassword" class="btn-reset">Reset Password</button>
       <a href="/" class="cancel-link">Cancel</a>
@@ -52,44 +53,40 @@ const handleOkButtonClick = () => {
   </section>
 </template>
 
-<style scoped>
 
-.logo {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  transition: top 0.3s ease;
-  width: 200px;
-  margin-bottom: 10px;
+<style scoped>
+@import '@/styles/common.css';
+
+.reset-password-page {
+  font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  background-color: #1A659E;
+  overflow: visible;
 }
 
- .reset-password-page {
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
-   align-items: center;
-   height: 100vh;
-   background-color: #1A659E; /* Background color for the page */
-   padding: 20px;
- }
-
-/* Logo styling */
-.logo {
-  width: 250px; /* Adjusted size for the logo */
-  margin-bottom: 30px;
+.reset-form-container h1 {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 /* Container for the form */
 .reset-form-container {
-  background-color: #ffffff; /* White background for form */
-  border: 1px solid #ddd; /* Light border */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   padding: 20px;
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  text-align: left;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
   width: 100%;
-  max-width: 400px; /* Center width */
+  max-width: 300px;
 }
 
 /* Input block styling */
@@ -104,11 +101,15 @@ const handleOkButtonClick = () => {
 }
 
 .input-block input {
-  width: calc(100% - 12px); /* Match the form size */
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  border: 1px solid #cddbef;
+  border-radius: 4px;
+  background-color: #eef9fe;
+  color: #0d1821;
 }
 
 /* Error message */
@@ -120,19 +121,21 @@ const handleOkButtonClick = () => {
 
 /* Button styling */
 .btn-reset {
-  background-color: #1a659e; /* Primary color */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  width: 100%; /* Full width */
-  margin-bottom: 10px; /* Spacing between button and cancel */
+  margin-top: 0 !important;
+  margin-bottom: 5px !important;
+  color: #fbfdff;
+  background: #db5650;
+  border-radius: 25px;
+  line-height: 40px;
+  font-size: 18px;
+  text-align: center;
+  width: 100%;
+  box-shadow: none;
+  transition: all 0.3s ease-out;
 }
 
 .btn-reset:hover {
-  background-color: #144d75; /* Darker shade on hover */
+  background-color: #144d75;
 }
 
 /* Cancel link */
@@ -174,16 +177,17 @@ const handleOkButtonClick = () => {
 }
 
 .btn-ok {
-  background-color: #1a659e; /* Button color */
+  background-color: #1a659e;
   color: white;
   border: none;
   border-radius: 5px;
   padding: 10px 20px;
   cursor: pointer;
-  width: 100%; /* Full width */
+  width: 100%;
 }
 
 .btn-ok:hover {
-  background-color: #144d75; /* Darker shade */
+  background-color: #144d75;
 }
 </style>
+
