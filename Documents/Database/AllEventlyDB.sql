@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS Events (
     font_background_color text DEFAULT '#000000',
     font_color text DEFAULT '#FFFFFF',
     font text DEFAULT 'italic bold 20px arial,serif',
-    is_public BOOLEAN DEFAULT TRUE,
+    is_public BOOLEAN DEFAULT FALSE,
     reoccurs BOOLEAN DEFAULT FALSE,
     reoccur_freq INT,
     end_reoccur DATE,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS Chat_Messages (
     message_id SERIAL,
     event_id INT NOT NULL,
     sender_email text NOT NULL,
-    content text NOT NULL,
+    contents text NOT NULL,
     sent_date DATE DEFAULT (CURRENT_DATE),
     accepted BOOLEAN,
     PRIMARY KEY (message_id),
@@ -262,37 +262,37 @@ END $$ LANGUAGE plpgsql;
 --Get Invited Events
 CREATE OR REPLACE FUNCTION Get_Attending_Events
 (Email_Address text)
-RETURNS SETOF Events AS $BODY$
+RETURNS SETOF Events AS $$
 BEGIN
 
-    RETURN NEXT (SELECT * FROM Events
-		WHERE event_id IN (SELECT ARRAY_AGG(event_id) FROM Guests
-        	WHERE guest_email = Email_Address));
+    RETURN QUERY SELECT * FROM Events
+		WHERE event_id IN (SELECT event_id FROM Guests
+        	WHERE guest_email = Email_Address);
 		
-END $BODY$ LANGUAGE plpgsql;
+END $$ LANGUAGE plpgsql;
 
 
 --Get Hosted Events
 CREATE OR REPLACE FUNCTION Get_Hosted_Events
 (Email_Address text)
-RETURNS SETOF Events AS $BODY$
+RETURNS SETOF Events AS $$
 BEGIN
 
-    RETURN NEXT (SELECT * FROM Events
-    WHERE event_host = Email_Address);
+    RETURN QUERY SELECT * FROM Events
+    WHERE event_host = Email_Address;
 	
-END $BODY$ LANGUAGE plpgsql;
+END $$ LANGUAGE plpgsql;
 
 
 --Get Public Events
 CREATE OR REPLACE FUNCTION Get_Public_Events ()
-RETURNS SETOF Events AS $BODY$
+RETURNS SETOF Events AS $$
 BEGIN
 
-    SELECT * FROM Events
+    RETURN QUERY SELECT * FROM Events
     WHERE is_public = TRUE;
 	
-END $BODY$ LANGUAGE plpgsql;
+END $$ LANGUAGE plpgsql;
 
 
 
@@ -313,16 +313,21 @@ select * from images;
 --Default event with minimum parameters
 INSERT INTO EVENTS (event_host, host_name, event_location)
 VALUES ('ben', 'benjamin', 'here');
-
 INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date)
 VALUES ('peggy', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
-
-INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date)
-VALUES ('spensor', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25');
-
-SELECT * FROM events;
+INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
+VALUES ('spensor', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
 
 
+--Create Guest
+INSERT INTO GUESTS (guest_email, event_id)
+VALUES ('ben', 2);
+
+--Create Chat Message
+INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
+VALUES (2, 'ben', 'Hello World');
+INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
+VALUES (2, 'peggy', 'Hello Ben');
 
 
 
