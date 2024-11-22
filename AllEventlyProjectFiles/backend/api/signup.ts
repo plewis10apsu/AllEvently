@@ -2,6 +2,7 @@ import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import {IncomingMessage, ServerResponse} from 'http';
 
+
 dotenv.config();
 
 const pool = new Pool({
@@ -80,12 +81,13 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             res.statusCode = 500;
             res.end(JSON.stringify({message: 'Internal server error.'}));
             console.log(err);
-            return;
+           // return;
         }
     } else {
         // Respond with method not allowed for non-POST requests
         res.statusCode = 405;
         res.end(JSON.stringify({message: 'Method Not Allowed'}));
+        console.log("Method: "+req.method);
         return;
     }
 };

@@ -52,6 +52,7 @@ const handleSignup = async () => {
     // Place your signup logic here
     //console.log("Sign up successful!");
     try {
+      console.log("Before calling endpoint");
       const response = await fetch('/api/signup', {
         method: 'POST',
         headers: {
@@ -62,6 +63,8 @@ const handleSignup = async () => {
           password: password.value,
         }),
       });
+      console.log("After endpoint");
+
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
@@ -71,7 +74,6 @@ const handleSignup = async () => {
       }
     } catch (err) {
       console.error("Error during signup: ", err);
-      alert(err);
       alert('Something went wrong. Please try again.');
     }
   }
