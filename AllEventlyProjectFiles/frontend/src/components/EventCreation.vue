@@ -1,203 +1,309 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onUnmounted } from "vue";
 import logo from "@/assets/AllEventlyLogo.png";
 import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
 import SidebarWithPreview from "@/components/SidebarWithPreview.vue";
 
-// Reactive state using `ref` or `reactive`
-const eventName = ref('');
-const eventNameValid = ref(true);
-const isSingleEvent = ref(true);
-const eventDate = ref('');
-const startTime = ref('');
-const endTime = ref('');
-const timeZone = ref('CDT');
-const timeZones = ['CDT', 'EST', 'PST'];
-const requestChildCount = ref(false);
-const limitGuests = ref(false);
-const allowRSVP = ref(false);
-const hostFirstName = ref('');
-const hostLastName = ref('');
-const notifyRSVPs = ref(false);
+// Reactive state
+const eventName = ref<string>("");
+const eventNameValid = ref<boolean>(true);
+const isSingleEvent = ref<boolean>(true);
+const eventDate = ref<string>("");
+const startTime = ref<string>("");
+const endTime = ref<string>("");
+const timeZone = ref<string>("CDT");
+const timeZones = ref<string[]>(["CDT", "EST", "PST", "MST", "UTC"]);
+const requestChildCount = ref<boolean>(false);
+const limitGuests = ref<boolean>(false);
+const allowRSVP = ref<boolean>(false);
+const hostFirstName = ref<string>("");
+const hostLastName = ref<string>("");
+const notifyRSVPs = ref<boolean>(false);
+const isSidebarVisible = ref<boolean>(true);
+const sidebarWidth = ref<number>(200);
 
-function toggleEventType(isSingle: boolean) {
+// Tab navigation
+const activeTab = ref<"details" | "settings">("details");
+
+// Adjust sidebar width dynamically based on screen size
+const updateSidebarWidth = () => {
+  sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
+};
+
+window.addEventListener("resize", updateSidebarWidth);
+onUnmounted(() => {
+  window.removeEventListener("resize", updateSidebarWidth);
+});
+
+/*// Computed properties
+const isFormValid = computed((): boolean => {
+  return (
+    eventName.value.trim() !== "" &&
+    eventDate.value !== "" &&
+    startTime.value !== "" &&
+    endTime.value !== ""
+  );
+});*/
+
+// Methods
+function toggleEventType(isSingle: boolean): void {
   isSingleEvent.value = isSingle;
 }
 
-function validateEventName() {
+function validateEventName(): void {
   eventNameValid.value = eventName.value.trim().length > 0;
 }
+
+/*function submitEvent(): void {
+  if (isFormValid.value) {
+    console.log("Event submitted with the following details:", {
+      eventName: eventName.value,
+      eventDate: eventDate.value,
+      startTime: startTime.value,
+      endTime: endTime.value,
+      timeZone: timeZone.value,
+      requestChildCount: requestChildCount.value,
+      limitGuests: limitGuests.value,
+      allowRSVP: allowRSVP.value,
+      hostFirstName: hostFirstName.value,
+      hostLastName: hostLastName.value,
+      notifyRSVPs: notifyRSVPs.value,
+    });
+    alert("Event successfully created!");
+  } else {
+    alert("Please fill in all required fields.");
+  }
+}*/
 </script>
 
 <template>
-  <div class="event-creation">
+  <div class="page-layout event-creation-page">
     <TopPanelWithBack :logo="logo" />
-
-    <div class="event-sidebar">
-      <SidebarWithPreview :eventDetails="{ name: eventName, date: eventDate, time: startTime }" />
-    </div>
-
-    <div class="event-main">
-      <header class="event-header">
-        <h1>ALL EVENTLY</h1>
-        <p>EVENT MANAGEMENT</p>
-      </header>
-
-      <fieldset>
-        <legend>Event Details</legend>
-        <label for="event-name">Event Name</label>
-        <input
-            id="event-name"
-            type="text"
-            v-model="eventName"
-            @blur="validateEventName"
-            :class="{ 'input-error': !eventNameValid }"
-            placeholder="Enter event name"
-            required
-        />
-        <p v-if="!eventNameValid" class="error-message">Event name is required.</p>
-      </fieldset>
-
-      <fieldset>
-        <legend>Date and Location</legend>
-        <div class="event-type">
-          <button
-              class="button"
-              :class="{ selected: isSingleEvent }"
-              @click="toggleEventType(true)"
-          >
-            Single Event
-          </button>
-          <button
-              class="button"
-              :class="{ selected: !isSingleEvent }"
-              @click="toggleEventType(false)"
-          >
-            Recurring Event
-          </button>
+    <SidebarWithPreview
+        :isVisible="isSidebarVisible"
+        :width="sidebarWidth"
+        :eventDetails="{ name: eventName, date: eventDate, time: startTime }"
+    />
+    <!-- Main content area -->
+    <main class="content-area event-creation-content">
+      <div>
+        <div class="content-header">
+          <h1 class="main-title">New Event</h1>
+          <div class="tabs">
+            <button
+                :class="{ active: activeTab === 'details' }"
+                @click="activeTab = 'details'"
+            >
+              Event Details
+            </button>
+            <button
+                :class="{ active: activeTab === 'settings' }"
+                @click="activeTab = 'settings'"
+            >
+              Event Settings
+            </button>
+          </div>
         </div>
+        <section v-if="activeTab === 'details'" class="event-details">
+          <fieldset>
+            <legend>Event Details</legend>
+            <label for="event-name">Event Name</label>
+            <input
+                id="event-name"
+                type="text"
+                v-model="eventName"
+                @blur="validateEventName"
+                :class="{ 'input-error': !eventNameValid }"
+                placeholder="Enter event name"
+                required
+            />
+            <label for="event-name">Note for Guests</label>
+            <input
+                id="event-note"
+                type="text"
+                placeholder="Optional: Note for Guests"
+                required
+            />
+            <p v-if="!eventNameValid" class="error-message">Event name is required.</p>
+          </fieldset>
 
-        <div class="event-date-time">
-          <label for="event-date">Date and time</label>
-          <input id="event-date" type="date" v-model="eventDate" required />
-          <input id="start-time" type="time" v-model="startTime" required />
-          <input id="end-time" type="time" v-model="endTime" required />
+          <fieldset>
+            <legend>Date and Location</legend>
+            <div class="event-type">
+              <label for="event-type">Type of Event</label>
+              <button
+                  class="button"
+                  :class="{ selected: isSingleEvent }"
+                  @click="toggleEventType(true)"
+              >
+                Single Event
+              </button>
+              <button
+                  class="button"
+                  :class="{ selected: !isSingleEvent }"
+                  @click="toggleEventType(false)"
+              >
+                Recurring Event
+              </button>
+            </div>
+            <div class="event-date-time-row" v-if="isSingleEvent">
+              <div>
+                <label for="event-date">Date</label>
+                <input id="event-date" type="date" v-model="eventDate" required />
+              </div>
+              <div>
+                <label for="start-time">Start Time</label>
+                <input id="start-time" type="time" v-model="startTime" required />
+              </div>
+              <div>
+                <label for="end-time">End Time</label>
+                <input id="end-time" type="time" v-model="endTime" required />
+              </div>
+              <div>
+                <label for="time-zone">Event Time Zone</label>
+                <select id="time-zone" v-model="timeZone">
+                  <option v-for="tz in timeZones" :key="tz" :value="tz">{{ tz }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="event-location">
+              <label for="event-address">Event Address</label>
+              <input id="event-address" type="text" placeholder="Enter address" required />
 
-          <label for="time-zone">Event Time Zone</label>
-          <select id="time-zone" v-model="timeZone">
-            <option v-for="tz in timeZones" :key="tz" :value="tz">{{ tz }}</option>
-          </select>
-        </div>
+              <label for="event-venue">Event Venue Name</label>
+              <input id="event-venue" type="text" placeholder="Enter venue name" />
+            </div>
+          </fieldset>
+        </section>
 
-        <div class="event-location">
-          <label for="event-address">Event Address</label>
-          <input id="event-address" type="text" placeholder="Enter address" required />
+        <section v-if="activeTab === 'settings'" class="event-settings">
+          <section class="guest-settings">
+            <h2>Guest Settings</h2>
+            <div class="toggle-setting">
+              <label>Request Child Count</label>
+              <input type="checkbox" v-model="requestChildCount" />
+            </div>
+            <div class="toggle-setting">
+              <label>Limit Additional Guests</label>
+              <input type="checkbox" v-model="limitGuests" />
+            </div>
+            <div class="toggle-setting">
+              <label>Allow Guests to RSVP</label>
+              <input type="checkbox" v-model="allowRSVP" />
+            </div>
+          </section>
 
-          <label for="event-venue">Event Venue Name</label>
-          <input id="event-venue" type="text" placeholder="Enter venue name" />
-        </div>
-      </fieldset>
+          <section class="host-settings">
+            <h2>Host Settings</h2>
+            <label for="host-first-name">Hosted By</label>
+            <input
+                id="host-first-name"
+                class="event-input"
+                v-model="hostFirstName"
+                placeholder="Insert Host First Name"
+            />
+            <input
+                id="host-last-name"
+                class="event-input"
+                v-model="hostLastName"
+                placeholder="Insert Host Last Name"
+            />
+            <div class="toggle-setting">
+              <label>Get Notified of RSVPs</label>
+              <input type="checkbox" v-model="notifyRSVPs" />
+            </div>
+          </section>
 
-      <section class="guest-settings">
-        <h2>Guest Settings</h2>
-        <div class="toggle-setting">
-          <label>Request Child Count</label>
-          <input type="checkbox" v-model="requestChildCount" />
-        </div>
-        <div class="toggle-setting">
-          <label>Limit Additional Guests</label>
-          <input type="checkbox" v-model="limitGuests" />
-        </div>
-        <div class="toggle-setting">
-          <label>Allow Guests to RSVP</label>
-          <input type="checkbox" v-model="allowRSVP" />
-        </div>
-      </section>
-
-      <section class="host-settings">
-        <h2>Host Settings</h2>
-        <label for="host-first-name">Hosted By</label>
-        <input
-            id="host-first-name"
-            class="event-input"
-            v-model="hostFirstName"
-            placeholder="Insert Host First Name"
-        />
-        <input
-            id="host-last-name"
-            class="event-input"
-            v-model="hostLastName"
-            placeholder="Insert Host Last Name"
-        />
-        <div class="toggle-setting">
-          <label>Get Notified of RSVPs</label>
-          <input type="checkbox" v-model="notifyRSVPs" />
-        </div>
-      </section>
-
-      <section class="event-links">
-        <h2>Links</h2>
-        <button class="add-link-button" v-for="n in 4" :key="n">Add a Link to Your Invite</button>
-      </section>
-    </div>
+          <section class="event-links">
+            <h2>Links</h2>
+            <button
+                class="add-link-button"
+                v-for="n in 4"
+                :key="n"
+            >
+              Add a Link to Your Invite
+            </button>
+          </section>
+        </section>
+      </div>
+    </main>
   </div>
 </template>
 
 <style scoped>
 @import '@/styles/common.css';
 
-:root {
-  --primary: #3b5998;
-  --light: #f7f7f7;
-  --dark: #333;
-  --error: #ff4d4f;
-  --border: #ccc;
-  --background: #eef2f3;
+.content-header .main-title {
+  margin-top: 25px;
+  font-size: 4rem; /* Adjust to your desired size */
+  font-weight: bold; /* Optional: Keep it bold or adjust */
+  margin-bottom: 10px; /* Optional: Adjust spacing around the title */
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: var(--background);
-  color: var(--dark);
-}
-
-.event-creation {
+.tabs {
   display: flex;
-  gap: 20px;
-  padding: 20px;
-}
-
-.event-sidebar {
-  width: 25%;
-  background-color: var(--light);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 20px;
-}
-
-.event-main {
-  width: 75%;
-  background-color: white;
-  border-radius: 8px;
-  padding: 30px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.event-header h1 {
-  font-size: 1.5rem;
-  color: var(--primary);
-}
-
-fieldset {
-  border: 1px solid var(--border);
-  padding: 20px;
-  border-radius: 8px;
+  gap: 10px;
+  justify-content: flex-start; /* Align buttons to the left */
   margin-bottom: 20px;
 }
 
-legend {
-  color: var(--primary);
+.tabs button {
+  padding: 15px 30px; /* Height(px), Width(px) */
+  font-size: 1.2rem;
   font-weight: bold;
+  background-color: #FF6B35;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.tabs button:hover {
+  background-color: #D9432C;
+  transform: scale(1.05);
+}
+
+.tabs button.active {
+  background-color: #E63946;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+}
+
+legend {
+  font-size: 1.5rem; /* Adjust to match your design */
+  font-weight: bold;
+  color: #FF6B35; /* Match the primary accent color from your tabs */
+  padding: 0 10px; /* Adds spacing around the legend text */
+  text-transform: uppercase; /* Optional: Makes the text uppercase */
+  border-bottom: 2px solid #FF6B35; /* Adds an underline effect */
+  display: inline-block;
+}
+
+.event-date-time-row {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
+  gap: 15px; /* Space between the inputs */
+  justify-content: flex-start; /* Align items to the left */
+  align-items: flex-start; /* Align items at the top */
+}
+
+.event-date-time-row > div {
+  flex: 1 1 calc(25% - 15px); /* Adjust size of each input field */
+  min-width: 150px; /* Ensure inputs don’t shrink below this size */
+  max-width: 300px; /* Optional: Limit the maximum width */
+}
+
+/* Input and Label Styling */
+fieldset {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column; /* Align items vertically */
+  align-items: flex-start; /* Align content to the left */
 }
 
 label {
@@ -208,68 +314,41 @@ label {
 
 input, select {
   width: 100%;
+  max-width: 400px;
   padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid var(--border);
+  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
 input:focus, select:focus {
-  border-color: var(--primary);
+  border-color: #E63946;
   outline: none;
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.4);
 }
 
-.button {
-  padding: 10px 15px;
-  background-color: var(--primary);
+/* Button Styling */
+button {
+  font-size: 1rem;
+  padding: 10px 20px;
+  background-color: #FF6B35;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
-.button:hover {
+button:hover {
+  background-color: #D9432C;
   transform: scale(1.05);
 }
 
-.error-message {
-  color: var(--error);
-  font-size: 0.9rem;
-}
-
-.toggle-setting {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.add-link-button {
-  display: block;
-  width: 100%;
-  text-align: center;
-  background-color: var(--light);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 10px;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.add-link-button:hover {
-  background-color: var(--primary);
-  color: white;
-}
-
-@media (max-width: 768px) {
-  .event-creation {
-    flex-direction: column;
-  }
-
-  .event-sidebar, .event-main {
-    width: 100%;
+@media screen and (max-width: 768px) {
+  .tabs button {
+    padding: 10px 20px; /* Adjust padding for smaller screens */
+    font-size: 1rem; /* Reduce font size */
   }
 }
 </style>

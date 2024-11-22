@@ -32,7 +32,7 @@ const navigateTo = (path: string) => {
 
 <template>
   <aside :class="['sidebar', { 'sidebar-visible': isVisible }]">
-    <nav class="navigation">
+    <nav class="preview-container">
       <button v-for="item in navItems" :key="item.label" @click="navigateTo(item.path)" class="nav-button">
         <FontAwesomeIcon :icon="item.icon" class="nav-icon" />
         <span class="nav-label">{{ item.label }}</span>
