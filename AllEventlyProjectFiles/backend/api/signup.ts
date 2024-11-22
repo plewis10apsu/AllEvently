@@ -49,10 +49,13 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         try {
             // Parse the request body
             const {email, password} = await parseJsonBody(req);
+            console.log("Received email: "+email);
+            console.log("Received password : "+password);
 
             if (!email || !password) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({message: 'All fields are required.'}));
+                return;
             }
 
             // Check if the email already exists in the database
@@ -60,6 +63,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             if (emailCheck.rows.length > 0) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({message: 'Email is already registered.'}));
+                return;
             }
 
             // Insert the new account
@@ -70,15 +74,19 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
 
             res.statusCode = 201;
             res.end(JSON.stringify({message: 'Account created successfully!'}));
+            return;
         } catch (err) {
             console.error('Error creating account:', err);
             res.statusCode = 500;
             res.end(JSON.stringify({message: 'Internal server error.'}));
+            console.log(err);
+            return;
         }
     } else {
         // Respond with method not allowed for non-POST requests
         res.statusCode = 405;
         res.end(JSON.stringify({message: 'Method Not Allowed'}));
+        return;
     }
 };
 

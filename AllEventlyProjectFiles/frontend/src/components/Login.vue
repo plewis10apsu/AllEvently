@@ -71,6 +71,7 @@ const handleSignup = async () => {
       }
     } catch (err) {
       console.error("Error during signup: ", err);
+      alert(err);
       alert('Something went wrong. Please try again.');
     }
   }
