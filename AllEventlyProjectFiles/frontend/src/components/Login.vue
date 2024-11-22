@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router';
+import {ref} from 'vue'
+import {useRouter} from 'vue-router';
 import GoogleSSO from './GoogleSSO.vue';
 import logo from '@/assets/AllEventlyLogo.png';
 import visibleIcon from '@/assets/Visible_Icon.png';
@@ -23,8 +23,8 @@ const validateEmail = () => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   isEmailValid.value = emailPattern.test(email.value);
 };
-
-const handleSignup = () => {
+//experimental signup function. Please work 🙏🏻
+const handleSignup = async () => {
   errorMessageFirstName.value = '';
   errorMessageLastName.value = '';
   errorMessageEmail.value = '';
@@ -50,7 +50,30 @@ const handleSignup = () => {
 
   if (firstName.value && lastName.value && email.value && isEmailValid.value && password.value) {
     // Place your signup logic here
-    console.log("Sign up successful!");
+    //console.log("Sign up successful!");
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.value,
+          password: password.value,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+      } else {
+        const error = await response.json();
+        alert(error.message);
+      }
+    } catch (err) {
+      console.error("Error during signup: ", err);
+      alert(err);
+      alert('Something went wrong. Please try again.');
+    }
   }
 };
 
@@ -222,11 +245,11 @@ html, body {
 <style scoped>
 @import '@/styles/common.css';
 
- *,
- *::before,
- *::after {
-   box-sizing: border-box;
- }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 .login-page {
   margin: 0;
@@ -609,6 +632,7 @@ html, body {
   line-height: 30px;
   transform: translateX(30%);
 }
+
 .btn-signup:hover {
   background-color: #144d75;
 }
