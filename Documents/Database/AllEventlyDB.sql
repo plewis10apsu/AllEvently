@@ -1,71 +1,88 @@
+DROP FUNCTION IF EXISTS GET_PUBLIC_EVENTS;
+DROP FUNCTION IF EXISTS GET_HOSTED_EVENTS;
+DROP FUNCTION IF EXISTS GET_ATTENDING_EVENTS;
+DROP FUNCTION IF EXISTS UPDATE_PASSWORD;
+DROP FUNCTION IF EXISTS CREATE_RESET_CREDENTIALS;
+DROP FUNCTION IF EXISTS CREATE_ACCOUNT;
+DROP FUNCTION IF EXISTS AUTHENTICATE_USER;
+
+DROP TABLE IF EXISTS GUESTS;
+DROP TABLE IF EXISTS CHAT_MESSAGES;
+DROP TABLE IF EXISTS EVENTS;
+DROP TABLE IF EXISTS USER_IMAGES;
+DROP TABLE IF EXISTS IMAGES;
+DROP TABLE IF EXISTS RESET_CREDENTIALS;
+DROP TABLE IF EXISTS SESSIONS;
+DROP TABLE IF EXISTS ACCOUNTS;
+DROP TABLE IF EXISTS PEOPLE;
 
 
 -------------CREATE TABLES----------------
 --TABLE TO STORE USERS
-CREATE TABLE People (
-    email varchar(30),
-    first_name varchar(30) NOT NULL,
-    last_name varchar(30) NOT NULL,
+CREATE TABLE IF NOT EXISTS People (
+    email text,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
     PRIMARY KEY(email)
 );
 
 --TABLE TO STORE USER ACCOUNTS
-CREATE TABLE Accounts (
-    account_email varchar(30),
-    account_password varchar(30) NOT NULL,
+CREATE TABLE IF NOT EXISTS Accounts (
+    account_email text,
+    account_password text NOT NULL,
     PRIMARY KEY (account_email),
     FOREIGN KEY (account_email) REFERENCES People (email)
 );
 
 --TABLE TO STORE ACCOUNT SESSIONS
-CREATE TABLE Sessions (
-    session_id varchar(30),
-    session_email varchar(30) NOT NULL UNIQUE,
+CREATE TABLE IF NOT EXISTS Sessions (
+    session_id SERIAL,
+    session_email text NOT NULL UNIQUE,
     PRIMARY KEY(session_id),
     FOREIGN KEY (session_email) REFERENCES Accounts (account_email)
 );
 
 --TABLE TO STORE RESET PASSWORD CREDENTIALS
-CREATE TABLE Reset_Credentials (
-    account_email varchar(30),
-    temp_password varchar(30) NOT NULL,
+CREATE TABLE IF NOT EXISTS Reset_Credentials (
+    account_email text,
+    temp_password text NOT NULL,
     PRIMARY KEY (account_email),
     FOREIGN KEY (account_email) REFERENCES Accounts (account_email)
 );
 
 --TABLE TO STORE IMAGE PATHS
-CREATE TABLE Images (
-    image_id INT,
-    image_path varchar(30) NOT NULL,
+CREATE TABLE IF NOT EXISTS Images (
+    image_id SERIAL,
+    image_path text NOT NULL,
     is_template BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (image_id)
 );
 
 --TABLE TO STORE WHICH IMAGES BELONG TO WHICH USER
-CREATE TABLE User_Images (
+CREATE TABLE IF NOT EXISTS User_Images (
     image_id INT,
-    owner_email varchar(30) NOT NULL,
+    owner_email text NOT NULL,
     PRIMARY KEY (image_id),
     FOREIGN KEY (image_id) REFERENCES Images (image_id),
     FOREIGN KEY (owner_email) REFERENCES People (email)
 );
 
 --TABLE TO STORE EVENTS
-CREATE TABLE Events (
-    event_id INT,
-    event_host varchar(30) NOT NULL,
-    host_name varchar(30) NOT NULL,
-    event_name varchar(30) DEFAULT 'My Event',
-    event_location varchar(30) NOT NULL,
-    event_start_date DATE DEFAULT (CURRENT_DATE)+1,
+CREATE TABLE IF NOT EXISTS Events (
+    event_id SERIAL,
+    event_host text NOT NULL,
+    host_name text NOT NULL,
+    event_name text DEFAULT 'My Event',
+    event_location text NOT NULL,
+    event_start_date DATE DEFAULT (CURRENT_DATE) + INTERVAL '1 DAY',
     event_end_date DATE,
-    event_time_zone varchar(30) DEFAULT 'UTC',
-    invitation_layout varchar(30) DEFAULT 'Center',
-    background_image INT DEFAULT 0,
-    font_background_color varchar(30) DEFAULT '#000000',
-    font_color varchar(30) DEFAULT '#FFFFFF',
-    font varchar(30) DEFAULT 'italic bold 20px arial,serif',
-    is_public BOOLEAN DEFAULT TRUE,
+    event_time_zone text DEFAULT 'UTC',
+    invitation_layout text DEFAULT 'Center',
+    background_image INT DEFAULT 1,
+    font_background_color text DEFAULT '#000000',
+    font_color text DEFAULT '#FFFFFF',
+    font text DEFAULT 'italic bold 20px arial,serif',
+    is_public BOOLEAN DEFAULT FALSE,
     reoccurs BOOLEAN DEFAULT FALSE,
     reoccur_freq INT,
     end_reoccur DATE,
@@ -79,11 +96,11 @@ CREATE TABLE Events (
 );
 
 --TABLE TO STORE CHAT MESSAGES
-CREATE TABLE Chat_Messages (
-    message_id INT,
+CREATE TABLE IF NOT EXISTS Chat_Messages (
+    message_id SERIAL,
     event_id INT NOT NULL,
-    sender_email varchar(30) NOT NULL,
-    content varchar(30) NOT NULL,
+    sender_email text NOT NULL,
+    contents text NOT NULL,
     sent_date DATE DEFAULT (CURRENT_DATE),
     accepted BOOLEAN,
     PRIMARY KEY (message_id),
@@ -92,8 +109,8 @@ CREATE TABLE Chat_Messages (
 );
 
 --TABLE TO STORE GUESTS OF EVENTS
-CREATE TABLE Guests (
-    guest_email varchar(30),
+CREATE TABLE IF NOT EXISTS Guests (
+    guest_email text,
     event_id INT,
     responded BOOLEAN DEFAULT FALSE,
     invite_sent BOOLEAN DEFAULT FALSE,
@@ -105,48 +122,46 @@ CREATE TABLE Guests (
     FOREIGN KEY (event_id) REFERENCES Events(event_id)
 );
 
+
 -----------Create Functions-------------
---Authenticate Users
+--Authenticate Users -- COMPLETE DO NOT TOUCH
 CREATE OR REPLACE FUNCTION Authenticate_User
-(Email_Address varchar(30), Pass varchar(30)) RETURNS INT AS $$
+(Email_Address text, Pass text) RETURNS INT AS $$
 DECLARE
 	Count_A INT;
 BEGIN
 
 	Count_A := (SELECT COUNT(*) FROM Accounts
-    HAVING email = Email_Address and account_password = Pass);
+    WHERE account_email = Email_Address and account_password = Pass);
 
     --Check if there is only one account
     IF Count_A = 1 THEN
-        --Create Session
-        INSERT INTO Sessions (session_email)
-        VALUES (Email_Address);
 
         --Get Session ID
         RETURN (SELECT session_id FROM Sessions
         WHERE session_email = Email_Address);
+		
 	END IF;
 
 	RETURN NULL;
 	
 END $$ LANGUAGE plpgsql;
 
---Add Account
+
+--Add Account -- COMPLETE DO NOT TOUCH
 CREATE OR REPLACE FUNCTION Create_Account
-(Email_Address varchar(30), Pass varchar(30), FName varchar(30), LName varchar(30)) RETURNS INT AS $$
+(Email_Address text, Pass text, FName text, LName text) RETURNS INT AS $$
 DECLARE
 	Count_P INT;
 	Count_A INT;
 BEGIN
     --Get count of people with given address
 	Count_P := (SELECT COUNT(*) FROM People
-    GROUP BY People.email
-    HAVING People.email = Email_Address);
+    WHERE People.email = Email_Address);
 
 	--Get count of accounts with given address
     Count_A := (SELECT COUNT(*) FROM Accounts
-    GROUP BY Accounts.account_email
-	HAVING Accounts.account_email = Email_Address);
+    WHERE Accounts.account_email = Email_Address);
 
     --Check if no account exists
     IF Count_A = 0 THEN
@@ -164,61 +179,54 @@ BEGIN
         --Create Account
         INSERT INTO Accounts (account_email, account_password)
         VALUES (Email_Address, Pass);
-
+		
         --Create Session
-        INSERT INTO Sessions (session_email)
+        INSERT INTO Sessions
+		(session_email)
         VALUES (Email_Address);
 
         --Get Session ID
         RETURN (SELECT session_id FROM Sessions
         WHERE session_email = Email_Address);
-	END IF;
 
-	RETURN NULL;
+	ELSE
+		RETURN NULL;
+	END IF;
 	
 END $$ LANGUAGE plpgsql;
-
-Select Create_Account ('ben', 'qerhf ewlf', 'ben', 'schwartz');
 
 
 --Create reset credentials
 CREATE OR REPLACE FUNCTION Create_Reset_Credentials
-(Email_Address varchar(30)) RETURNS varchar(30) AS $$
+(Email_Address text) RETURNS text AS $$
 DECLARE
 	Count_A INT;
 	Count_RC INT;
 	rand_num INT;
-	temp_pass varchar(30);
+	temp_pass text;
 	diff INT;
 BEGIN
 
     --Get count of accounts with given address in Accounts
     Count_A := (SELECT COUNT(*) FROM Accounts
-    HAVING account_email = Email_Address);
+    WHERE account_email = Email_Address);
 
     --Get count of accounts with given address in Reset_Credentials
     Count_RC := (SELECT COUNT(*) FROM Reset_Credentials
-    HAVING account_email = Email_Address);
+    WHERE account_email = Email_Address);
 
     IF (Count_A = 1 AND Count_RC < 1) THEN
 
-        rand_num := (SELECT FLOOR(RAND()*9999999999));
+        rand_num := (SELECT FLOOR(RANDOM()*89999999)+10000000);
 
-        temp_pass := CAST(rand_num AS varchar(30));
-
-        WHILE (LEN(temp_pass) < 8) LOOP
-            diff := 8 - LEN(temp_pass);
-
-            rand_num := (SELECT FLOOR(RAND()*(POWER(10, diff)-1)));
-
-            temp_pass := temp_pass + CAST(rand_num AS varchar(30));
-		END LOOP;
+        temp_pass := CAST(rand_num AS text);
 
         INSERT INTO Reset_Credentials (account_email, temp_password)
-        VALUES (Email_Address, temp);
+        VALUES (Email_Address, temp_pass);
 
         RETURN (SELECT temp_password FROM Reset_Credentials
         where account_email = Email_Address);
+		
 	END IF;
 
 	RETURN NULL;
@@ -226,16 +234,16 @@ BEGIN
 END $$ LANGUAGE plpgsql;
 
 
---Reset Password
+--Update Password
 CREATE OR REPLACE FUNCTION Update_Password
-(Email_Address varchar(30), temp varchar(30), new_pass varchar(30))
-RETURNS INT AS $$
+(Email_Address text, temp text, new_pass text)
+RETURNS VOID AS $$
 DECLARE
 	Count_RC INT;
 BEGIN
     --Get count of accounts with given address in Reset_Credentials
     Count_RC := (SELECT COUNT(*) FROM Reset_Credentials
-    HAVING account_email = Email_Address AND temp_password = temp);
+    WHERE account_email = Email_Address AND temp_password = temp);
 
     IF (Count_RC = 1) THEN
         DELETE FROM Reset_Credentials
@@ -245,42 +253,89 @@ BEGIN
         SET account_password = new_pass
         WHERE (account_email = Email_Address);
     END IF;
+
+	RETURN;
 	
 END $$ LANGUAGE plpgsql;
 
 
 --Get Invited Events
 CREATE OR REPLACE FUNCTION Get_Attending_Events
-(Email_Address varchar(30))
-RETURNS SETOF Events AS $BODY$
+(Email_Address text)
+RETURNS SETOF Events AS $$
 BEGIN
 
-    RETURN NEXT (SELECT * FROM Events
-		WHERE event_id IN (SELECT ARRAY_AGG(event_id) FROM Guests
-        	WHERE guest_email = Email_Address));
+    RETURN QUERY SELECT * FROM Events
+		WHERE event_id IN (SELECT event_id FROM Guests
+        	WHERE guest_email = Email_Address);
 		
-END $BODY$ LANGUAGE plpgsql;
+END $$ LANGUAGE plpgsql;
+
 
 --Get Hosted Events
 CREATE OR REPLACE FUNCTION Get_Hosted_Events
-(Email_Address varchar(30))
-RETURNS SETOF Events AS $BODY$
+(Email_Address text)
+RETURNS SETOF Events AS $$
 BEGIN
 
-    RETURN NEXT (SELECT * FROM Events
-    WHERE event_host = Email_Address);
+    RETURN QUERY SELECT * FROM Events
+    WHERE event_host = Email_Address;
 	
-END $BODY$ LANGUAGE plpgsql;
+END $$ LANGUAGE plpgsql;
+
 
 --Get Public Events
 CREATE OR REPLACE FUNCTION Get_Public_Events ()
-RETURNS SETOF Events AS $BODY$
+RETURNS SETOF Events AS $$
 BEGIN
 
-    SELECT * FROM Events
+    RETURN QUERY SELECT * FROM Events
     WHERE is_public = TRUE;
 	
-END $BODY$ LANGUAGE plpgsql;
+END $$ LANGUAGE plpgsql;
 
 
------------Create Triggers---------------
+
+-----------Test--------------------------
+---Create users
+SELECT CREATE_ACCOUNT('ben', 'password', 'ben', 'bruyns');
+SELECT CREATE_ACCOUNT('peggy', 'asswordp', 'peggy', 'lewis');
+SELECT CREATE_ACCOUNT('spensor', 'sswordap', 'spensor', 'morey');
+SELECT AUTHENTICATE_USER('ben', 'password');
+
+--Create images
+INSERT INTO IMAGES (image_path)
+VALUES ('pig');
+
+select * from images;
+
+---Create events
+--Default event with minimum parameters
+INSERT INTO EVENTS (event_host, host_name, event_location)
+VALUES ('ben', 'benjamin', 'here');
+INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date)
+VALUES ('peggy', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
+INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
+VALUES ('spensor', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
+
+
+--Create Guest
+INSERT INTO GUESTS (guest_email, event_id)
+VALUES ('ben', 2);
+
+--Create Chat Message
+INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
+VALUES (2, 'ben', 'Hello World');
+INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
+VALUES (2, 'peggy', 'Hello Ben');
+
+
+
+
+
+
+
+
+
+
+

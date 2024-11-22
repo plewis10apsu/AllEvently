@@ -1,62 +1,62 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15" version="24.8.6">
   <diagram name="Page-1" id="qO7jV__PaO-5MtRfGxtY">
-    <mxGraphModel dx="1207" dy="814" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="1466" dy="989" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-1" value="Desktop Client" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="120" y="310" width="120" height="60" as="geometry" />
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-1" value="Desktop Client" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="165" y="310" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-2" value="Frontend" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-2" value="Frontend" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="360" y="310" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-4" value="Database&lt;div&gt;Server&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-          <mxGeometry x="920" y="300" width="60" height="80" as="geometry" />
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-4" value="Database&lt;div style=&quot;font-size: 16px;&quot;&gt;Server&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontStyle=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="585" y="440" width="100" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-5" value="Mobile Client" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-5" value="Mobile Client" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="360" y="470" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-7" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="k67DTi2gIu2Nwr46RiH4-1" target="k67DTi2gIu2Nwr46RiH4-2" edge="1">
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-7" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;" parent="1" source="k67DTi2gIu2Nwr46RiH4-1" target="k67DTi2gIu2Nwr46RiH4-2" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="530" y="460" as="sourcePoint" />
             <mxPoint x="580" y="410" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-8" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="EtBgoSmanaX7soMJlDYO-1" target="k67DTi2gIu2Nwr46RiH4-4" edge="1">
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-8" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;" parent="1" source="EtBgoSmanaX7soMJlDYO-1" target="k67DTi2gIu2Nwr46RiH4-4" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="741" y="340" as="sourcePoint" />
-            <mxPoint x="855.02" y="347.03999999999996" as="targetPoint" />
+            <mxPoint x="676" y="340" as="sourcePoint" />
+            <mxPoint x="790.02" y="347.03999999999996" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-9" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="k67DTi2gIu2Nwr46RiH4-5" target="k67DTi2gIu2Nwr46RiH4-2" edge="1">
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-9" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontSize=12;" parent="1" source="k67DTi2gIu2Nwr46RiH4-5" target="k67DTi2gIu2Nwr46RiH4-2" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="320" y="480" as="sourcePoint" />
             <mxPoint x="370" y="430" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="k67DTi2gIu2Nwr46RiH4-10" value="Users on desktop interacting&lt;div&gt;with the system UI&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="90" y="240" width="180" height="40" as="geometry" />
+          <mxGeometry x="135" y="255" width="180" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-11" value="Server the website will&lt;div&gt;be hosted on. Will load pages and interact&lt;/div&gt;&lt;div&gt;with the backend&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="295" y="230" width="250" height="60" as="geometry" />
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-11" value="Server the website will&lt;div style=&quot;font-size: 12px;&quot;&gt;be hosted on.&lt;/div&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;Will load pages and interact&lt;/div&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;with the backend&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="335" y="240" width="170" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-12" value="Users on mobile devices interacting&lt;div&gt;with the system UI&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-12" value="Users on mobile devices interacting&lt;div style=&quot;font-size: 12px;&quot;&gt;with the system UI&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;" parent="1" vertex="1">
           <mxGeometry x="315" y="550" width="210" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="k67DTi2gIu2Nwr46RiH4-13" value="Database server for storing information&lt;div&gt;and sending necessary&amp;nbsp;&lt;/div&gt;&lt;div&gt;data over the web server.&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="845" y="230" width="230" height="60" as="geometry" />
+        <mxCell id="k67DTi2gIu2Nwr46RiH4-13" value="Database server for&lt;div&gt;storing information&lt;div style=&quot;font-size: 12px;&quot;&gt;and sending necessary&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;data over the web server.&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="550" y="555" width="160" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="EtBgoSmanaX7soMJlDYO-2" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="k67DTi2gIu2Nwr46RiH4-2" target="EtBgoSmanaX7soMJlDYO-1">
+        <mxCell id="EtBgoSmanaX7soMJlDYO-2" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;" parent="1" source="k67DTi2gIu2Nwr46RiH4-2" target="EtBgoSmanaX7soMJlDYO-1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="480" y="340" as="sourcePoint" />
             <mxPoint x="610" y="340" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="EtBgoSmanaX7soMJlDYO-1" value="Backend" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="640" y="310" width="120" height="60" as="geometry" />
+        <mxCell id="EtBgoSmanaX7soMJlDYO-1" value="Backend" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="575" y="310" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="EtBgoSmanaX7soMJlDYO-5" value="Server that will respond to the Frontend&lt;div&gt;&amp;nbsp;and make database calls&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="580" y="240" width="230" height="40" as="geometry" />
+        <mxCell id="EtBgoSmanaX7soMJlDYO-5" value="Server that will respond to the&lt;div style=&quot;font-size: 12px;&quot;&gt;Frontend and make database calls&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="525" y="255" width="210" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
