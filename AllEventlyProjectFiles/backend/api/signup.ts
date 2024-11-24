@@ -49,14 +49,16 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
     if (req.method === 'POST') {
         try {
             // Parse the request body
-            const {email, password} = await parseJsonBody(req);
+            const {email, password, firstName, lastName} = await parseJsonBody(req);
             console.log("Received email: "+email);
             console.log("Received password : "+password);
+            console.log("Received firstName: "+firstName);
+            console.log("Received lastName: "+lastName);
 
             if (!email || !password) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({message: 'All fields are required.'}));
-                return;
+                //return;
             }
 
             // Check if the email already exists in the database
@@ -64,18 +66,14 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             if (emailCheck.rows.length > 0) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({message: 'Email is already registered.'}));
-                return;
+               // return;
             }
 
             // Insert the new account
-            await pool.query(
-                'INSERT INTO Accounts (email, password) VALUES ($1, $2)',
-                [email, password]
-            );
-
+            await pool.query('CALL CreateAccount($1, $2, $3, $4', [email, password, firstName, lastName]);
             res.statusCode = 201;
             res.end(JSON.stringify({message: 'Account created successfully!'}));
-            return;
+            //return;
         } catch (err) {
             console.error('Error creating account:', err);
             res.statusCode = 500;
@@ -88,7 +86,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         res.statusCode = 405;
         res.end(JSON.stringify({message: 'Method Not Allowed'}));
         console.log("Method: "+req.method);
-        return;
+        //return;
     }
 };
 
