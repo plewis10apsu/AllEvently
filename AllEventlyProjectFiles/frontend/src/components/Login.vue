@@ -53,7 +53,7 @@ const handleSignup = async () => {
     //console.log("Sign up successful!");
     try {
       console.log("Before calling endpoint");
-      const response = await fetch('/api/signup', {
+      const response = await fetch('https://all-evently-backend.vercel.app/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,6 +61,8 @@ const handleSignup = async () => {
         body: JSON.stringify({
           email: email.value,
           password: password.value,
+          firstName: firstName.value,
+          lastName: lastName.value
         }),
       });
       console.log("After endpoint");
@@ -69,11 +71,20 @@ const handleSignup = async () => {
         const data = await response.json();
         alert(data.message);
       } else {
+        /*
         const error = await response.json();
+        console.log("Caught in response.ok error...");
         alert(error.message);
+        */
+        response.json().then(data => {
+          console.error('Error response from server:', data);
+          alert(data.message + (data.error ? `: ${data.error}` : ''));
+        });
+
+
       }
     } catch (err) {
-      console.error("Error during signup: ", err);
+      console.log("Error during signup: ", err);
       alert('Something went wrong. Please try again.');
     }
   }
