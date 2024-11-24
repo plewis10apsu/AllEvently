@@ -1,7 +1,7 @@
 import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import {IncomingMessage, ServerResponse} from 'http';
-
+const bcrypt = require('bcrypt');
 
 dotenv.config();
 
@@ -49,44 +49,46 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
     if (req.method === 'POST') {
         try {
             // Parse the request body
-            const {email, password, firstName, lastName} = await parseJsonBody(req);
-            console.log("Received email: "+email);
-            console.log("Received password : "+password);
-            console.log("Received firstName: "+firstName);
-            console.log("Received lastName: "+lastName);
+            const body = await parseJsonBody(req);
+            console.log("Received email: "+body.email);
+            console.log("Received password : "+body.password);
+            console.log("Received firstName: "+body.firstName);
+            console.log("Received lastName: "+body.lastName);
 
-            if (!email || !password) {
+
+
+            if (!body.email || !body.password) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({message: 'All fields are required.'}));
-                //return;
+                return;
             }
-
+            const hashedPassword = await bcrypt.hash(body.password, 12);
             // Check if the email already exists in the database
-            const emailCheck = await pool.query('SELECT email FROM Accounts WHERE email = $1', [email]);
+            const emailCheck = await pool.query('SELECT email FROM Accounts WHERE email = $1', [body.email]);
             if (emailCheck.rows.length > 0) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({message: 'Email is already registered.'}));
-               // return;
+                return;
             }
 
             // Insert the new account
-            await pool.query('CALL CreateAccount($1, $2, $3, $4', [email, password, firstName, lastName]);
+            await pool.query('CALL CreateAccount($1, $2, $3, $4)', [body.email, hashedPassword, body.firstName, body.lastName]);
             res.statusCode = 201;
             res.end(JSON.stringify({message: 'Account created successfully!'}));
-            //return;
+            return;
         } catch (err) {
             console.error('Error creating account:', err);
             res.statusCode = 500;
             res.end(JSON.stringify({message: 'Internal server error.'}));
             console.log(err);
-           // return;
+            return;
         }
     } else {
         // Respond with method not allowed for non-POST requests
         res.statusCode = 405;
         res.end(JSON.stringify({message: 'Method Not Allowed'}));
         console.log("Method: "+req.method);
-        //return;
+        return;
     }
 };
 
