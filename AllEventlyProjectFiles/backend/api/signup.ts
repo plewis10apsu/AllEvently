@@ -1,7 +1,7 @@
 import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import {IncomingMessage, ServerResponse} from 'http';
-const bcryptjs = require('bcryptjs');
+//const bcryptjs = require('bcryptjs');
 
 dotenv.config();
 
@@ -62,7 +62,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message: 'All fields are required.'}));
                 return;
             }
-            const hashedPassword = await bcryptjs.hash(body.password, 12);
+            //const hashedPassword = await bcryptjs.hash(body.password, 12);
             // Check if the email already exists in the database
             const emailCheck = await pool.query('SELECT email FROM Accounts WHERE email = $1', [body.email]);
             if (emailCheck.rows.length > 0) {
@@ -72,7 +72,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             }
 
             // Insert the new account
-            await pool.query('CALL CreateAccount($1, $2, $3, $4)', [body.email, hashedPassword, body.firstName, body.lastName]);
+            await pool.query('CALL CreateAccount($1, $2, $3, $4)', [body.email, body.password, body.firstName, body.lastName]);
             res.statusCode = 201;
             res.end(JSON.stringify({message: 'Account created successfully!'}));
             return;
