@@ -29,7 +29,7 @@ const parseJsonBody = (req: IncomingMessage) =>
 const allowCors = (fn: (req: IncomingMessage, res: ServerResponse) => Promise<void>) =>
     async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
         res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Origin', '*'); // Or use a specific frontend URL
+        res.setHeader('Access-Control-Allow-Origin', 'https://all-evently-backend.vercel.app'); // Or use a specific frontend URL
         res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
         res.setHeader(
             'Access-Control-Allow-Headers',
