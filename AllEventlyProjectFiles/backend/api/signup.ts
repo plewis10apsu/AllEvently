@@ -1,7 +1,7 @@
 import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import {IncomingMessage, ServerResponse} from 'http';
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 
 dotenv.config();
 
@@ -62,7 +62,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message: 'All fields are required.'}));
                 return;
             }
-            const hashedPassword = await bcrypt.hash(body.password, 12);
+            const hashedPassword = await bcryptjs.hash(body.password, 12);
             // Check if the email already exists in the database
             const emailCheck = await pool.query('SELECT email FROM Accounts WHERE email = $1', [body.email]);
             if (emailCheck.rows.length > 0) {
