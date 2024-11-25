@@ -63,13 +63,6 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 return;
             }
             const hashedPassword = await bcrypt.hash(body.password, 12);
-            // Check if the email already exists in the database
-            const emailCheck = await pool.query('SELECT email FROM Accounts WHERE email = $1', [body.email]);
-            if (emailCheck.rows.length > 0) {
-                res.statusCode = 400;
-                res.end(JSON.stringify({message: 'Email is already registered.'}));
-                return;
-            }
 
             // Insert the new account
             await pool.query('CALL CreateAccount($1, $2, $3, $4)', [body.email, hashedPassword, body.firstName, body.lastName]);
