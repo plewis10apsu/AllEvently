@@ -39,12 +39,9 @@ const loginUser = async () => {
     } else {
       response.json().then(data => {
         console.error('Error response from server:', data);
-        alert(data.message + (data.error ? `: ${data.error}` : ''));
       });
     }
   } catch (error) {
-    //Change the way it displays error message later on
-    alert("Something went wrong, please try again.");
     console.log("Error during login: "+error);
   }
 }
@@ -79,7 +76,6 @@ const handleSignup = async () => {
   }
   if (firstName.value && lastName.value && email.value && isEmailValid.value && password.value) {
     try {
-      console.log("Before calling endpoint");
       const response = await fetch('https://all-evently-backend.vercel.app/api/signup', {
         method: 'POST',
         headers: {
@@ -171,7 +167,7 @@ const handleResetPasswordLink = () => {
 
 
             </fieldset>
-            <button @click="loginUser()" type="submit" class="btn-login">Login</button>
+            <button @click="handleLogin" type="submit" class="btn-login">Login</button>
 
             <!-- Reset Password Link (Login) -->
             <a @click.prevent="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
