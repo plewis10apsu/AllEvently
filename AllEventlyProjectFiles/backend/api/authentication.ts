@@ -1,7 +1,6 @@
 import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import {IncomingMessage, ServerResponse} from 'http';
-const bcrypt = require('bcrypt');
 
 dotenv.config();
 
@@ -9,7 +8,7 @@ const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
 
-// Helper function to parse JSON body - written by ChatGPT
+// Helper function to parse JSON body
 const parseJsonBody = (req: IncomingMessage) =>
     new Promise<any>((resolve, reject) => {
         let body = '';
@@ -51,19 +50,17 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             const body = await parseJsonBody(req);
             if (!body.email || !body.password) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({message: 'All fields are required.'}));
+                res.end(JSON.stringify({message : 'All fields are required.'}));
                 return;
             }
-            const hashedPassword = await bcrypt.hash(body.password, 12);
-            await pool.query('SELECT CREATE_ACCOUNT($1, $2, $3, $4);', [body.email, hashedPassword, body.firstName, body.lastName]);
+            await pool.query('SELECT AUTHENTICATE_USER($1, $2);', [body.email, body.password]);
             res.statusCode = 201;
-            res.end(JSON.stringify({message: 'Account created successfully!'}));
+            res.end(JSON.stringify({message: 'Login successful'}));
             return;
-        } catch (err) {
-            console.error('Error creating account:', err);
+        } catch (error) {
+            console.error(error);
             res.statusCode = 500;
-            res.end(JSON.stringify({message: 'Internal server error.'}));
-            console.log(err);
+            res.end(JSON.stringify({message : 'Error logging in'}));
             return;
         }
     } else {
@@ -73,4 +70,5 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         return;
     }
 };
+
 export default allowCors(handler);

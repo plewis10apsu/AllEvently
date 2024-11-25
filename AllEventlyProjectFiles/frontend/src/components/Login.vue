@@ -19,17 +19,47 @@ const errorMessageLastName = ref('');
 const errorMessageEmail = ref('');
 const errorMessagePassword = ref('');
 
+
+const loginUser = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/authentication', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value
+      }),
+    });
+    if (response.ok){
+      const data = await response.json();
+      //remove later, using temporarily for debugging and making sure it all works fine
+      alert(data.msg);
+    } else {
+      response.json().then(data => {
+        console.error('Error response from server:', data);
+        alert(data.message + (data.error ? `: ${data.error}` : ''));
+      });
+    }
+  } catch (error) {
+    //Change the way it displays error message later on
+    alert("Something went wrong, please try again.");
+    console.log("Error during login: "+error);
+  }
+}
+
 const validateEmail = () => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   isEmailValid.value = emailPattern.test(email.value);
 };
 //experimental signup function. Please work 🙏🏻
+//IT WORKS NOW :)
 const handleSignup = async () => {
   errorMessageFirstName.value = '';
   errorMessageLastName.value = '';
   errorMessageEmail.value = '';
   errorMessagePassword.value = '';
-
   if (!firstName.value) {
     errorMessageFirstName.value = 'Please enter your first name.';
   }
@@ -47,10 +77,7 @@ const handleSignup = async () => {
   if (!password.value) {
     errorMessagePassword.value = 'Please enter your password.';
   }
-
   if (firstName.value && lastName.value && email.value && isEmailValid.value && password.value) {
-    // Place your signup logic here
-    //console.log("Sign up successful!");
     try {
       console.log("Before calling endpoint");
       const response = await fetch('https://all-evently-backend.vercel.app/api/signup', {
@@ -65,23 +92,14 @@ const handleSignup = async () => {
           lastName: lastName.value
         }),
       });
-      console.log("After endpoint");
-
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
       } else {
-        /*
-        const error = await response.json();
-        console.log("Caught in response.ok error...");
-        alert(error.message);
-        */
         response.json().then(data => {
           console.error('Error response from server:', data);
           alert(data.message + (data.error ? `: ${data.error}` : ''));
         });
-
-
       }
     } catch (err) {
       console.log("Error during signup: ", err);
