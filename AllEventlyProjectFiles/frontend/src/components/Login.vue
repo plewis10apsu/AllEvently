@@ -98,14 +98,10 @@ const handleSignup = async () => {
       } else {
         response.json().then(data => {
           console.error('Error response from server:', data);
-          alert(data.message + (data.error ? `: ${data.error}` : ''));
         });
       }
     } catch (err) {
       console.log("Error during signup: ", err);
-      alert('Something went wrong. Please try again.');
-      alert(err);
-      console.log(err.stackTrace);
     }
   }
 };
@@ -175,7 +171,7 @@ const handleResetPasswordLink = () => {
 
 
             </fieldset>
-            <button @click="handleLogin" type="submit" class="btn-login">Login</button>
+            <button @click="loginUser()" type="submit" class="btn-login">Login</button>
 
             <!-- Reset Password Link (Login) -->
             <a @click.prevent="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
