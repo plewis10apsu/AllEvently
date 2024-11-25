@@ -65,7 +65,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             const hashedPassword = await bcrypt.hash(body.password, 12);
 
             // Insert the new account
-            await pool.query('CALL CreateAccount($1, $2, $3, $4)', [body.email, hashedPassword, body.firstName, body.lastName]);
+            await pool.query('CALL Create_Account($1, $2, $3, $4)', [body.email, hashedPassword, body.firstName, body.lastName]);
             res.statusCode = 201;
             res.end(JSON.stringify({message: 'Account created successfully!'}));
             return;
