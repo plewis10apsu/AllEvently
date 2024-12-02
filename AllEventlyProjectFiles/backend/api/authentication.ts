@@ -53,10 +53,23 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message : 'All fields are required.'}));
                 return;
             }
-            await pool.query('SELECT AUTHENTICATE_USER($1, $2);', [body.email, body.password]);
-            res.statusCode = 201;
-            res.end(JSON.stringify({message: 'Login successful'}));
-            return;
+            const result = await pool.query('SELECT AUTHENTICATE_USER($1, $2);', [body.email, body.password]);
+            if (result.rows.length === 0) {
+                res.statusCode = 401;
+                res.end(JSON.stringify({message : 'Invalid Credentials'}));
+                return;
+            }
+
+            const { authenticate_user: sessionId } = result.rows[0];
+            if (sessionId){
+                res.statusCode = 201;
+                res.end(JSON.stringify({message: 'Login successful', userId: sessionId}));
+                return;
+            } else {
+                res.statusCode = 401;
+                res.end(JSON.stringify({message: 'Not Found'}));
+                return;
+            }
         } catch (error) {
             console.error(error);
             res.statusCode = 500;

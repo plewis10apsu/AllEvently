@@ -13,6 +13,7 @@ const isEmailValid = ref(true);
 const password = ref('');
 const showPassword = ref(false);
 const currentIcon = ref(visibleIcon);
+const userId = ref(null);
 
 const errorMessageFirstName = ref('');
 const errorMessageLastName = ref('');
@@ -37,9 +38,16 @@ const loginUser = async () => {
     // Logic for determining if the validation response is affirmative
     if (response.ok) {
       const data = await response.json();
-      // Redirect to the events page upon successful login
-      // Should use await because it is an async function
-      await router.push('/events');
+      if (data.userId) {
+        userId.value = data.userId;
+        console.log("Login successful, user ID: "+userId.value);
+        alter("User id: "+userId.value);
+        // Should use await because it is an async function
+        // Redirect to the events page upon successful login
+        await router.push('/events');
+      } else {
+        console.error('No userID returned from server');
+      }
     } else {
       // Negative message from database validation message
       response.json().then((data) => {
