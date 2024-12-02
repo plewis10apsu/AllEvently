@@ -38,10 +38,10 @@ const loginUser = async () => {
     // Logic for determining if the validation response is affirmative
     if (response.ok) {
       const data = await response.json();
-      if (data.userId) {
+      if (data.userId !== null && data.userId !== undefined) {
         userId.value = data.userId;
         console.log("Login successful, user ID: "+userId.value);
-        alter("User id: "+userId.value);
+        console.log("Data contents:"+data);
         // Should use await because it is an async function
         // Redirect to the events page upon successful login
         await router.push('/events');
@@ -49,6 +49,7 @@ const loginUser = async () => {
         console.error('No userID returned from server');
         console.log("User Id value: "+userId.value);
         console.log(data.message);
+
       }
     } else {
       // Negative message from database validation message
