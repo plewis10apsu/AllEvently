@@ -38,7 +38,7 @@ const loginUser = async () => {
     // Logic for determining if the validation response is affirmative
     if (response.ok) {
       const data = await response.json();
-      if (data.userId !== null && data.userId !== undefined) {
+      if (data.userId !== null) {
         userId.value = data.userId;
         console.log("Login successful, user ID: "+userId.value);
         console.log("Data contents:"+data);
