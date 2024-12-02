@@ -342,7 +342,7 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: -60px;
+  margin-top: 30px;
 }
 
 .forms {
