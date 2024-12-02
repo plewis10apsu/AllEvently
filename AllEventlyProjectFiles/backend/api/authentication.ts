@@ -60,7 +60,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 return;
             }
 
-            const { authenticate_user: sessionId } = result.rows[0];
+            const sessionId = results.rows[0];
             if (sessionId){
                 res.statusCode = 201;
                 res.end(JSON.stringify({message: 'Login successful', userId: sessionId}));
