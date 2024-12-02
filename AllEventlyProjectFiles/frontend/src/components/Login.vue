@@ -47,6 +47,8 @@ const loginUser = async () => {
         await router.push('/events');
       } else {
         console.error('No userID returned from server');
+        console.log("User Id value: "+userId.value);
+        console.log(data.message);
       }
     } else {
       // Negative message from database validation message
