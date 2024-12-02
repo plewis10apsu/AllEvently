@@ -29,22 +29,24 @@ const loginUser = async () => {
       },
       body: JSON.stringify({
         email: email.value,
-        password: password.value
+        password: password.value,
       }),
     });
-    if (response.ok){
+
+    if (response.ok) {
       const data = await response.json();
-      //remove later, using temporarily for debugging and making sure it all works fine
-      alert(data.msg);
+      // Redirect to the events page upon successful login
+      router.push('/events');
     } else {
-      response.json().then(data => {
+      response.json().then((data) => {
         console.error('Error response from server:', data);
       });
     }
   } catch (error) {
-    console.log("Error during login: "+error);
+    console.log('Error during login: ' + error);
   }
-}
+};
+
 
 const validateEmail = () => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -136,7 +138,8 @@ const handleResetPasswordLink = () => {
             Login<span class="underline"></span>
           </button>
 
-          <form class="form form-login">
+          <!-- Login Form -->
+          <form @submit.prevent="loginUser" class="form form-login">
             <fieldset>
               <legend>Please, enter your email and password for login.</legend>
 
@@ -147,13 +150,11 @@ const handleResetPasswordLink = () => {
                 <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
               </div>
 
-
               <!-- Password Field (Login) -->
               <div class="input-block">
                 <label for="password">Password</label>
                 <div class="password-input-wrapper">
-                  <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password"
-                  />
+                  <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password" />
                   <!-- Icon for toggling password visibility (Login) -->
                   <img
                       :src="currentIcon"
@@ -165,9 +166,12 @@ const handleResetPasswordLink = () => {
                 <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
               </div>
 
-
             </fieldset>
-            <button @click="handleLogin" type="submit" class="btn-login">Login</button>
+
+            <!-- Login Button -->
+            <!-- Changed the @click handler from handleLogin to loginUser -->
+            <!-- The button is now part of the form submission, and @submit.prevent ensures we prevent a page refresh -->
+            <button type="submit" class="btn-login">Login</button>
 
             <!-- Reset Password Link (Login) -->
             <a @click.prevent="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
@@ -185,6 +189,7 @@ const handleResetPasswordLink = () => {
           </form>
         </div>
 
+        <!-- Signup Section -->
         <div :class="['form-wrapper', { 'is-active': switchToSignup }]">
           <button @click="toggleForm('signup')" type="button" class="switcher switcher-signup">
             Sign Up<span class="underline"></span>
@@ -215,13 +220,11 @@ const handleResetPasswordLink = () => {
                 <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
               </div>
 
-
               <!-- Password Field (Sign Up) -->
               <div class="input-block">
                 <label for="signup-password">Password</label>
                 <div class="password-input-wrapper">
-                  <input id="signup-password" :type="showPassword ? 'text' : 'password'" v-model="password"
-                  />
+                  <input id="signup-password" :type="showPassword ? 'text' : 'password'" v-model="password" />
 
                   <!-- Eye icon for toggling visibility (Sign Up) -->
                   <img
@@ -233,7 +236,6 @@ const handleResetPasswordLink = () => {
                 </div>
                 <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
               </div>
-
 
             </fieldset>
 
@@ -255,6 +257,7 @@ const handleResetPasswordLink = () => {
     </section>
   </section>
 </template>
+
 
 <style>
 html, body {
