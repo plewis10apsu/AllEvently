@@ -19,9 +19,11 @@ const errorMessageLastName = ref('');
 const errorMessageEmail = ref('');
 const errorMessagePassword = ref('');
 
-
+// Async function to log user in
 const loginUser = async () => {
   try {
+    // Fetches validation response from database
+    // Specify method type, headers, and content of JSON message body
     const response = await fetch('https://all-evently-backend.vercel.app/api/authentication', {
       method: 'POST',
       headers: {
@@ -32,33 +34,37 @@ const loginUser = async () => {
         password: password.value,
       }),
     });
-
+    // Logic for determining if the validation response is affirmative
     if (response.ok) {
       const data = await response.json();
       // Redirect to the events page upon successful login
-      router.push('/events');
+      // Should use await because it is an async function
+      await router.push('/events');
     } else {
+      // Negative message from database validation message
       response.json().then((data) => {
         console.error('Error response from server:', data);
       });
     }
+    // Error has occured
   } catch (error) {
     console.log('Error during login: ' + error);
   }
 };
 
-
+// Validates that email is a valid string value
 const validateEmail = () => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   isEmailValid.value = emailPattern.test(email.value);
 };
-//experimental signup function. Please work 🙏🏻
-//IT WORKS NOW :)
+
+// Asynchronous function to create user account
 const handleSignup = async () => {
   errorMessageFirstName.value = '';
   errorMessageLastName.value = '';
   errorMessageEmail.value = '';
   errorMessagePassword.value = '';
+  // Input validation
   if (!firstName.value) {
     errorMessageFirstName.value = 'Please enter your first name.';
   }
@@ -78,6 +84,7 @@ const handleSignup = async () => {
   }
   if (firstName.value && lastName.value && email.value && isEmailValid.value && password.value) {
     try {
+      // Specify method type, headers, and JSON body content
       const response = await fetch('https://all-evently-backend.vercel.app/api/signup', {
         method: 'POST',
         headers: {
@@ -90,14 +97,17 @@ const handleSignup = async () => {
           lastName: lastName.value
         }),
       });
+      // Logic for if the database message is affirmative
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
+      // The case of a negative database response
       } else {
         response.json().then(data => {
           console.error('Error response from server:', data);
         });
       }
+    // An error has occurred
     } catch (err) {
       console.log("Error during signup: ", err);
     }
@@ -117,9 +127,12 @@ const toggleForm = (formType: 'login' | 'signup') => {
   switchToSignup.value = formType === 'signup'
 }
 
+/*
+Commented this function out as it is no longer in use
 const handleLogin = () => {
   router.push('/events');   // Redirect to the Events page
 };
+*/
 
 const handleResetPasswordLink = () => {
   router.push('/password-reset'); // Redirect to the Password Reset page
