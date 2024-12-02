@@ -9,6 +9,9 @@ const eventName = ref<string>("");
 const eventNameValid = ref<boolean>(true);
 const isSingleEvent = ref<boolean>(true);
 const eventDate = ref<string>("");
+const eventDisplayStartTime = ref<boolean>(false);
+const eventAllDayEvent = ref<boolean>(false);
+const eventDisplayEndTime = ref<boolean>(false);
 const startTime = ref<string>("");
 const endTime = ref<string>("");
 const timeZone = ref<string>("CDT");
@@ -74,6 +77,7 @@ function validateEventName(): void {
     alert("Please fill in all required fields.");
   }
 }*/
+
 </script>
 
 <template>
@@ -117,6 +121,8 @@ function validateEventName(): void {
                 placeholder="Enter event name"
                 required
             />
+            <p v-if="!eventNameValid" class="error-message">Event name is required.</p>
+
             <label for="event-name">Note for Guests</label>
             <input
                 id="event-note"
@@ -124,31 +130,25 @@ function validateEventName(): void {
                 placeholder="Optional: Note for Guests"
                 required
             />
-            <p v-if="!eventNameValid" class="error-message">Event name is required.</p>
           </fieldset>
 
           <fieldset>
             <legend>Date and Location</legend>
             <div class="event-type">
               <label for="event-type">Type of Event</label>
-              <button
-                  class="button"
-                  :class="{ selected: isSingleEvent }"
-                  @click="toggleEventType(true)"
-              >
+              <button class="button" :class="{ selected: isSingleEvent }" @click="toggleEventType(true)">
                 Single Event
               </button>
-              <button
-                  class="button"
-                  :class="{ selected: !isSingleEvent }"
-                  @click="toggleEventType(false)"
-              >
+              <button class="button" :class="{ selected: !isSingleEvent }" @click="toggleEventType(false)">
                 Recurring Event
               </button>
+
             </div>
             <div class="event-date-time-row" v-if="isSingleEvent">
               <div>
-                <label for="event-date">Date</label>
+                <label for="event-date" class="">
+                  Date
+                </label>
                 <input id="event-date" type="date" v-model="eventDate" required />
               </div>
               <div>
@@ -164,6 +164,20 @@ function validateEventName(): void {
                 <select id="time-zone" v-model="timeZone">
                   <option v-for="tz in timeZones" :key="tz" :value="tz">{{ tz }}</option>
                 </select>
+              </div>
+            </div>
+            <div class="checkbox-row" v-if="isSingleEvent">
+              <div>
+                <label for="all-day-event">All-day event</label>
+                <input id="all-day-event" class="checkbox" type="checkbox" v-model="eventAllDayEvent" required />
+              </div>
+              <div>
+                <label for="display-start-time">Display start time</label>
+                <input id="display-start-time" class="checkbox" type="checkbox" v-model="eventDisplayStartTime" required />
+              </div>
+              <div>
+                <label for="display-end-time">Display end time</label>
+                <input id="display-end-time" class="checkbox" type="checkbox" v-model="eventDisplayEndTime" required />
               </div>
             </div>
             <div class="event-location">
@@ -293,6 +307,28 @@ legend {
   flex: 1 1 calc(25% - 15px); /* Adjust size of each input field */
   min-width: 150px; /* Ensure inputs don’t shrink below this size */
   max-width: 300px; /* Optional: Limit the maximum width */
+}
+
+.checkbox-row {
+  display: flex; /* Make the entire row a flex container */
+  flex-wrap: wrap; /* Allow wrapping if there are too many items in a row */
+  gap: 16px; /* Space between each checkbox-label pair */
+}
+
+.checkbox-row > div {
+  display: flex; /* Align each label-checkbox pair in a row */
+  align-items: center; /* Vertically align the checkbox and label */
+  gap: 8px; /* Space between the checkbox and label */
+}
+
+.checkbox {
+  margin: 0; /* Remove default margins for checkboxes */
+  width: 16px; /* Ensure consistent width for the checkbox */
+  height: 16px; /* Ensure consistent height for the checkbox */
+}
+
+.checkbox-row label {
+  min-width: 125px; /* Ensure all labels take at least this much space */
 }
 
 /* Input and Label Styling */
