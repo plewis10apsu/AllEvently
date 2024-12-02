@@ -1,3 +1,4 @@
+DROP FUNCTION IF EXISTS GET_USER;
 DROP FUNCTION IF EXISTS GET_PUBLIC_EVENTS;
 DROP FUNCTION IF EXISTS GET_HOSTED_EVENTS;
 DROP FUNCTION IF EXISTS GET_ATTENDING_EVENTS;
@@ -91,8 +92,8 @@ CREATE TABLE IF NOT EXISTS Events (
     max_additional_guests INT DEFAULT 0,
     notify_host BOOLEAN DEFAULT TRUE,
     PRIMARY KEY (event_id),
-    FOREIGN KEY (event_host) REFERENCES Accounts (account_email),
-    FOREIGN KEY (background_image) REFERENCES Images (image_id)
+    FOREIGN KEY (event_host) REFERENCES Accounts (account_email)
+    --FOREIGN KEY (background_image) REFERENCES Images (image_id)
 );
 
 --TABLE TO STORE CHAT MESSAGES
@@ -124,7 +125,7 @@ CREATE TABLE IF NOT EXISTS Guests (
 
 
 -----------Create Functions-------------
---Authenticate Users -- COMPLETE DO NOT TOUCH
+--Authenticate Users
 CREATE OR REPLACE FUNCTION Authenticate_User
 (Email_Address text, Pass text) RETURNS INT AS $$
 DECLARE
@@ -148,7 +149,7 @@ BEGIN
 END $$ LANGUAGE plpgsql;
 
 
---Add Account -- COMPLETE DO NOT TOUCH
+--Add Account
 CREATE OR REPLACE FUNCTION Create_Account
 (Email_Address text, Pass text, FName text, LName text) RETURNS INT AS $$
 DECLARE
@@ -192,6 +193,19 @@ BEGIN
 	ELSE
 		RETURN NULL;
 	END IF;
+	
+END $$ LANGUAGE plpgsql;
+
+
+--Get User
+CREATE OR REPLACE FUNCTION Get_User
+(Identifier int) RETURNS SETOF People AS $$
+DECLARE
+BEGIN
+
+	RETURN QUERY SELECT * FROM People
+		WHERE email IN (SELECT session_email FROM sessions
+        	WHERE session_id = Identifier);
 	
 END $$ LANGUAGE plpgsql;
 
@@ -298,10 +312,10 @@ END $$ LANGUAGE plpgsql;
 
 -----------Test--------------------------
 ---Create users
-SELECT CREATE_ACCOUNT('ben', 'password', 'ben', 'bruyns');
-SELECT CREATE_ACCOUNT('peggy', 'asswordp', 'peggy', 'lewis');
-SELECT CREATE_ACCOUNT('spensor', 'sswordap', 'spensor', 'morey');
-SELECT AUTHENTICATE_USER('ben', 'password');
+SELECT CREATE_ACCOUNT('ben@gmail.com', 'password', 'ben', 'bruyns');
+SELECT CREATE_ACCOUNT('peggy@gmail.com', 'asswordp', 'peggy', 'lewis');
+SELECT CREATE_ACCOUNT('spensor@gmail.com', 'sswordap', 'spensor', 'morey');
+SELECT AUTHENTICATE_USER('ben@gmail.com', 'password');
 
 --Create images
 INSERT INTO IMAGES (image_path)
@@ -312,28 +326,24 @@ select * from images;
 ---Create events
 --Default event with minimum parameters
 INSERT INTO EVENTS (event_host, host_name, event_location)
-VALUES ('ben', 'benjamin', 'here');
+VALUES ('ben@gmail.com', 'benjamin', 'here');
 INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date)
-VALUES ('peggy', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
+VALUES ('peggy@gmail.com', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
 INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
-VALUES ('spensor', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
+VALUES ('spensor@gmail.com', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
 
 
 --Create Guest
 INSERT INTO GUESTS (guest_email, event_id)
-VALUES ('ben', 2);
+VALUES ('ben@gmail.com', 2);
 
 --Create Chat Message
 INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
-VALUES (2, 'ben', 'Hello World');
+VALUES (2, 'ben@gmail.com', 'Hello World');
 INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
-VALUES (2, 'peggy', 'Hello Ben');
+VALUES (2, 'peggy@gmail.com', 'Hello Ben');
 
-
-
-
-
-
+select * from people p join accounts a on p.email = a.account_email;
 
 
 

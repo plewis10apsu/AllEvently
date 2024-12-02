@@ -15,7 +15,10 @@ UPDATE_PASSWORD (email, temp_password, new_password);
 —Create temp password for update password - returns temp password for success and NULL for failure
 CREATE_RESET_CREDENTIALS (email);
 
-—Sign-in - returns number for success adn NULL for failure
+-Get User from number identifier
+GET_USER (Identifier int) RETURNS SETOF People
+
+—Sign-in - returns number for success and NULL for failure
 CREATE_ACCOUNT (email, password, firstname, lastname);
 
 —Login - returns number for success and NULL for failure
