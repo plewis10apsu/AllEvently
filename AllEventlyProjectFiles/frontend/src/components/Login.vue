@@ -13,23 +13,69 @@ const isEmailValid = ref(true);
 const password = ref('');
 const showPassword = ref(false);
 const currentIcon = ref(visibleIcon);
+const userId = ref(null);
 
 const errorMessageFirstName = ref('');
 const errorMessageLastName = ref('');
 const errorMessageEmail = ref('');
 const errorMessagePassword = ref('');
 
+// Async function to log user in
+const loginUser = async () => {
+  try {
+    // Fetches validation response from database
+    // Specify method type, headers, and content of JSON message body
+    const response = await fetch('https://all-evently-backend.vercel.app/api/authentication', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value,
+      }),
+    });
+    // Logic for determining if the validation response is affirmative
+    if (response.ok) {
+      const data = await response.json();
+      if (data.userId !== null) {
+        userId.value = data.userId;
+        console.log("Login successful, user ID: "+userId.value);
+        console.log("Data contents:"+data);
+        // Should use await because it is an async function
+        // Redirect to the events page upon successful login
+        await router.push('/events');
+      } else {
+        console.error('No userID returned from server');
+        console.log("User Id value: "+userId.value);
+        console.log(data.message);
+
+      }
+    } else {
+      // Negative message from database validation message
+      response.json().then((data) => {
+        console.error('Error response from server:', data);
+      });
+    }
+    // Error has occured
+  } catch (error) {
+    console.log('Error during login: ' + error);
+  }
+};
+
+// Validates that email is a valid string value
 const validateEmail = () => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   isEmailValid.value = emailPattern.test(email.value);
 };
-//experimental signup function. Please work 🙏🏻
+
+// Asynchronous function to create user account
 const handleSignup = async () => {
   errorMessageFirstName.value = '';
   errorMessageLastName.value = '';
   errorMessageEmail.value = '';
   errorMessagePassword.value = '';
-
+  // Input validation
   if (!firstName.value) {
     errorMessageFirstName.value = 'Please enter your first name.';
   }
@@ -47,13 +93,10 @@ const handleSignup = async () => {
   if (!password.value) {
     errorMessagePassword.value = 'Please enter your password.';
   }
-
   if (firstName.value && lastName.value && email.value && isEmailValid.value && password.value) {
-    // Place your signup logic here
-    //console.log("Sign up successful!");
     try {
-      console.log("Before calling endpoint");
-      const response = await fetch('/api/signup', {
+      // Specify method type, headers, and JSON body content
+      const response = await fetch('https://all-evently-backend.vercel.app/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,20 +104,23 @@ const handleSignup = async () => {
         body: JSON.stringify({
           email: email.value,
           password: password.value,
+          firstName: firstName.value,
+          lastName: lastName.value
         }),
       });
-      console.log("After endpoint");
-
+      // Logic for if the database message is affirmative
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
+      // The case of a negative database response
       } else {
-        const error = await response.json();
-        alert(error.message);
+        response.json().then(data => {
+          console.error('Error response from server:', data);
+        });
       }
+    // An error has occurred
     } catch (err) {
-      console.error("Error during signup: ", err);
-      alert('Something went wrong. Please try again.');
+      console.log("Error during signup: ", err);
     }
   }
 };
@@ -92,9 +138,12 @@ const toggleForm = (formType: 'login' | 'signup') => {
   switchToSignup.value = formType === 'signup'
 }
 
+/*
+Commented this function out as it is no longer in use
 const handleLogin = () => {
   router.push('/events');   // Redirect to the Events page
 };
+*/
 
 const handleResetPasswordLink = () => {
   router.push('/password-reset'); // Redirect to the Password Reset page
@@ -113,7 +162,8 @@ const handleResetPasswordLink = () => {
             Login<span class="underline"></span>
           </button>
 
-          <form class="form form-login">
+          <!-- Login Form -->
+          <form @submit.prevent="loginUser" class="form form-login">
             <fieldset>
               <legend>Please, enter your email and password for login.</legend>
 
@@ -124,13 +174,11 @@ const handleResetPasswordLink = () => {
                 <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
               </div>
 
-
               <!-- Password Field (Login) -->
               <div class="input-block">
                 <label for="password">Password</label>
                 <div class="password-input-wrapper">
-                  <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password"
-                  />
+                  <input id="password" :type="showPassword ? 'text' : 'password'" v-model="password" />
                   <!-- Icon for toggling password visibility (Login) -->
                   <img
                       :src="currentIcon"
@@ -142,9 +190,12 @@ const handleResetPasswordLink = () => {
                 <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
               </div>
 
-
             </fieldset>
-            <button @click="handleLogin" type="submit" class="btn-login">Login</button>
+
+            <!-- Login Button -->
+            <!-- Changed the @click handler from handleLogin to loginUser -->
+            <!-- The button is now part of the form submission, and @submit.prevent ensures we prevent a page refresh -->
+            <button type="submit" class="btn-login">Login</button>
 
             <!-- Reset Password Link (Login) -->
             <a @click.prevent="handleResetPasswordLink" class="reset-password-link">Reset Password</a>
@@ -162,6 +213,7 @@ const handleResetPasswordLink = () => {
           </form>
         </div>
 
+        <!-- Signup Section -->
         <div :class="['form-wrapper', { 'is-active': switchToSignup }]">
           <button @click="toggleForm('signup')" type="button" class="switcher switcher-signup">
             Sign Up<span class="underline"></span>
@@ -192,13 +244,11 @@ const handleResetPasswordLink = () => {
                 <span v-if="errorMessageEmail" class="error-message">{{ errorMessageEmail }}</span>
               </div>
 
-
               <!-- Password Field (Sign Up) -->
               <div class="input-block">
                 <label for="signup-password">Password</label>
                 <div class="password-input-wrapper">
-                  <input id="signup-password" :type="showPassword ? 'text' : 'password'" v-model="password"
-                  />
+                  <input id="signup-password" :type="showPassword ? 'text' : 'password'" v-model="password" />
 
                   <!-- Eye icon for toggling visibility (Sign Up) -->
                   <img
@@ -210,7 +260,6 @@ const handleResetPasswordLink = () => {
                 </div>
                 <span v-if="errorMessagePassword" class="error-message">{{ errorMessagePassword }}</span>
               </div>
-
 
             </fieldset>
 
@@ -232,6 +281,7 @@ const handleResetPasswordLink = () => {
     </section>
   </section>
 </template>
+
 
 <style>
 html, body {

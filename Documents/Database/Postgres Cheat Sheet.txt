@@ -1,0 +1,26 @@
+—Function headers
+
+—returns all public events
+GET_PUBLIC_EVENTS ();
+
+—returns all events hosted by the user with email
+GET_HOSTED_EVENTS (email);
+
+—returns all events where the user with email is on the guestlist,  (attending/not attend/not responded)
+GET_ATTENDING_EVENTS (email);
+
+—Update password - no return
+UPDATE_PASSWORD (email, temp_password, new_password);
+
+—Create temp password for update password - returns temp password for success and NULL for failure
+CREATE_RESET_CREDENTIALS (email);
+
+—Sign-in - returns number for success adn NULL for failure
+CREATE_ACCOUNT (email, password, firstname, lastname);
+
+—Login - returns number for success and NULL for failure
+AUTHENTICATE_USER (email, password);
+
+
+—Example
+SELECT CREATE_ACCOUNT('ben', 'password', 'ben', 'bruyns');

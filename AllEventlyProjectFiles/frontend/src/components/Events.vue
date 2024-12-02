@@ -13,6 +13,34 @@ const filterOption = ref('Upcoming Events');
 const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
+// Empty ref for events to be populated later
+const events = ref<Event[]>([]);
+
+const fetchEvents = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: currentUser.value
+      }),
+    });
+    if (response.ok) {
+      //const data = await response.json();
+      events.value = await response.json();
+      alert("Got the events successfully!");
+    } else {
+      console.error('Error fetching events:', response.statusText);
+      alert("Failed to fetch events");
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
@@ -46,7 +74,8 @@ onMounted(() => {
   fetchCurrentUser();
   updateSidebarWidth();
 });
-
+/*
+Commenting out hard-coded events and testing it with data from the server request
 // Event list
 const events = ref<Event[]>([
   {
@@ -86,7 +115,7 @@ const events = ref<Event[]>([
     venueAddress: '310 Needmore Rd, Clarksville, TN 37040',
   }
 ]);
-
+*/
 // Processed events with dynamic isHost and isGuest
 const processedEvents = computed(() =>
   events.value.map(event => ({
@@ -115,6 +144,7 @@ const filteredEvents = computed(() => {
   }
   return processedEvents.value;
 });
+
 
 </script>
 
