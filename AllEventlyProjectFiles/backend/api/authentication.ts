@@ -54,12 +54,11 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 return;
             }
             const result = await pool.query('SELECT AUTHENTICATE_USER($1, $2);', [body.email, body.password]);
-            if (result.rows.length === 0 || result.rows[0].authenticate_user === null) {
+            if (result.rows.length === 0 || result.rows[0].authenticate_user === null || result.rows[0] === null) {
                 res.statusCode = 401;
                 res.end(JSON.stringify({message : 'Invalid Credentials'}));
                 return;
             }
-
             const { authenticate_user: sessionId } = result.rows[0];
             if (sessionId){
                 res.statusCode = 201;

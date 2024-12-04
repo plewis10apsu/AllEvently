@@ -15,7 +15,7 @@ const sidebarWidth = ref(200);
 
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
-
+/*
 const fetchEvents = async () => {
   try {
     const response = await fetch('https://all-evently-backend.vercel.app/api/events', {
@@ -40,7 +40,7 @@ const fetchEvents = async () => {
     console.log(error);
   }
 };
-
+*/
 // Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;

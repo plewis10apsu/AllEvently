@@ -66,7 +66,10 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 hostedEvents,
                 attendedEvents
             };
-            res.status(200).json(responseData);
+            //res.status(200).json(responseData);
+            res.statusCode = 201;
+            res.end(JSON.stringify(responseData));
+            return;
         } catch (err) {
             console.error('Error fetching events:', err);
             res.statusCode = 500;
