@@ -117,7 +117,7 @@ const events = ref<Event[]>([
   }
 ]);
 */
- */
+
 console.log(fetchEvents);
 // Processed events with dynamic isHost and isGuest
 const processedEvents = computed(() =>
