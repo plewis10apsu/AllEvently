@@ -74,8 +74,8 @@ onMounted(() => {
   fetchCurrentUser();
   updateSidebarWidth();
 });
-/*
-Commenting out hard-coded events and testing it with data from the server request
+
+//Commenting out hard-coded events and testing it with data from the server request
 // Event list
 const events = ref<Event[]>([
   {
@@ -115,7 +115,7 @@ const events = ref<Event[]>([
     venueAddress: '310 Needmore Rd, Clarksville, TN 37040',
   }
 ]);
-*/
+console.log(fetchEvents);
 // Processed events with dynamic isHost and isGuest
 const processedEvents = computed(() =>
   events.value.map(event => ({

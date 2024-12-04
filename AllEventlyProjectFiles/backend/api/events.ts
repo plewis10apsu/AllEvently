@@ -53,8 +53,8 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message : 'Error: all fields are required.'}));
                 return;
             }
-            const [publicEventsResult, hostedEventsResult, attendingEventsResult] = await Promise.all([
-                pool.query('SELECT GET_HOSTED_EVENTS();'),
+            const [hostedEventsResult, publicEventsResult, attendingEventsResult] = await Promise.all([
+                pool.query('SELECT GET_PUBLIC_EVENTS();'),
                 pool.query('SELECT GET_HOSTED_EVENTS($1);', [body.email]),
                 pool.query('SELECT GET_ATTENDING_EVENTS($1);', [body.email])
             ]);
