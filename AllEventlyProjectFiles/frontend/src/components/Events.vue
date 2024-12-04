@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from 'axios';
+//import axios from 'axios';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Event } from '@/types/EventInterface';
 import TopPanel from "@/components/TopPanel.vue";
@@ -41,6 +41,30 @@ const fetchEvents = async () => {
   }
 };
 
+const getCurrentUser = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/currentuser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: currentUser.value
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const user = data.user;
+      currentUser.value = user.first_name;
+    } else {
+      console.error('Error fetching current user');
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
@@ -52,7 +76,7 @@ onUnmounted(() => {
 });
 
 const currentUser = ref<string>(''); // Empty string initially
-
+/*
 // Fetch current username from the API
 const fetchCurrentUser = async () => {
   try {
@@ -68,10 +92,11 @@ const fetchCurrentUser = async () => {
     currentUser.value = 'Guest';
   }
 };
-
+*/
 // Fetch user data on component mount
 onMounted(() => {
-  fetchCurrentUser();
+  //fetchCurrentUser();
+  getCurrentUser();
   updateSidebarWidth();
 });
 
