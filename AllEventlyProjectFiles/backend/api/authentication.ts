@@ -59,7 +59,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message : 'Invalid Credentials'}));
                 return;
             }
-            const { authenticate_user: sessionId } = result.rows[0];
+            const sessionId = result.rows[0];
             if (sessionId){
                 res.statusCode = 201;
                 res.end(JSON.stringify({message: 'Login successful', userId: sessionId}));
