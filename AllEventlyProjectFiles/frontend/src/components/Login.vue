@@ -31,8 +31,8 @@ const loginUser = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: email.value,
-        password: password.value,
+        email: string.valueOf(email.value),
+        password: string.valueOf(password.value),
       }),
     });
     // Logic for determining if the validation response is affirmative
@@ -112,6 +112,7 @@ const handleSignup = async () => {
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
+        alert("Account details:\nemail: "+string.valueOf(email)+"\nPassword: "+string.valueOf(password));
       // The case of a negative database response
       } else {
         response.json().then(data => {
