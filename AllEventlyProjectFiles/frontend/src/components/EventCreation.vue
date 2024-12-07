@@ -3,8 +3,10 @@ import {ref, onUnmounted, onMounted, watch, computed} from "vue";
 import logo from "@/assets/AllEventlyLogo.png";
 import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
 import SidebarWithPreview from "@/components/SidebarWithPreview.vue";
+import {loadGoogleMapsAPI} from "@/utils/googleMapsLoader.ts";
 
 // Reactive state
+const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const eventName = ref<string>("");
 const eventNameValid = ref<boolean>(true);
 const isSingleEvent = ref<boolean>(true);
@@ -26,62 +28,71 @@ const isSidebarVisible = ref<boolean>(true);
 const sidebarWidth = ref<number>(200);
 const address = ref<string>("");
 const inputValue = ref<string>("");
+const links = ref<string[]>([]); // List of links
+const newLink = ref<string>(""); // New link input
+const isRemoveMode = ref(false); // Toggle remove mode
+const searchQuery = ref("");
+const selectedImage = ref<number | null>(null);
 const mapImageUrl = ref<string>("");
-const autocomplete: any = ref(null);
-const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-//commenting these out since they are used in the async function and vercel is whining
-/*
-const eventLocation = ref<string>("");
-const isPublic = ref<Boolean>(true);
-const hostEmail = ref<String>("");
-*/
-
-// Tab navigation
+//const autocomplete: any = ref(null);
 const activeTab = ref<"details" | "settings">("details");
-
+const selectedLayout = ref<string | null>(null);
 declare const google: any;
+const filteredGallery = computed(() =>
+    gallery.value.filter(
+        (image) =>
+            image.theme.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            searchQuery.value.trim() === ""
+    )
+);
 
-// Initialize Google Places Autocomplete
-const initializeAutocomplete = () => {
-  if (!window.google) {
-    console.error("Google Maps API is not loaded");
-    return;
-  }
-
-  const input = document.getElementById("event-address") as HTMLInputElement;
-  if (!input) {
-    console.error("Address input field is not found");
-    return;
-  }
-
-  // Initialize Autocomplete
-  autocomplete.value = new google.maps.places.Autocomplete(input, {
-    fields: ["formatted_address", "geometry"],
-  });
-
-
-  // Listener for when a place is selected
-  google.maps.event.addListener(autocomplete.value, "place_changed", () => {
-    const place = autocomplete.value.getPlace();
-    if (place?.formatted_address && place?.geometry) {
-      address.value = place.formatted_address;
-      inputValue.value = place.formatted_address; // Update input value
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      mapImageUrl.value = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=${googleMapsApiKey}`;
-    } else {
-      console.error("No valid place selected");
-      // Reset the input if no place is selected
-      inputValue.value = "";
-    }
-  });
-
-  // Update the v-model value directly when typing
-  input.addEventListener("input", (event) => {
-    inputValue.value = (event.target as HTMLInputElement).value;
-  });
+// Adjust sidebar width dynamically based on screen size
+const updateSidebarWidth = () => {
+  sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
 };
+
+const fontStyle = ref<Record<string, any>>({
+  fontFamily: "Arial",
+  fontSize: 48,
+  bold: false,
+  italic: false,
+  underline: false,
+  color: "#000000",
+});
+
+function toggleEventType(isSingle: boolean): void {
+  isSingleEvent.value = isSingle;
+}
+
+function validateEventName(): void {
+  eventNameValid.value = eventName.value.trim().length > 0;
+}
+
+function addLink(link: string) {
+  if (link.trim() !== "") {
+    links.value.push(link);
+    newLink.value = ""; // Clear the input after adding
+  }
+}
+
+// Function to remove a link by index
+function removeLink(index: number) {
+  links.value.splice(index, 1);
+}
+
+// Toggle remove mode
+function toggleRemoveMode() {
+  isRemoveMode.value = !isRemoveMode.value;
+}
+
+function updateFontStyle(property: string, value: any) {
+  fontStyle.value[property] = value;
+}
+
+// Function to select an image
+function selectImage(imageId: number): void {
+  selectedImage.value = imageId;
+}
 
 watch(inputValue, (newValue) => {
   if (newValue.trim() === "") {
@@ -90,28 +101,96 @@ watch(inputValue, (newValue) => {
   }
 });
 
+// Image gallery
+const gallery = ref([
+  { id: 1, src:new URL('@/assets/Bike.jpg', import.meta.url).href, theme: "Bike" },
+  { id: 2, src:new URL('@/assets/Christmas.jpg', import.meta.url).href, theme: "Christmas" },
+  { id: 3, src:new URL('@/assets/Confetti.jpg', import.meta.url).href, theme: "Confetti" },
+  { id: 4, src:new URL('@/assets/Default_Invite.jpg', import.meta.url).href, theme: "Default" },
+  { id: 5, src:new URL('@/assets/Dog.jpg', import.meta.url).href, theme: "Dog" },
+  { id: 6, src:new URL('@/assets/Dry_Flower.jpg', import.meta.url).href, theme: "Flower" },
+  { id: 7, src:new URL('@/assets/Easter.jpg', import.meta.url).href, theme: "Easter" },
+  { id: 8, src:new URL('@/assets/Football.jpg', import.meta.url).href, theme: "Football" },
+  { id: 9, src:new URL('@/assets/Fourth.jpg', import.meta.url).href, theme: "Fourth" },
+  { id: 10, src:new URL('@/assets/Gamer.jpg', import.meta.url).href, theme: "Gamer" },
+  { id: 11, src:new URL('@/assets/Haley\'s_Birthday_Event_Page.jpg', import.meta.url).href, theme: "Birthday" },
+  { id: 12, src:new URL('@/assets/Hanukkah.jpg', import.meta.url).href, theme: "Hanukkah" },
+  { id: 13, src:new URL('@/assets/Hike.jpg', import.meta.url).href, theme: "Hike" },
+  { id: 14, src:new URL('@/assets/Joy.jpg', import.meta.url).href, theme: "Joy" },
+  { id: 15, src:new URL('@/assets/Lisa\'s_Baby_Shower_Event_Page.jpg', import.meta.url).href, theme: "Baby Shower" },
+  { id: 16, src:new URL('@/assets/Love.jpg', import.meta.url).href, theme: "Love" },
+  { id: 17, src:new URL('@/assets/Pineapple.jpg', import.meta.url).href, theme: "Pineapple" },
+  { id: 18, src:new URL('@/assets/PinkPurple_Birthday.jpg', import.meta.url).href, theme: "Purple_Birthday" },
+  { id: 19, src:new URL('@/assets/Rose_Invite.jpg', import.meta.url).href, theme: "Rose" },
+  { id: 20, src:new URL('@/assets/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
+  { id: 21, src:new URL('@/assets/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
+  { id: 22, src:new URL('@/assets/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
+  // Add more images with themes as needed
+]);
+
 // Initialize functionality on mount
-onMounted(() => {
-  initializeAutocomplete();
+onMounted(async () => {
   updateSidebarWidth();
   window.addEventListener("resize", updateSidebarWidth);
+
+  try {
+    await loadGoogleMapsAPI(googleMapsApiKey);
+    console.log("Google Maps API loaded successfully.");
+    initializeAutocomplete();
+  } catch {
+    console.error(Error);
+  }
 });
+
+const initializeAutocomplete = (): void => {
+  if (!window.google || !google.maps || !google.maps.places) {
+    console.error("Google Maps API is not fully loaded.");
+    return;
+  }
+
+  console.log("Initializing Google Maps Autocomplete...");
+
+  const input = document.getElementById("event-address") as HTMLInputElement | null;
+  if (!input) {
+    console.error("Address input field is not found.");
+    return;
+  }
+
+  const autocomplete = new google.maps.places.Autocomplete(input, {
+    fields: ["formatted_address", "geometry"],
+  });
+
+  autocomplete.addListener("place_changed", () => {
+    const place: google.maps.places.PlaceResult = autocomplete.getPlace();
+    console.log("Selected place:", place);
+
+    if (place?.geometry?.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+
+      mapImageUrl.value = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=${googleMapsApiKey}`;
+      console.log("Static Map URL:", mapImageUrl.value);
+    } else {
+      console.error("Place geometry is missing or invalid.");
+      mapImageUrl.value = ""; // Clear the map preview if invalid
+    }
+  });
+};
+
 
 // Cleanup on unmount
 onUnmounted(() => {
   window.removeEventListener("resize", updateSidebarWidth);
 });
 
-// Adjust sidebar width dynamically based on screen size
-const updateSidebarWidth = () => {
-  sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
-};
+// Add save logic here, such as sending the data to an API or storing it locally
 
-window.addEventListener("resize", updateSidebarWidth);
-onUnmounted(() => {
-  window.removeEventListener("resize", updateSidebarWidth);
-});
-
+//commenting these out since they are used in the async function and vercel is whining
+/*
+const eventLocation = ref<string>("");
+const isPublic = ref<Boolean>(true);
+const hostEmail = ref<String>("");
+*/
 /*// Computed properties
 const isFormValid = computed((): boolean => {
   return (
@@ -150,15 +229,6 @@ const createEvent = async () => {
   }
 };
 */
-// Methods
-function toggleEventType(isSingle: boolean): void {
-  isSingleEvent.value = isSingle;
-}
-
-function validateEventName(): void {
-  eventNameValid.value = eventName.value.trim().length > 0;
-}
-
 /*function submitEvent(): void {
   if (isFormValid.value) {
     console.log("Event submitted with the following details:", {
@@ -179,97 +249,6 @@ function validateEventName(): void {
     alert("Please fill in all required fields.");
   }
 }*/
-
-// Reactive state
-const links = ref<string[]>([]); // List of links
-const newLink = ref<string>(""); // New link input
-const isRemoveMode = ref(false); // Toggle remove mode
-
-
-// Function to add a new link
-function addLink(link: string) {
-  if (link.trim() !== "") {
-    links.value.push(link);
-    newLink.value = ""; // Clear the input after adding
-  }
-}
-
-// Function to remove a link by index
-function removeLink(index: number) {
-  links.value.splice(index, 1);
-}
-
-// Toggle remove mode
-function toggleRemoveMode() {
-  isRemoveMode.value = !isRemoveMode.value;
-}
-
-
-// Reactive states for new sections
-const selectedLayout = ref<string | null>(null);
-
-const fontStyle = ref<Record<string, any>>({
-  fontFamily: "Arial",
-  fontSize: 48,
-  bold: false,
-  italic: false,
-  underline: false,
-  color: "#000000",
-});
-
-function updateFontStyle(property: string, value: any) {
-  fontStyle.value[property] = value;
-}
-
-// Image gallery
-const gallery = ref([
-  { id: 1, src:new URL('@/assets/Bike.jpg', import.meta.url).href, theme: "Bike" },
-  { id: 2, src:new URL('@/assets/Christmas.jpg', import.meta.url).href, theme: "Christmas" },
-  { id: 3, src:new URL('@/assets/Confetti.jpg', import.meta.url).href, theme: "Confetti" },
-  { id: 4, src:new URL('@/assets/Default_Invite.jpg', import.meta.url).href, theme: "Default" },
-  { id: 5, src:new URL('@/assets/Dog.jpg', import.meta.url).href, theme: "Dog" },
-  { id: 6, src:new URL('@/assets/Dry_Flower.jpg', import.meta.url).href, theme: "Flower" },
-  { id: 7, src:new URL('@/assets/Easter.jpg', import.meta.url).href, theme: "Easter" },
-  { id: 8, src:new URL('@/assets/Football.jpg', import.meta.url).href, theme: "Football" },
-  { id: 9, src:new URL('@/assets/Fourth.jpg', import.meta.url).href, theme: "Fourth" },
-  { id: 10, src:new URL('@/assets/Gamer.jpg', import.meta.url).href, theme: "Gamer" },
-  { id: 11, src:new URL('@/assets/Haley\'s_Birthday_Event_Page.jpg', import.meta.url).href, theme: "Birthday" },
-  { id: 12, src:new URL('@/assets/Hanukkah.jpg', import.meta.url).href, theme: "Hanukkah" },
-  { id: 13, src:new URL('@/assets/Hike.jpg', import.meta.url).href, theme: "Hike" },
-  { id: 14, src:new URL('@/assets/Joy.jpg', import.meta.url).href, theme: "Joy" },
-  { id: 15, src:new URL('@/assets/Lisa\'s_Baby_Shower_Event_Page.jpg', import.meta.url).href, theme: "Baby Shower" },
-  { id: 16, src:new URL('@/assets/Love.jpg', import.meta.url).href, theme: "Love" },
-  { id: 17, src:new URL('@/assets/Pineapple.jpg', import.meta.url).href, theme: "Pineapple" },
-  { id: 18, src:new URL('@/assets/PinkPurple_Birthday.jpg', import.meta.url).href, theme: "Purple_Birthday" },
-  { id: 19, src:new URL('@/assets/Rose_Invite.jpg', import.meta.url).href, theme: "Rose" },
-  { id: 20, src:new URL('@/assets/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
-  { id: 21, src:new URL('@/assets/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
-  { id: 22, src:new URL('@/assets/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
-  // Add more images with themes as needed
-]);
-
-// Search query
-const searchQuery = ref("");
-
-// Selected image
-const selectedImage = ref<number | null>(null);
-
-// Filtered gallery based on search query
-const filteredGallery = computed(() =>
-    gallery.value.filter(
-        (image) =>
-            image.theme.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            searchQuery.value.trim() === ""
-    )
-);
-
-// Function to select an image
-function selectImage(imageId: number): void {
-  selectedImage.value = imageId;
-}
-
-// Add save logic here, such as sending the data to an API or storing it locally
-
 </script>
 
 <template>
