@@ -413,40 +413,6 @@ function selectImage(imageId: number): void {
               </div>
             </div>
           </fieldset>
-          <section class="event-links">
-            <h2>Links</h2>
-
-            <!-- Input and Add Link Button -->
-            <div class="add-link-section">
-              <input
-                  type="text"
-                  v-model="newLink"
-                  placeholder="Enter link URL"
-                  class="link-input"
-              />
-              <button class="add-link-button" @click="addLink(newLink)">
-                Add a Link to Your Invite
-              </button>
-              <button class="remove-mode-button" @click="toggleRemoveMode">
-                Remove
-              </button>
-            </div>
-
-            <!-- List of Links -->
-            <ul v-if="links.length > 0" class="links-list">
-              <li v-for="(link, index) in links" :key="index" class="link-item">
-                <span>{{ link }}</span>
-                <button
-                    v-if="isRemoveMode"
-                    class="remove-link-button"
-                    @click="removeLink(index)"
-                >
-                  -
-                </button>
-              </li>
-            </ul>
-          </section>
-
           <fieldset>
             <legend>Choose an Image</legend>
             <!-- Search Bar -->
@@ -580,6 +546,43 @@ function selectImage(imageId: number): void {
               <label>Get Notified of RSVPs</label>
               <input type="checkbox" v-model="notifyRSVPs"/>
             </div>
+
+
+            <section class="event-links">
+              <h2>Links</h2>
+
+              <!-- Input and Add Link Button -->
+              <div class="add-link-section">
+                <input
+                    type="text"
+                    v-model="newLink"
+                    placeholder="Enter link URL"
+                    class="link-input"
+                />
+                <button class="add-link-button" @click="addLink(newLink)">
+                  Add a Link to Your Invite
+                </button>
+                <button class="remove-mode-button" @click="toggleRemoveMode">
+                  Remove
+                </button>
+              </div>
+
+              <!-- List of Links -->
+              <ul v-if="links.length > 0" class="links-list">
+                <li v-for="(link, index) in links" :key="index" class="link-item">
+                  <span>{{ link }}</span>
+                  <button
+                      v-if="isRemoveMode"
+                      class="remove-link-button"
+                      @click="removeLink(index)"
+                  >
+                    -
+                  </button>
+                </li>
+              </ul>
+            </section>
+
+
           </section>
         </section>
       </div>
