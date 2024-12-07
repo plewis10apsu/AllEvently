@@ -28,7 +28,8 @@ const address = ref<string>("");
 const inputValue = ref<string>("");
 const mapImageUrl = ref<string>("");
 const autocomplete: any = ref(null);
-const googleMapsApiKey = "AIzaSyBvoIccZuXaMtBk5khe7fmqe_NLn9QJeWM";
+const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
 //commenting these out since they are used in the async function and vercel is whining
 /*
 const eventLocation = ref<string>("");
