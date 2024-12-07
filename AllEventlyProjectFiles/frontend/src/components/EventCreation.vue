@@ -34,8 +34,11 @@ const isRemoveMode = ref(false); // Toggle remove mode
 const searchQuery = ref("");
 const selectedImage = ref<number | null>(null);
 const mapImageUrl = ref<string>("");
+let autocomplete: google.maps.places.Autocomplete | null = null;
+const nearbyBounds = {  north: 36.678118, south: 34.982972, east: -81.6469, west: -90.3103, };
 const activeTab = ref<"details" | "settings">("details");
 const selectedLayout = ref<string | null>(null);
+const isPrivate = ref<boolean>(true);
 declare const google: any;
 const filteredGallery = computed(() =>
     gallery.value.filter(
@@ -58,6 +61,21 @@ const fontStyle = ref<Record<string, any>>({
   underline: false,
   color: "#000000",
 });
+
+function getContrastingBackground(color: string): string {
+  // Remove the '#' if present and parse the RGB values
+  const hex = color.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  // Return white for dark colors, black for light colors
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+}
+
 
 function toggleEventType(isSingle: boolean): void {
   isSingleEvent.value = isSingle;
@@ -98,6 +116,10 @@ watch(inputValue, (newValue) => {
     address.value = ""; // Clear the selected address if input is empty
     mapImageUrl.value = "";
   }
+
+  if (autocomplete && newValue.trim() !== "") {
+    autocomplete.setBounds(nearbyBounds);
+  }
 });
 
 // Image gallery
@@ -124,6 +146,7 @@ const gallery = ref([
   { id: 20, src:new URL('@/assets/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
   { id: 21, src:new URL('@/assets/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
   { id: 22, src:new URL('@/assets/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
+  { id: 23, src:new URL('@/assets/Graduation.jpg', import.meta.url).href, theme: "Graduation" },
   // Add more images with themes as needed
 ]);
 
@@ -155,16 +178,16 @@ const initializeAutocomplete = (): void => {
     return;
   }
 
-  const autocomplete = new google.maps.places.Autocomplete(input, {
+  autocomplete = new google.maps.places.Autocomplete(input, {
     fields: ["formatted_address", "geometry"],
   });
 
+  if (autocomplete) {
   autocomplete.addListener("place_changed", () => {
-    const place = autocomplete.getPlace();
+    const place = autocomplete?.getPlace();
     console.log("Selected place:", place);
 
     if (place?.formatted_address) {
-      // Update the input field with the formatted address
       inputValue.value = place.formatted_address;
     } else {
       console.error("Formatted address is missing from the selected place.");
@@ -181,8 +204,10 @@ const initializeAutocomplete = (): void => {
       mapImageUrl.value = ""; // Clear the map preview if invalid
     }
   });
+  } else {
+    console.error("Autocomplete is not initialized.");
+  }
 };
-
 
 // Cleanup on unmount
 onUnmounted(() => {
@@ -445,10 +470,25 @@ const createEvent = async () => {
             <legend>Customize the Font</legend>
             <div class="font-customization">
               <select v-model="fontStyle.fontFamily">
+                <option value="'Allura', cursive">Allura</option>
                 <option value="Arial">Arial</option>
+                <option value="'Dancing Script', cursive">Dancing Script</option>
+                <option value="Courier New">Courier New</option>
+                <option value="'Great Vibes', cursive">Great Vibes</option>
+                <option value="Georgia">Georgia</option>
+                <option value="'Lato', sans-serif">Lato</option>
+                <option value="Lucida Console">Lucida Console</option>
+                <option value="'Montserrat', sans-serif">Montserrat</option>
+                <option value="'Open Sans', sans-serif">Open Sans</option>
+                <option value="'Pacifico', cursive">Pacifico</option>
+                <option value="'Poppins', sans-serif">Poppins</option>
+                <option value="'Roboto', sans-serif">Roboto</option>
+                <option value="'Satisfy', cursive">Satisfy</option>
+                <option value="Tahoma">Tahoma</option>
                 <option value="Times New Roman">Times New Roman</option>
                 <option value="Verdana">Verdana</option>
-                <!-- Add more font families as needed -->
+
+                <!-- Add more fonts here -->
               </select>
               <input
                   type="number"
@@ -488,6 +528,9 @@ const createEvent = async () => {
     fontStyle: fontStyle.italic ? 'italic' : 'normal',
     textDecoration: fontStyle.underline ? 'underline' : 'none',
     color: fontStyle.color,
+    backgroundColor: getContrastingBackground(fontStyle.color),
+    padding: '10px', // Optional for better readability
+     borderRadius: '5px' // Optional for styling
   }">
               Sample Text Preview
             </div>
@@ -499,40 +542,54 @@ const createEvent = async () => {
         <section v-if="activeTab === 'settings'" class="event-settings">
           <section class="guest-settings">
             <h2>Guest Settings</h2>
-            <div class="toggle-setting">
+            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
               <label>Request Child Count</label>
-              <input type="checkbox" v-model="requestChildCount"/>
+              <button class="toggle-button" :class="{'active-toggle': requestChildCount}" @click="requestChildCount = !requestChildCount">
+                {{ requestChildCount ? 'ON' : 'OFF' }}
+              </button>
             </div>
-            <div class="toggle-setting">
+            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
               <label>Limit Additional Guests</label>
-              <input type="checkbox" v-model="limitGuests"/>
+              <button class="toggle-button" :class="{'active-toggle': limitGuests}" @click="limitGuests = !limitGuests">
+                {{ limitGuests ? 'ON' : 'OFF' }}
+              </button>
             </div>
-            <div class="toggle-setting">
+            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
               <label>Allow Guests to RSVP</label>
-              <input type="checkbox" v-model="allowRSVP"/>
+              <button class="toggle-button" :class="{'active-toggle': allowRSVP}" @click="allowRSVP = !allowRSVP">
+                {{ allowRSVP ? 'ON' : 'OFF' }}
+              </button>
             </div>
+            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <label>Event is Public or Private</label>
+              <button class="toggle-button" :class="{'active-toggle': isPrivate}" @click="isPrivate = !isPrivate">
+                {{ isPrivate ? 'Private' : 'Public' }}
+              </button>
+            </div>
+
           </section>
 
           <section class="host-settings">
             <h2>Host Settings</h2>
             <label for="host-first-name">Hosted By</label>
             <input
-              id="host-first-name"
-              class="event-input"
-              v-model="hostFirstName"
-              placeholder="Insert Host First Name"
+                id="host-first-name"
+                class="event-input"
+                v-model="hostFirstName"
+                placeholder="Insert Host First Name"
             />
             <input
-              id="host-last-name"
-              class="event-input"
-              v-model="hostLastName"
-              placeholder="Insert Host Last Name"
+                id="host-last-name"
+                class="event-input"
+                v-model="hostLastName"
+                placeholder="Insert Host Last Name"
             />
-            <div class="toggle-setting">
+            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
               <label>Get Notified of RSVPs</label>
-              <input type="checkbox" v-model="notifyRSVPs"/>
+              <button :class="{'active-toggle': notifyRSVPs}" @click="notifyRSVPs = !notifyRSVPs">
+                {{ notifyRSVPs ? 'ON' : 'OFF' }}
+              </button>
             </div>
-
 
             <section class="event-links">
               <h2>Links</h2>
@@ -567,7 +624,6 @@ const createEvent = async () => {
                 </li>
               </ul>
             </section>
-
 
           </section>
         </section>
@@ -827,6 +883,23 @@ button:hover {
   width: 100%; /* Make the image fill the container width */
   height: 100%; /* Make the image fill the container height */
   object-fit: cover; /* Ensure the image scales and crops to fit the container */
+}
+
+.toggle-setting button {
+  min-width: 100px; /* Adjust width as needed */
+  padding: 5px 10px;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f1b8a3; /* Default background */
+  transition: background-color 0.3s;
+}
+
+.toggle-setting button.active-toggle {
+  background-color: #ff6b35; /* Active state background */
+  color: white;
 }
 
 
