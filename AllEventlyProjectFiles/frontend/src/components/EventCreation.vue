@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue";
+import {ref, onUnmounted} from "vue";
 import logo from "@/assets/AllEventlyLogo.png";
 import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
 import SidebarWithPreview from "@/components/SidebarWithPreview.vue";
@@ -24,6 +24,12 @@ const hostLastName = ref<string>("");
 const notifyRSVPs = ref<boolean>(false);
 const isSidebarVisible = ref<boolean>(true);
 const sidebarWidth = ref<number>(200);
+//commenting these out since they are used in the async function and vercel is whining
+/*
+const eventLocation = ref<string>("");
+const isPublic = ref<Boolean>(true);
+const hostEmail = ref<String>("");
+*/
 
 // Tab navigation
 const activeTab = ref<"details" | "settings">("details");
@@ -47,7 +53,35 @@ const isFormValid = computed((): boolean => {
     endTime.value !== ""
   );
 });*/
-
+/*
+//commented out for now to avoid vercel complaints
+const createEvent = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
+      method : 'POST',
+      headers : {
+        'Content-Type': 'application/json',
+      },
+      body : JSON.stringify({
+        hostEmail : hostEmail.value,
+        hostFirstName : hostFirstName.value,
+        hostLastName : hostLastName.value,
+        eventName : eventName.value,
+        eventLocation : eventLocation.value,
+        isPublic : isPublic.value
+      })
+    });
+    if (response.ok) {
+      const data = await response.json();
+      alert("Successfully created event: "+data.eventName);
+    } else {
+      console.error("Error creating event. Please try again.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+*/
 // Methods
 function toggleEventType(isSingle: boolean): void {
   isSingleEvent.value = isSingle;
@@ -82,7 +116,7 @@ function validateEventName(): void {
 
 <template>
   <div class="page-layout event-creation-page">
-    <TopPanelWithBack :logo="logo" />
+    <TopPanelWithBack :logo="logo"/>
     <SidebarWithPreview
         :isVisible="isSidebarVisible"
         :width="sidebarWidth"
@@ -149,15 +183,15 @@ function validateEventName(): void {
                 <label for="event-date" class="">
                   Date
                 </label>
-                <input id="event-date" type="date" v-model="eventDate" required />
+                <input id="event-date" type="date" v-model="eventDate" required/>
               </div>
               <div>
                 <label for="start-time">Start Time</label>
-                <input id="start-time" type="time" v-model="startTime" required />
+                <input id="start-time" type="time" v-model="startTime" required/>
               </div>
               <div>
                 <label for="end-time">End Time</label>
-                <input id="end-time" type="time" v-model="endTime" required />
+                <input id="end-time" type="time" v-model="endTime" required/>
               </div>
               <div>
                 <label for="time-zone">Event Time Zone</label>
@@ -169,23 +203,24 @@ function validateEventName(): void {
             <div class="checkbox-row" v-if="isSingleEvent">
               <div>
                 <label for="all-day-event">All-day event</label>
-                <input id="all-day-event" class="checkbox" type="checkbox" v-model="eventAllDayEvent" required />
+                <input id="all-day-event" class="checkbox" type="checkbox" v-model="eventAllDayEvent" required/>
               </div>
               <div>
                 <label for="display-start-time">Display start time</label>
-                <input id="display-start-time" class="checkbox" type="checkbox" v-model="eventDisplayStartTime" required />
+                <input id="display-start-time" class="checkbox" type="checkbox" v-model="eventDisplayStartTime"
+                       required/>
               </div>
               <div>
                 <label for="display-end-time">Display end time</label>
-                <input id="display-end-time" class="checkbox" type="checkbox" v-model="eventDisplayEndTime" required />
+                <input id="display-end-time" class="checkbox" type="checkbox" v-model="eventDisplayEndTime" required/>
               </div>
             </div>
             <div class="event-location">
               <label for="event-address">Event Address</label>
-              <input id="event-address" type="text" placeholder="Enter address" required />
+              <input id="event-address" type="text" placeholder="Enter address" required/>
 
               <label for="event-venue">Event Venue Name</label>
-              <input id="event-venue" type="text" placeholder="Enter venue name" />
+              <input id="event-venue" type="text" placeholder="Enter venue name"/>
             </div>
           </fieldset>
         </section>
@@ -195,15 +230,15 @@ function validateEventName(): void {
             <h2>Guest Settings</h2>
             <div class="toggle-setting">
               <label>Request Child Count</label>
-              <input type="checkbox" v-model="requestChildCount" />
+              <input type="checkbox" v-model="requestChildCount"/>
             </div>
             <div class="toggle-setting">
               <label>Limit Additional Guests</label>
-              <input type="checkbox" v-model="limitGuests" />
+              <input type="checkbox" v-model="limitGuests"/>
             </div>
             <div class="toggle-setting">
               <label>Allow Guests to RSVP</label>
-              <input type="checkbox" v-model="allowRSVP" />
+              <input type="checkbox" v-model="allowRSVP"/>
             </div>
           </section>
 
@@ -224,7 +259,7 @@ function validateEventName(): void {
             />
             <div class="toggle-setting">
               <label>Get Notified of RSVPs</label>
-              <input type="checkbox" v-model="notifyRSVPs" />
+              <input type="checkbox" v-model="notifyRSVPs"/>
             </div>
           </section>
 
