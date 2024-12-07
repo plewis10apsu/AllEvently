@@ -541,91 +541,108 @@ const createEvent = async () => {
         <!-- Event Settings Section -->
         <section v-if="activeTab === 'settings'" class="event-settings">
           <section class="guest-settings">
-            <h2>Guest Settings</h2>
-            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-              <label>Request Child Count</label>
-              <button class="toggle-button" :class="{'active-toggle': requestChildCount}" @click="requestChildCount = !requestChildCount">
-                {{ requestChildCount ? 'ON' : 'OFF' }}
-              </button>
-            </div>
-            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-              <label>Limit Additional Guests</label>
-              <button class="toggle-button" :class="{'active-toggle': limitGuests}" @click="limitGuests = !limitGuests">
-                {{ limitGuests ? 'ON' : 'OFF' }}
-              </button>
-            </div>
-            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-              <label>Allow Guests to RSVP</label>
-              <button class="toggle-button" :class="{'active-toggle': allowRSVP}" @click="allowRSVP = !allowRSVP">
-                {{ allowRSVP ? 'ON' : 'OFF' }}
-              </button>
-            </div>
-            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-              <label>Event is Public or Private</label>
-              <button class="toggle-button" :class="{'active-toggle': isPrivate}" @click="isPrivate = !isPrivate">
-                {{ isPrivate ? 'Private' : 'Public' }}
-              </button>
-            </div>
+            <fieldset>
+              <legend>Guest Settings</legend>
+              <div class="toggle-setting">
+                <label for="request-child-count">Request Child Count</label>
+                <button :class="{'active-toggle': requestChildCount}" @click="requestChildCount = !requestChildCount">
+                  {{ requestChildCount ? 'ON' : 'OFF' }}
+                </button>
+              </div>
+              <div class="toggle-setting">
+                <label for="limit-additional-guests">Limit Additional Guests</label>
+                <button :class="{'active-toggle': limitGuests}" @click="limitGuests = !limitGuests">
+                  {{ limitGuests ? 'ON' : 'OFF' }}
+                </button>
+              </div>
+              <div class="toggle-setting">
+                <label for="allow-rsvp">Allow Guests to RSVP</label>
+                <button :class="{'active-toggle': allowRSVP}" @click="allowRSVP = !allowRSVP">
+                  {{ allowRSVP ? 'ON' : 'OFF' }}
+                </button>
+              </div>
+            </fieldset>
 
           </section>
-
-          <section class="host-settings">
-            <h2>Host Settings</h2>
-            <label for="host-first-name">Hosted By</label>
-            <input
-                id="host-first-name"
-                class="event-input"
-                v-model="hostFirstName"
-                placeholder="Insert Host First Name"
-            />
-            <input
-                id="host-last-name"
-                class="event-input"
-                v-model="hostLastName"
-                placeholder="Insert Host Last Name"
-            />
-            <div class="toggle-setting" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-              <label>Get Notified of RSVPs</label>
-              <button :class="{'active-toggle': notifyRSVPs}" @click="notifyRSVPs = !notifyRSVPs">
+        <section>
+          <fieldset>
+            <legend>Host Settings</legend>
+            <div class="host-setting">
+              <label for="host-first-name">Host First Name</label>
+              <input
+                  id="host-first-name"
+                  class="event-input"
+                  v-model="hostFirstName"
+                  placeholder="Insert Host First Name"
+              />
+            </div>
+            <div class="host-setting">
+              <label for="host-last-name">Host Last Name</label>
+              <input
+                  id="host-last-name"
+                  class="event-input"
+                  v-model="hostLastName"
+                  placeholder="Insert Host Last Name"
+              />
+            </div>
+            <div class="toggle-setting">
+              <label for="notify-rsvps">Get Notified of RSVPs</label>
+              <button
+                  :class="{'active-toggle': notifyRSVPs}"
+                  @click="notifyRSVPs = !notifyRSVPs"
+              >
                 {{ notifyRSVPs ? 'ON' : 'OFF' }}
               </button>
             </div>
+            <div class="toggle-setting">
+              <label for="event-public-private">Event is Public or Private</label>
+              <button
+                  class="toggle-button"
+                  :class="{'active-toggle': isPrivate}"
+                  @click="isPrivate = !isPrivate"
+              >
+                {{ isPrivate ? 'Private' : 'Public' }}
+              </button>
+            </div>
+          </fieldset>
+        </section>
 
-            <section class="event-links">
-              <h2>Links</h2>
+          <fieldset class="event-links">
+            <legend>Links</legend>
+            <div class="add-link-section">
+              <input
+                  type="text"
+                  v-model="newLink"
+                  placeholder="Enter link URL"
+                  class="link-input"
+              />
+              <button class="add-link-button" @click="addLink(newLink)">
+                Add Link
+              </button>
+              <button
+                  v-if="links.length > 0"
+                  class="remove-mode-button"
+                  @click="toggleRemoveMode"
+              >
+                {{ isRemoveMode ? "Done" : "Remove Mode" }}
+              </button>
+            </div>
 
-              <!-- Input and Add Link Button -->
-              <div class="add-link-section">
-                <input
-                    type="text"
-                    v-model="newLink"
-                    placeholder="Enter link URL"
-                    class="link-input"
-                />
-                <button class="add-link-button" @click="addLink(newLink)">
-                  Add a Link to Your Invite
+            <ul v-if="links.length > 0" class="links-list">
+              <li v-for="(link, index) in links" :key="index" class="link-item">
+                <a :href="link" target="_blank" class="link-url">{{ link }}</a>
+                <button
+                    v-if="isRemoveMode"
+                    class="remove-link-button"
+                    @click="removeLink(index)"
+                >
+                  ×
                 </button>
-                <button class="remove-mode-button" @click="toggleRemoveMode">
-                  Remove
-                </button>
-              </div>
+              </li>
+            </ul>
+            <p v-else class="no-links-message">No links added yet.</p>
+          </fieldset>
 
-              <!-- List of Links -->
-              <ul v-if="links.length > 0" class="links-list">
-                <li v-for="(link, index) in links" :key="index" class="link-item">
-                  <span>{{ link }}</span>
-                  <button
-                      v-if="isRemoveMode"
-                      class="remove-link-button"
-                      @click="removeLink(index)"
-                  >
-                    -
-                  </button>
-                </li>
-              </ul>
-            </section>
-
-          </section>
         </section>
       </div>
     </main>
@@ -785,21 +802,46 @@ button:hover {
 }
 
 .event-links {
-  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+.event-links legend {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FF6B35;
+  padding: 0 10px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #FF6B35;
+  display: inline-block;
+}
+
+/* Input and Button Alignment */
 .add-link-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10px; /* Space between input and buttons */
+  width: 100%; /* Ensure the section spans the fieldset */
 }
 
 .link-input {
-  flex: 1;
-  padding: 8px;
+  flex: 1; /* Input spans remaining space */
+  padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.link-input:focus {
+  border-color: #E63946;
+  outline: none;
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.4);
 }
 
 .add-link-button,
@@ -809,9 +851,10 @@ button:hover {
   background-color: #ff6b35;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
+  white-space: nowrap; /* Prevent button text from wrapping */
 }
 
 .add-link-button:hover,
@@ -820,24 +863,39 @@ button:hover {
   transform: scale(1.05);
 }
 
+/* Links List */
 .links-list {
   margin-top: 15px;
   list-style: none;
   padding: 0;
+  width: 100%; /* Ensure the list spans the fieldset */
 }
 
 .link-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  justify-content: space-between; /* Space between link and remove button */
+  padding: 8px 0; /* Add space between items */
+  border-bottom: 1px solid #eee; /* Divider between items */
 }
 
-.link-item span {
-  flex: 1;
-  font-size: 1rem;
+.link-item:last-child {
+  border-bottom: none; /* Remove divider for the last item */
 }
 
+.link-url {
+  flex: 1; /* Ensures the link spans available space */
+  color: #007bff;
+  text-decoration: none;
+  word-break: break-word; /* Break long URLs to fit in smaller screens */
+  margin-right: 10px; /* Add space between the link and remove button */
+}
+
+.link-url:hover {
+  text-decoration: underline;
+}
+
+/* Remove Button */
 .remove-link-button {
   background-color: #ff6b35;
   color: white;
@@ -850,12 +908,21 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .remove-link-button:hover {
   background-color: #d9432c;
+  transform: scale(1.1);
 }
 
+/* Empty Links Message */
+.no-links-message {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 10px;
+  text-align: center;
+}
 
 .image-gallery {
   display: grid;
@@ -885,15 +952,60 @@ button:hover {
   object-fit: cover; /* Ensure the image scales and crops to fit the container */
 }
 
+/* Layout for Host First Name and Last Name */
+.host-setting {
+  display: flex;
+  flex-direction: column; /* Stack label and input vertically */
+  margin-bottom: 15px; /* Space between fields */
+}
+
+.host-setting label {
+  margin-bottom: 5px; /* Space between label and input */
+  font-weight: bold;
+}
+
+.host-setting input {
+  width: 100%; /* Input spans the full width */
+  max-width: 400px; /* Optional: Limit input width */
+  padding: 8px; /* Add padding for better usability */
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.host-setting input:focus {
+  border-color: #E63946; /* Add focus styling */
+  outline: none;
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.4);
+}
+
+.toggle-setting {
+  display: flex; /* Enables flexbox layout */
+  justify-content: space-between; /* Space between label and button */
+  align-items: center; /* Aligns label and button vertically */
+  margin-bottom: 10px;
+  width: 100%; /* Ensure the container spans the full width */
+}
+
+.toggle-setting label {
+  flex: 1; /* Makes the label take up available space */
+  margin-bottom: 0; /* Removes extra space below the label */
+  font-weight: bold;
+  text-align: left; /* Aligns label text to the left */
+  padding-right: 10px; /* Optional spacing */
+}
+
 .toggle-setting button {
-  min-width: 100px; /* Adjust width as needed */
-  padding: 5px 10px;
-  text-align: center;
-  font-size: 16px;
+  flex: 0; /* Ensures button does not stretch */
+  min-width: 120px; /* Consistent button width */
+  padding: 5px 15px; /* Adjust padding for better sizing */
+  font-size: 16px; /* Ensure readable text */
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  background-color: #f1b8a3; /* Default background */
+  background-color: #f1b8a3; /* Default button background */
+  text-align: center;
   transition: background-color 0.3s;
 }
 
@@ -901,7 +1013,6 @@ button:hover {
   background-color: #ff6b35; /* Active state background */
   color: white;
 }
-
 
 @media screen and (max-width: 768px) {
   .tabs button {
