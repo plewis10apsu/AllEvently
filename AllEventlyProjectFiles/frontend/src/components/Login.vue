@@ -31,8 +31,8 @@ const loginUser = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: string.valueOf(email.value),
-        password: string.valueOf(password.value),
+        email: <string>email.value,
+        password: <string>password.value,
       }),
     });
     // Logic for determining if the validation response is affirmative
@@ -57,7 +57,7 @@ const loginUser = async () => {
         console.error('Error response from server:', data);
       });
     }
-    // Error has occured
+    // Error has occurred
   } catch (error) {
     console.log('Error during login: ' + error);
   }
@@ -102,17 +102,19 @@ const handleSignup = async () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email.value,
-          password: password.value,
-          firstName: firstName.value,
-          lastName: lastName.value
+          email: <string>email.value,
+          password: <string>password.value,
+          firstName: <string>firstName.value,
+          lastName: <string>lastName.value
         }),
       });
       // Logic for if the database message is affirmative
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
-        alert("Account details:\nemail: "+string.valueOf(email)+"\nPassword: "+string.valueOf(password));
+        const stringemail: string = email.value;
+        const stringpw: string = password.value;
+        alert("Account details:\nemail: "+stringemail+"\nPassword: "+stringpw);
       // The case of a negative database response
       } else {
         response.json().then(data => {
