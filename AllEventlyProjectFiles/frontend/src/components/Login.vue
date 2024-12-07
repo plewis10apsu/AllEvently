@@ -25,7 +25,6 @@ const loginUser = async () => {
   try {
     // Fetches validation response from database
     // Specify method type, headers, and content of JSON message body
-    console.log("Email: "+<string>email.value+"\nPassword: "+<string>password.value);
     const response = await fetch('https://all-evently-backend.vercel.app/api/authentication', {
       method: 'POST',
       headers: {
@@ -41,16 +40,9 @@ const loginUser = async () => {
       const data = await response.json();
       if (data.userId !== null) {
         userId.value = data.userId;
-        console.log("Login successful, user ID: "+userId.value);
-        console.log("Data contents:"+data);
-        // Should use await because it is an async function
-        // Redirect to the events page upon successful login
         await router.push('/events');
       } else {
-        console.error('No userID returned from server');
-        console.log("User Id value: "+userId.value);
         console.log(data.message);
-
       }
     } else {
       // Negative message from database validation message
