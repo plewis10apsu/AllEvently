@@ -12,6 +12,13 @@ defineProps<{
   };
 }>();
 
+// Emit save event
+const emit = defineEmits(["save"]);
+
+function handleSave() {
+  emit("save");
+}
+
 </script>
 
 <template>
@@ -23,6 +30,8 @@ defineProps<{
       </div>
       <div class="preview-box">Preview</div>
     </nav>
+    <!-- Save Button -->
+    <button class="save-button" @click="handleSave">Save</button>
   </aside>
 </template>
 
@@ -76,6 +85,26 @@ defineProps<{
   justify-content: center;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.save-button {
+  margin-top: auto;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  width: 80%;
+  align-self: center;
+}
+
+.save-button:hover {
+  background-color: #d9432c;
+  transform: scale(1.05);
 }
 
 /* Adjustments for small screens */

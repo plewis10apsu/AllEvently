@@ -11,3 +11,6 @@ _pg*
 # Environment variables for local development
 .env
 .vercel
+
+# Ignore auto-generated files like diagnosticMessages.generated.json
+*.generated.json
