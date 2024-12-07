@@ -1,6 +1,7 @@
 import {Pool} from 'pg';
 import * as dotenv from 'dotenv';
 import {IncomingMessage, ServerResponse} from 'http';
+const bcrypt = require('bcrypt');
 
 dotenv.config();
 
@@ -53,13 +54,32 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message : 'All fields are required.'}));
                 return;
             }
-            const result = await pool.query('SELECT AUTHENTICATE_USER($1, $2);', [<string>body.email, <string>body.password]);
+            const hashed_password_query = await pool.query('SELECT account_password FROM Accounts WHERE account_email = $1;', [<string>body.email]);
+            if (hashed_password_query.rows.length === 0) {
+                res.statusCode = 401;
+                res.end(JSON.stringify({message: 'Password not Found'}));
+                return;
+            }
+
+            const hashed_password = hashed_password_query.rows[0].account_password;
+
+            const is_valid = await bcrypt.compare(body.password, hashed_password);
+
+            if (!is_valid) {
+                res.statusCode = 401;
+                res.end(JSON.stringify({message: 'Incorrect password.'}));
+                return;
+            }
+
+
+            const result = await pool.query('SELECT AUTHENTICATE_USER($1, $2);', [<string>body.email, hashed_password]);
             if (result.rows.length === 0) {
                 res.statusCode = 401;
                 res.end(JSON.stringify({message : 'Invalid Credentials'}));
                 return;
             }
-            const sessionId = parseInt(result.rows[0]);
+            const sessionId: number = result.rows[0]?.authenticate_user || result.rows[0]?.column_name;
+
             if (sessionId){
                 res.statusCode = 201;
                 res.end(JSON.stringify({message: 'Login successful', userId: sessionId}));
