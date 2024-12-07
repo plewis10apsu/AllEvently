@@ -34,7 +34,6 @@ const isRemoveMode = ref(false); // Toggle remove mode
 const searchQuery = ref("");
 const selectedImage = ref<number | null>(null);
 const mapImageUrl = ref<string>("");
-//const autocomplete: any = ref(null);
 const activeTab = ref<"details" | "settings">("details");
 const selectedLayout = ref<string | null>(null);
 declare const google: any;
@@ -161,8 +160,15 @@ const initializeAutocomplete = (): void => {
   });
 
   autocomplete.addListener("place_changed", () => {
-    const place: google.maps.places.PlaceResult = autocomplete.getPlace();
+    const place = autocomplete.getPlace();
     console.log("Selected place:", place);
+
+    if (place?.formatted_address) {
+      // Update the input field with the formatted address
+      inputValue.value = place.formatted_address;
+    } else {
+      console.error("Formatted address is missing from the selected place.");
+    }
 
     if (place?.geometry?.location) {
       const lat = place.geometry.location.lat();
@@ -373,6 +379,7 @@ const createEvent = async () => {
                       v-model="inputValue"
                       placeholder="Enter address"
                       required
+                      style="width: 100%;"
                   />
                 </div>
                 <div>
