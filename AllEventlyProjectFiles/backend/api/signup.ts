@@ -56,7 +56,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             }
             const hashedPassword: string = await bcrypt.hash(<string>body.password, 12);
             try {
-                await pool.query('SELECT CREATE_ACCOUNT($1, $2, $3, $4);', [<string>body.email, hashedPassword, <string>body.first_name, <string>body.last_name]);
+                await pool.query('SELECT CREATE_ACCOUNT($1, $2, $3, $4);', [<string>body.email, hashedPassword, <string>body.firstName, <string>body.lastName]);
             } catch (err) {
                 res.statusCode = 502;
                 res.end(JSON.stringify({message: "Internal server error."}));
