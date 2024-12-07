@@ -6,11 +6,11 @@ import logo from '@/assets/AllEventlyLogo.png';
 import visibleIcon from '@/assets/Visible_Icon.png';
 import invisibleIcon from '@/assets/Invisible_Icon.png';
 
-const firstName = ref('');
-const lastName = ref('');
-const email = ref('');
+const firstName = ref<string>('');
+const lastName = ref<string>('');
+const email = ref<string>('');
 const isEmailValid = ref(true);
-const password = ref('');
+const password = ref<string>('');
 const showPassword = ref(false);
 const currentIcon = ref(visibleIcon);
 const userId = ref(null);

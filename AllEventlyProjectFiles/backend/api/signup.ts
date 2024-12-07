@@ -54,12 +54,14 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message: 'All fields are required.'}));
                 return;
             }
-            const email: string = body.email;
-            const password: string = body.password;
-            const first_name: string = body.first_name;
-            const last_name: string = body.last_name;
-            const hashedPassword: string = await bcrypt.hash(password, 12);
-            await pool.query('SELECT CREATE_ACCOUNT($1, $2, $3, $4);', [email, hashedPassword, first_name, last_name]);
+            const hashedPassword: string = await bcrypt.hash(<string>body.password, 12);
+            try {
+                await pool.query('SELECT CREATE_ACCOUNT($1, $2, $3, $4);', [<string>body.email, hashedPassword, <string>body.first_name, <string>body.last_name]);
+            } catch (err) {
+                res.statusCode = 502;
+                res.end(JSON.stringify({message: "Internal server error."}));
+                return;
+            }
             res.statusCode = 201;
             res.end(JSON.stringify({message: 'Account created successfully!'}));
             return;
