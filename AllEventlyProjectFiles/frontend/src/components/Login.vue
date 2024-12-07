@@ -25,6 +25,7 @@ const loginUser = async () => {
   try {
     // Fetches validation response from database
     // Specify method type, headers, and content of JSON message body
+    console.log("Email: "+<string>email.value+"\nPassword: "+<string>password.value);
     const response = await fetch('https://all-evently-backend.vercel.app/api/authentication', {
       method: 'POST',
       headers: {
