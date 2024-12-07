@@ -8,7 +8,7 @@ const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
 
-// Helper function to parse JSON body - written by ChatGPT
+// Helper function to parse JSON body
 const parseJsonBody = (req: IncomingMessage) =>
     new Promise<any>((resolve, reject) => {
         let body = '';
@@ -48,33 +48,25 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
     if (req.method === 'POST') {
         try {
             const body = await parseJsonBody(req);
-            if(!body.email){
-                res.statusCode = 400;
-                res.end(JSON.stringify({message : 'Error: all fields are required.'}));
+            if (! body.id){
+                res.statusCode = 401;
+                res.end(JSON.stringify({message: "Error. User not found"}));
                 return;
             }
-            const [hostedEventsResult, publicEventsResult, attendingEventsResult] = await Promise.all([
-                pool.query('SELECT GET_PUBLIC_EVENTS();'),
-                pool.query('SELECT GET_HOSTED_EVENTS($1);', [body.email]),
-                pool.query('SELECT GET_ATTENDING_EVENTS($1);', [body.email])
-            ]);
-            const publicEvents = publicEventsResult.rows;
-            const hostedEvents = hostedEventsResult.rows;
-            const attendedEvents = attendingEventsResult.rows;
-            const responseData = {
-                publicEvents,
-                hostedEvents,
-                attendedEvents
-            };
-            //res.status(200).json(responseData);
+            const result = await pool.query('GET_USER ($1);', [body.id] );
+            if (result.rows.length == 0) {
+                res.statusCode = 401;
+                res.end(JSON.stringify({message: "Error. User not found"}));
+                return;
+            }
+            const user = result.rows[0];
             res.statusCode = 201;
-            res.end(JSON.stringify(responseData));
+            res.end(JSON.stringify({message: 'User found', user: user}));
             return;
-        } catch (err) {
-            console.error('Error fetching events:', err);
+        } catch (error) {
+            console.error(error);
             res.statusCode = 500;
-            res.end(JSON.stringify({message: 'Internal server error.'}));
-            console.log(err);
+            res.end(JSON.stringify({message : 'Error logging in'}));
             return;
         }
     } else {
@@ -84,4 +76,5 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         return;
     }
 };
+
 export default allowCors(handler);

@@ -29,6 +29,14 @@ const inputValue = ref<string>("");
 const mapImageUrl = ref<string>("");
 const autocomplete: any = ref(null);
 const googleMapsApiKey = "AIzaSyBvoIccZuXaMtBk5khe7fmqe_NLn9QJeWM";
+//commenting these out since they are used in the async function and vercel is whining
+/*
+const eventLocation = ref<string>("");
+const isPublic = ref<Boolean>(true);
+const hostEmail = ref<String>("");
+*/
+
+// Tab navigation
 const activeTab = ref<"details" | "settings">("details");
 
 declare const google: any;
@@ -112,7 +120,35 @@ const isFormValid = computed((): boolean => {
     endTime.value !== ""
   );
 });*/
-
+/*
+//commented out for now to avoid vercel complaints
+const createEvent = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
+      method : 'POST',
+      headers : {
+        'Content-Type': 'application/json',
+      },
+      body : JSON.stringify({
+        hostEmail : hostEmail.value,
+        hostFirstName : hostFirstName.value,
+        hostLastName : hostLastName.value,
+        eventName : eventName.value,
+        eventLocation : eventLocation.value,
+        isPublic : isPublic.value
+      })
+    });
+    if (response.ok) {
+      const data = await response.json();
+      alert("Successfully created event: "+data.eventName);
+    } else {
+      console.error("Error creating event. Please try again.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+*/
 // Methods
 function toggleEventType(isSingle: boolean): void {
   isSingleEvent.value = isSingle;
@@ -237,7 +273,7 @@ function selectImage(imageId: number): void {
 
 <template>
   <div class="page-layout event-creation-page">
-    <TopPanelWithBack :logo="logo" />
+    <TopPanelWithBack :logo="logo"/>
     <SidebarWithPreview
       :isVisible="isSidebarVisible"
       :width="sidebarWidth"
@@ -312,15 +348,15 @@ function selectImage(imageId: number): void {
             <div class="event-date-time-row">
               <div>
                 <label for="event-date">Date</label>
-                <input id="event-date" type="date" v-model="eventDate" required />
+                <input id="event-date" type="date" v-model="eventDate" required/>
               </div>
               <div>
                 <label for="start-time">Start Time</label>
-                <input id="start-time" type="time" v-model="startTime" required />
+                <input id="start-time" type="time" v-model="startTime" required/>
               </div>
               <div>
                 <label for="end-time">End Time</label>
-                <input id="end-time" type="time" v-model="endTime" required />
+                <input id="end-time" type="time" v-model="endTime" required/>
               </div>
               <div>
                 <label for="time-zone">Time Zone</label>
@@ -512,15 +548,15 @@ function selectImage(imageId: number): void {
             <h2>Guest Settings</h2>
             <div class="toggle-setting">
               <label>Request Child Count</label>
-              <input type="checkbox" v-model="requestChildCount" />
+              <input type="checkbox" v-model="requestChildCount"/>
             </div>
             <div class="toggle-setting">
               <label>Limit Additional Guests</label>
-              <input type="checkbox" v-model="limitGuests" />
+              <input type="checkbox" v-model="limitGuests"/>
             </div>
             <div class="toggle-setting">
               <label>Allow Guests to RSVP</label>
-              <input type="checkbox" v-model="allowRSVP" />
+              <input type="checkbox" v-model="allowRSVP"/>
             </div>
           </section>
 
@@ -541,7 +577,7 @@ function selectImage(imageId: number): void {
             />
             <div class="toggle-setting">
               <label>Get Notified of RSVPs</label>
-              <input type="checkbox" v-model="notifyRSVPs" />
+              <input type="checkbox" v-model="notifyRSVPs"/>
             </div>
           </section>
         </section>

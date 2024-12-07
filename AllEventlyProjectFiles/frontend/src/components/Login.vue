@@ -42,7 +42,6 @@ const loginUser = async () => {
         userId.value = data.userId;
         console.log("Login successful, user ID: "+userId.value);
         console.log("Data contents:"+data);
-        console.log(data.email);
         // Should use await because it is an async function
         // Redirect to the events page upon successful login
         await router.push('/events');

@@ -8,7 +8,7 @@ const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
 
-// Helper function to parse JSON body - written by ChatGPT
+// Helper function to parse JSON body
 const parseJsonBody = (req: IncomingMessage) =>
     new Promise<any>((resolve, reject) => {
         let body = '';
@@ -48,40 +48,59 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
     if (req.method === 'POST') {
         try {
             const body = await parseJsonBody(req);
-            if(!body.email){
+            const {
+                host_email,
+                host_first_name,
+                host_last_name,
+                event_name,
+                event_location,
+                event_end_date,
+                is_public
+            } = body;
+
+// Validate all required fields
+            if (!host_email || !host_first_name || !host_last_name || !event_name || !event_location || event_end_date === undefined || is_public === undefined) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({message : 'Error: all fields are required.'}));
+                res.end(JSON.stringify({message: "All fields are required."}));
                 return;
             }
-            const [hostedEventsResult, publicEventsResult, attendingEventsResult] = await Promise.all([
-                pool.query('SELECT GET_PUBLIC_EVENTS();'),
-                pool.query('SELECT GET_HOSTED_EVENTS($1);', [body.email]),
-                pool.query('SELECT GET_ATTENDING_EVENTS($1);', [body.email])
-            ]);
-            const publicEvents = publicEventsResult.rows;
-            const hostedEvents = hostedEventsResult.rows;
-            const attendedEvents = attendingEventsResult.rows;
-            const responseData = {
-                publicEvents,
-                hostedEvents,
-                attendedEvents
-            };
-            //res.status(200).json(responseData);
-            res.statusCode = 201;
-            res.end(JSON.stringify(responseData));
-            return;
-        } catch (err) {
-            console.error('Error fetching events:', err);
-            res.statusCode = 500;
-            res.end(JSON.stringify({message: 'Internal server error.'}));
-            console.log(err);
+
+// Combine first and last name to create host_name
+            const host_name: string = `${host_first_name} ${host_last_name}`;
+
+            try {
+                // Construct the query and parameters
+                const query = `
+        INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
+        VALUES ($1, $2, $3, $4, $5, $6);
+    `;
+                const values = [host_email, host_name, event_name, event_location, event_end_date, is_public];
+
+                // Execute the query
+                await pool.query(query, values);
+
+                // Send a success response
+                res.statusCode = 201;
+                res.end(JSON.stringify({message: "Event created successfully."}));
+            } catch (error) {
+                console.error("Database error:", error);
+
+                // Handle database errors
+                res.statusCode = 500;
+                res.end(JSON.stringify({message: "Failed to create event. Please try again later."}));
+            }
+
+        } catch (error) {
+            res.statusCode = 501;
+            res.end(JSON.stringify({message: "Server error creating event. Please try again."}));
             return;
         }
     } else {
         res.statusCode = 405;
         res.end(JSON.stringify({message: 'Method Not Allowed'}));
-        console.log("Method: "+req.method);
+        console.log("Method: " + req.method);
         return;
     }
 };
+
 export default allowCors(handler);
