@@ -6,15 +6,30 @@ import SidebarWithPreview from "@/components/SidebarWithPreview.vue";
 import {loadGoogleMapsAPI} from "@/utils/googleMapsLoader.ts";
 
 // Reactive state
+const invitation = ref({
+  eventName: "",
+  date: "",
+  time: "",
+  location: "",
+  imageId: null,
+  layout: null,
+  fontStyle: {
+    fontFamily: "Arial",
+    fontSize: 48,
+    bold: false,
+    italic: false,
+    underline: false,
+    color: "#000000",
+  },
+});
+const guestNote = ref<string>("");
 const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const eventName = ref<string>("");
 const eventNameValid = ref<boolean>(true);
 const isSingleEvent = ref<boolean>(true);
-const eventDate = ref<string>("");
 const eventDisplayStartTime = ref<boolean>(false);
 const eventAllDayEvent = ref<boolean>(false);
 const eventDisplayEndTime = ref<boolean>(false);
-const startTime = ref<string>("");
 const endTime = ref<string>("");
 const timeZone = ref<string>("CDT");
 const timeZones = ref<string[]>(["CDT", "EST", "PST", "MST", "UTC"]);
@@ -37,7 +52,7 @@ const mapImageUrl = ref<string>("");
 let autocomplete: google.maps.places.Autocomplete | null = null;
 const nearbyBounds = {  north: 36.678118, south: 34.982972, east: -81.6469, west: -90.3103, };
 const activeTab = ref<"details" | "settings">("details");
-const selectedLayout = ref<string | null>(null);
+const selectedLayout = ref("layout-default");
 const isPrivate = ref<boolean>(true);
 declare const google: any;
 const filteredGallery = computed(() =>
@@ -48,34 +63,45 @@ const filteredGallery = computed(() =>
     )
 );
 
+const selectedImageUrl = computed(() => {
+  const image = gallery.value.find((img) => img.id === selectedImage.value);
+  return image ? image.src : null;
+});
+
+// Function to select an image
+function selectImage(imageId: number): void {
+  selectedImage.value = imageId;
+}
+
 // Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
 };
 
-const fontStyle = ref<Record<string, any>>({
+const fontStyle = ref<{
+  fontFamily: string;
+  fontSize: number;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  color: string;
+  backgroundColor: string;
+}>({
   fontFamily: "Arial",
   fontSize: 48,
   bold: false,
   italic: false,
   underline: false,
   color: "#000000",
+  backgroundColor: "#ffffff",
 });
 
-function getContrastingBackground(color: string): string {
-  // Remove the '#' if present and parse the RGB values
-  const hex = color.replace("#", "");
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-
-  // Calculate luminance
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  // Return white for dark colors, black for light colors
-  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+function updateFontStyle<K extends keyof typeof fontStyle.value>(
+    property: K,
+    value: typeof fontStyle.value[K]
+) {
+  fontStyle.value[property] = value;
 }
-
 
 function toggleEventType(isSingle: boolean): void {
   isSingleEvent.value = isSingle;
@@ -102,14 +128,12 @@ function toggleRemoveMode() {
   isRemoveMode.value = !isRemoveMode.value;
 }
 
-function updateFontStyle(property: string, value: any) {
-  fontStyle.value[property] = value;
-}
+/*
 
-// Function to select an image
-function selectImage(imageId: number): void {
-  selectedImage.value = imageId;
+function selectLayout(layoutId: string): void {
+  invitation.value.layout = layoutId;
 }
+*/
 
 watch(inputValue, (newValue) => {
   if (newValue.trim() === "") {
@@ -215,6 +239,10 @@ onUnmounted(() => {
 });
 
 // Add save logic here, such as sending the data to an API or storing it locally
+function saveEventDetails() {
+  alert("Event details saved!");
+  console.log("Saving details:", invitation.value);
+}
 
 //commenting these out since they are used in the async function and vercel is whining
 /*
@@ -288,7 +316,24 @@ const createEvent = async () => {
     <SidebarWithPreview
       :isVisible="isSidebarVisible"
       :width="sidebarWidth"
-      :eventDetails="{ name: eventName, date: eventDate, time: startTime }"
+      :eventDetails="{
+        name: invitation.eventName,
+        date: invitation.date,
+        time: invitation.time,
+        endTime: endTime,
+        imageUrl: selectedImageUrl,
+        fontStyle:{
+          fontFamily: fontStyle.fontFamily,
+          fontSize: fontStyle.fontSize,
+          bold: fontStyle.bold,
+          italic: fontStyle.italic,
+          underline: fontStyle.underline,
+          color: fontStyle.color,
+          backgroundColor: fontStyle.backgroundColor
+    },
+    note: guestNote
+    }"
+      @save="saveEventDetails"
     />
     <!-- Main content area -->
     <main class="content-area event-creation-content">
@@ -319,19 +364,20 @@ const createEvent = async () => {
             <input
               id="event-name"
               type="text"
-              v-model="eventName"
+              v-model="invitation.eventName"
               @blur="validateEventName"
               :class="{ 'input-error': !eventNameValid }"
               placeholder="Enter event name"
               required
             />
-            <p v-if="!eventNameValid" class="error-message">
+            <p v-if="!invitation.eventName" class="error-message">
               Event name is required.
             </p>
-            <label for="event-name">Note for Guests</label>
+            <label for="event-note">Note for Guests</label>
             <input
               id="event-note"
               type="text"
+              v-model="guestNote"
               placeholder="Optional: Note for Guests"
               required
             />
@@ -359,11 +405,11 @@ const createEvent = async () => {
             <div class="event-date-time-row">
               <div>
                 <label for="event-date">Date</label>
-                <input id="event-date" type="date" v-model="eventDate" required/>
+                <input id="event-date" type="date" v-model="invitation.date" required/>
               </div>
               <div>
                 <label for="start-time">Start Time</label>
-                <input id="start-time" type="time" v-model="startTime" required/>
+                <input id="start-time" type="time" v-model="invitation.time" required/>
               </div>
               <div>
                 <label for="end-time">End Time</label>
@@ -455,13 +501,11 @@ const createEvent = async () => {
             <legend>Choose a Layout</legend>
             <div class="layout-grid">
               <button
-                  v-for="n in 6"
-                  :key="n"
                   class="layout-button"
-                  :class="{ selected: selectedLayout === `layout-${n}` }"
-                  @click="selectedLayout = `layout-${n}`"
+                  :class="{ selected: selectedLayout === 'layout-default' }"
+                  @click="selectedLayout = 'layout-default'"
               >
-                <span class="layout-placeholder"></span>
+                Default Layout
               </button>
             </div>
           </fieldset>
@@ -470,33 +514,33 @@ const createEvent = async () => {
             <legend>Customize the Font</legend>
             <div class="font-customization">
               <select v-model="fontStyle.fontFamily">
-                <option value="'Allura', cursive">Allura</option>
+                <option value="Allura, cursive">Allura</option>
                 <option value="Arial">Arial</option>
-                <option value="'Dancing Script', cursive">Dancing Script</option>
+                <option value="Dancing Script, cursive">Dancing Script</option>
                 <option value="Courier New">Courier New</option>
-                <option value="'Great Vibes', cursive">Great Vibes</option>
+                <option value="Great Vibes, cursive">Great Vibes</option>
                 <option value="Georgia">Georgia</option>
-                <option value="'Lato', sans-serif">Lato</option>
+                <option value="Lato, sans-serif">Lato</option>
                 <option value="Lucida Console">Lucida Console</option>
-                <option value="'Montserrat', sans-serif">Montserrat</option>
-                <option value="'Open Sans', sans-serif">Open Sans</option>
-                <option value="'Pacifico', cursive">Pacifico</option>
-                <option value="'Poppins', sans-serif">Poppins</option>
-                <option value="'Roboto', sans-serif">Roboto</option>
-                <option value="'Satisfy', cursive">Satisfy</option>
+                <option value="Montserrat, sans-serif">Montserrat</option>
+                <option value="Open Sans, sans-serif">Open Sans</option>
+                <option value="Pacifico, cursive">Pacifico</option>
+                <option value="Poppins, sans-serif">Poppins</option>
+                <option value="Roboto, sans-serif">Roboto</option>
+                <option value="Satisfy, cursive">Satisfy</option>
                 <option value="Tahoma">Tahoma</option>
                 <option value="Times New Roman">Times New Roman</option>
                 <option value="Verdana">Verdana</option>
-
-                <!-- Add more fonts here -->
               </select>
+
               <input
                   type="number"
-                  v-model="fontStyle.fontSize"
-                  min="10"
-                  max="72"
+                  v-model.string="fontStyle.fontSize"
+                  :min="10"
+                  :max="72"
                   placeholder="Font Size"
               />
+
               <button
                   :class="{ active: fontStyle.bold }"
                   @click="updateFontStyle('bold', !fontStyle.bold)"
@@ -515,26 +559,44 @@ const createEvent = async () => {
               >
                 U
               </button>
+
+              <div>
+                <label for="text-color">Text Color</label>
+                <input
+                    id="text-color"
+                    type="color"
+                    v-model="fontStyle.color"
+                    title="Text Color"
+                />
+              </div>
+            </div>
+            <div>
+              <label for="background-color">Background Color</label>
               <input
+                  id="background-color"
                   type="color"
-                  v-model="fontStyle.color"
-                  title="Text Color"
+                  v-model="fontStyle.backgroundColor"
+                  title="Background Color"
               />
             </div>
-            <div class="font-preview" :style="{
-    fontFamily: fontStyle.fontFamily,
-    fontSize: fontStyle.fontSize + 'px',
-    fontWeight: fontStyle.bold ? 'bold' : 'normal',
-    fontStyle: fontStyle.italic ? 'italic' : 'normal',
-    textDecoration: fontStyle.underline ? 'underline' : 'none',
-    color: fontStyle.color,
-    backgroundColor: getContrastingBackground(fontStyle.color),
-    padding: '10px', // Optional for better readability
-     borderRadius: '5px' // Optional for styling
-  }">
+            <div
+                class="font-preview"
+                :style="{
+      fontFamily: fontStyle.fontFamily,
+      fontSize: fontStyle.fontSize + 'px',
+      fontWeight: fontStyle.bold ? 'bold' : 'normal',
+      fontStyle: fontStyle.italic ? 'italic' : 'normal',
+      textDecoration: fontStyle.underline ? 'underline' : 'none',
+      color: fontStyle.color,
+      backgroundColor: fontStyle.backgroundColor,
+      padding: '10px',
+      borderRadius: '5px',
+    }"
+            >
               Sample Text Preview
             </div>
           </fieldset>
+
 
         </section>
 
