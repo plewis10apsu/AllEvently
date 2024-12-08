@@ -62,7 +62,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         } catch (err) {
             console.error('Error fetching public events:', err);
             res.statusCode = 500;
-            res.end(JSON.stringify({message: 'Internal server error.'}));
+            res.end(JSON.stringify({message: err}));
             console.log(err);
             return;
         }

@@ -7,76 +7,23 @@ import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
 const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
-const userEmail = ref<String>("");
+const userEmail = ref<string>("");
 const userFirstName = ref<string>("");
 const userLastName = ref<string>("");
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
 const publicEvents = ref<Event[]>([]);
 //defining the router that will be used to obtain the user's id from Login.vue
-const router = useRouter();
+const route = useRoute();
 //the id itself
-const userId =  ref(router.currentRoute.value.params.userId);
-/*
-const fetchEvents = async () => {
-  try {
-    const response = await fetch('https://all-evently-backend.vercel.app/api/events', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: currentUser.value
-      }),
-    });
-    if (response.ok) {
-      //const data = await response.json();
-      events.value = await response.json();
-      alert("Got the events successfully!");
-    } else {
-      console.error('Error fetching events:', response.statusText);
-      alert("Failed to fetch events");
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
-};
-*/
-const getPublicEvents = async () => {
-  try {
-    const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: userEmail.value,
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (!data.publicEvents || data.publicEvents.length === 0) {
-        console.log("No public events to display.");
-      } else {
-        publicEvents.value = data.publicEvents;
-        console.log(publicEvents.value);
-      }
-    } else {
-      console.log("Error fetching public events.");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
-
+const userId =  ref(route.params.userId);
 
 const getCurrentUser = async () => {
   try {
@@ -101,6 +48,7 @@ const getCurrentUser = async () => {
         userLastName.value = userData[2];
         userEmail.value = userEmail.value.replace(/\(/g, "");
         userLastName.value = userLastName.value.replace(/\)/g, "");
+        console.log("User email within fetch current user: "+userEmail.value);
       }
     } else {
       console.error('Error fetching current user');
@@ -109,6 +57,35 @@ const getCurrentUser = async () => {
   } catch (error) {
     console.log("Error message: ")
     console.log(error);
+  }
+}
+
+const getPublicEvents = async () => {
+  try {
+    console.log("User email: "+userEmail.value);
+    const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: userEmail.value,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (!data.publicEvents || data.publicEvents.length === 0) {
+        console.log("No public events to display.");
+      } else {
+        publicEvents.value = data.publicEvents;
+        console.log(publicEvents.value);
+      }
+    } else {
+      console.log("Error fetching public events.");
+      console.log(response);
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -141,13 +118,12 @@ const fetchCurrentUser = async () => {
 };
 */
 // Fetch user data on component mount
-onMounted(() => {
+onMounted(async() => {
   //fetchCurrentUser();
-  getCurrentUser();
+  await getCurrentUser();
+  await getPublicEvents();
   updateSidebarWidth();
-  getPublicEvents();
 });
-
 
 //Commenting out hard-coded events and testing it with data from the server request
 // Event list
