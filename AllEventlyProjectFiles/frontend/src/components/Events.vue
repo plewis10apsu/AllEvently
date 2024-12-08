@@ -66,7 +66,6 @@ const getCurrentUser = async () => {
     });
     if (response.ok) {
       const data = await response.json();
-      console.log("Response data: "+data);
       if (!data.user){
         alert(data.user);
       }
@@ -75,9 +74,8 @@ const getCurrentUser = async () => {
         userEmail.value = userData[0];
         userFirstName.value = userData[1];
         userLastName.value = userData[2];
-        console.log("User email: "+userEmail.value);
-        console.log("User first name: "+userFirstName.value);
-        console.log("User last name: "+userLastName.value);
+        userEmail.value = userEmail.value.replace(/\(/g, "");
+        userLastName.value = userLastName.value.replace(/\)/g, "");
       }
     } else {
       console.error('Error fetching current user');
