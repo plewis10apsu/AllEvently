@@ -15,7 +15,8 @@ const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
 const userEmail = ref<String>("");
-
+const userFirstName = ref<string>("");
+const userLastName = ref<string>("");
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
 
@@ -66,12 +67,17 @@ const getCurrentUser = async () => {
     if (response.ok) {
       const data = await response.json();
       console.log("Response data: "+data);
-      if (!data.userEmail){
-        alert(data.userEmail);
+      if (!data.user){
+        alert(data.user);
       }
       else {
-        userEmail.value = data.userEmail;
-        console.log("User email address: "+data.userEmail);
+        const userData = data.user.split(",");
+        userEmail.value = userData[0];
+        userFirstName.value = userData[1];
+        userLastName.value = userData[2];
+        console.log("User email: "+userEmail.value);
+        console.log("User first name: "+userFirstName.value);
+        console.log("User last name: "+userLastName.value);
       }
     } else {
       console.error('Error fetching current user');

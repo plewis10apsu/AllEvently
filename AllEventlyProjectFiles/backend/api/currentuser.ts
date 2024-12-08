@@ -59,9 +59,10 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 res.end(JSON.stringify({message: "Error. User not found"}));
                 return;
             }
-            const userEmail: string = result.rows[0].get_user;
+            const user: string = result.rows[0].get_user;
+
             res.statusCode = 201;
-            res.end(JSON.stringify({message: 'User found', userEmail: userEmail}));
+            res.end(JSON.stringify({message: 'User found', user: user}));
             return;
         } catch (error) {
             console.error(error);
