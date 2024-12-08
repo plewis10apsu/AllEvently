@@ -18,8 +18,15 @@ const props = defineProps<{
       backgroundColor: string;
     };
     note?: string;
+    locationName?: string; // Venue Name
+    locationAddress?: string; // Address
+    mapImageUrl?: string; // Map URL
   };
+  isAllDayEvent: boolean;
+  displayStartTime: boolean;
+  displayEndTime: boolean;
 }>();
+
 const eventDetails = computed(() => props.eventDetails);
 const isVisible = ref(true);
 const emit = defineEmits(["save"]); // Emit save event
@@ -29,7 +36,7 @@ function handleSave() {
 }
 
 const formattedDateTime = computed(() => {
-  if (!props.eventDetails.date || !props.eventDetails.time) {
+  if (!props.eventDetails.date) {
     return {
       formattedDate: "",
       formattedStartTime: "",
@@ -37,7 +44,7 @@ const formattedDateTime = computed(() => {
     };
   }
 
-  const startDate = new Date(`${props.eventDetails.date}T${props.eventDetails.time}`);
+  const startDate = new Date(`${props.eventDetails.date}T${props.eventDetails.time || "00:00"}`);
   const endDate = props.eventDetails.endTime
       ? new Date(`${props.eventDetails.date}T${props.eventDetails.endTime}`)
       : null;
@@ -48,19 +55,29 @@ const formattedDateTime = computed(() => {
     year: "numeric",
   }).format(startDate);
 
-  const formattedStartTime = new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  }).format(startDate);
+  const formattedStartTime = props.displayStartTime
+      ? new Intl.DateTimeFormat("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }).format(startDate)
+      : "";
 
-  const formattedEndTime = endDate
+  const formattedEndTime = props.displayEndTime && endDate
       ? new Intl.DateTimeFormat("en-US", {
         hour: "numeric",
         minute: "numeric",
         hour12: true,
       }).format(endDate)
       : "";
+
+  if (props.isAllDayEvent) {
+    return {
+      formattedDate,
+      formattedStartTime: "",
+      formattedEndTime: "",
+    };
+  }
 
   return {
     formattedDate,
@@ -77,39 +94,31 @@ function viewInvitation() {
 
   const details = eventDetails.value;
 
-  if (!details.date || !details.time) {
-    alert("Event date and time are required.");
+  if (!details.date) {
+    alert("Event date is required.");
     return;
   }
 
-  // Format the date and time
-  const {formattedDate, formattedStartTime, formattedEndTime} = formattedDateTime.value;
+  const { formattedDate, formattedStartTime, formattedEndTime } = formattedDateTime.value;
 
-  // Explicitly define the type of fontStyle and provide default values
-  const fontStyle: {
-    fontFamily: string;
-    fontSize: number;
-    bold: boolean;
-    italic: boolean;
-    underline: boolean;
-    color: string;
-    backgroundColor: string;
-  } = {
+  const fontStyle = {
     fontFamily: details.fontStyle?.fontFamily || "Arial",
-    fontSize: details.fontStyle?.fontSize || 48,
+    fontSize: details.fontStyle?.fontSize || 16,
     bold: details.fontStyle?.bold || false,
     italic: details.fontStyle?.italic || false,
     underline: details.fontStyle?.underline || false,
-    color: details.fontStyle?.color || "#000000",
-    backgroundColor: details.fontStyle?.backgroundColor || "#ffffff", // Include background color
+    color: details.fontStyle?.color || "#ffffff",
+    backgroundColor: details.fontStyle?.backgroundColor || "rgba(0, 0, 0, 0.7)",
   };
 
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
-      <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&family=Allura&family=Satisfy&display=swap" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&family=Allura&family=Satisfy&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Event Invitation</title>
@@ -117,64 +126,121 @@ function viewInvitation() {
         body {
           margin: 0;
           padding: 0;
+          font-family: ${fontStyle.fontFamily};
+          background: ${details.imageUrl ? `url('${details.imageUrl}') no-repeat center center / cover` : "#333"};
+          height: 100vh;
+          display: flex;
+          align-items: flex-start;
+          justify-content: flex-start;
+          overflow: hidden;
+        }
+        .invitation {
+          position: absolute;
+          left: 10px;
+          top: 20px;
+          max-width: 400px;
+          padding: 10px;
+          background-color: ${fontStyle.backgroundColor};
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          color: ${fontStyle.color};
+          font-size: ${fontStyle.fontSize};
+          text-align: left;
+        }
+        .event-name {
+          font-size: ${fontStyle.fontSize + 4}px;
+          font-weight: ${fontStyle.bold ? "bold" : "normal"};
+          text-decoration: ${fontStyle.underline ? "underline" : "none"};
+          margin-bottom: 5px;
+        }
+        .event-date{
+          margin: 5px 0;
+        }
+        .event-note {
+            margin-top: 10px;
+            max-width: 180px; /* Match the map width */
+            word-wrap: break-word; /* Break long words */
+            overflow-wrap: break-word; /* For modern browsers */
+            line-height: 1.4;
+        }
+        .map-preview img {
+          width: 180px;
+          height: auto;
+          border-radius: 6px;
+          margin-top: 8px;
+        }
+        .qr-code-placeholder {
+          margin-top: 10px;
+          width: 60px;
+          height: 60px;
+          background-color: #ccc;
+          border-radius: 6px;
+          font-size: 10px;
+          color: #333;
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 100vh;
-        }
-        .invitation {
-          width: 600px;
-          height: 400px;
-          position: relative;
-          background-color: white;
-          overflow: hidden;
-          border: 1px solid #ccc;
-          border-radius: 10px;
-        }
-        .invitation img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        .invitation-text {
-          position: absolute;
-          top: 20%;
-          left: 10%;
-          font-family: ${fontStyle.fontFamily};
-          color: ${fontStyle.color};
-          font-size: ${fontStyle.fontSize}px;
-          font-weight: ${fontStyle.bold ? "bold" : "normal"};
-          font-style: ${fontStyle.italic ? "italic" : "normal"};
-          text-decoration: ${fontStyle.underline ? "underline" : "none"};
-          background-color: ${fontStyle.backgroundColor};
-          padding: 10px;
-          border-radius: 5px;
-        }
-        .date-view {
-          margin-bottom: 10px;
-          font-size: 18px;
-          font-weight: bold;
-        }
-        .time-view {
-          font-size: 16px;
         }
       </style>
     </head>
     <body>
       <div class="invitation">
-        <img src="${details.imageUrl || ''}" alt="Invitation Background">
-        <div class="invitation-text">
-          <h1>${details.name || "Event Name"}</h1>
-          <div class="date-view">${formattedDate}</div>
-          <div class="time-view">${formattedStartTime}${formattedEndTime ? ` - ${formattedEndTime}` : ""}</div>
-          <p>${details.note || ""}</p>
+        <!-- Event Name -->
+        <div class="event-name">${details.name || "Event Name"}</div>
+
+        <!-- Event Date -->
+        <div class="event-date">${formattedDate || "Event Date"}</div>
+
+        <!-- Event Time -->
+        ${
+      formattedStartTime || formattedEndTime
+          ? `<div class="event-time">
+                  ${formattedStartTime || ""} ${
+              formattedEndTime ? `- ${formattedEndTime}` : ""
+          }
+                </div>`
+          : ""
+  }
+
+        <!-- Venue Name and Address -->
+        ${
+      details.locationName || details.locationAddress
+          ? `<div class="event-location">
+         <div class="location-details">
+           <span>${details.locationName || ""}</span><br>
+           <span>${details.locationAddress?.split(",")[0] ?? ""}</span><br>
+           <span>${details.locationAddress?.split(",").slice(1).join(",") ?? ""}</span>
+         </div>
+       </div>`
+          : ""
+  }
+
+        <!-- Map Preview -->
+        ${
+      details.mapImageUrl
+          ? `<div class="map-preview">
+                   <img src="${details.mapImageUrl}" alt="Map Preview" />
+                 </div>`
+          : ""
+  }
+
+        <!-- Notes -->
+        ${
+      details.note
+          ? `<div class="event-note">${details.note}</div>`
+          : ""
+  }
+
+        <!-- QR Code Placeholder -->
+        <div class="qr-code-placeholder">
+          QR Code
         </div>
       </div>
     </body>
     </html>
   `;
 
-  const newWindow = window.open("", "_blank", "width=800,height=600");
+  const newWindow = window.open("", "_blank", "width=600,height=400");
   if (newWindow) {
     newWindow.document.write(htmlContent);
     newWindow.document.close();
@@ -182,51 +248,63 @@ function viewInvitation() {
     alert("Popup blocked! Please allow popups for this website.");
   }
 }
+
 </script>
 
 <template>
   <aside :class="['event-sidebar', { 'sidebar-visible': isVisible }]">
     <div
         class="preview-container"
-        :style="{
-    backgroundColor: eventDetails.fontStyle?.backgroundColor, // Use the chosen background color
-    padding: '10px',
-    borderRadius: '8px',
-  }"
+        :style="{ backgroundColor: eventDetails.fontStyle?.backgroundColor, // Use the chosen background color
+        borderRadius: '8px',}"
     >
-
       <div class="event-details-section">
+
+        <!---------------- Event Name -------------->
         <h3
-            class="event-name-preview"
+            class="event-name-preview shared-preview-style"
             :style="{
       fontFamily: eventDetails.fontStyle?.fontFamily,
       fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
       fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
       textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
-      color: eventDetails.fontStyle?.color
-    }"
+      color: eventDetails.fontStyle?.color}"
         >
           {{ eventDetails.name || "Event Name" }}
         </h3>
-        <!-- Date and Time -->
-        <div class="event-date-time-preview">
-          <div
-              class="date-preview"
-              :style="{ fontFamily: eventDetails.fontStyle?.fontFamily }"
+
+        <!---------------- Date and Time -------------->
+        <div class="date-preview shared-preview-style">
+          <!-- Always display the date -->
+          <div class="date-preview" :style="{
+            fontFamily: eventDetails.fontStyle?.fontFamily,
+            fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
+            fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
+            textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
+            color: eventDetails.fontStyle?.color}"
           >
-            {{ formattedDateTime.formattedDate }}
-          </div>
+            {{ formattedDateTime.formattedDate || "Event Date"}} </div>
+
+          <!-- Conditionally display the time -->
           <div
-              class="time-preview"
-              :style="{ fontFamily: eventDetails.fontStyle?.fontFamily }"
+              class="time-preview shared-preview-style"
+              :style="{
+            fontFamily: eventDetails.fontStyle?.fontFamily,
+            fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
+            fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
+            textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
+            color: eventDetails.fontStyle?.color}"
           >
-            {{ formattedDateTime.formattedStartTime }}
-            <span v-if="formattedDateTime.formattedEndTime">
-      - {{ formattedDateTime.formattedEndTime }}
-    </span>
+            <span v-if="props.displayStartTime && formattedDateTime.formattedStartTime">
+             {{ formattedDateTime.formattedStartTime }}
+            </span>
+                <span v-if="props.displayEndTime && formattedDateTime.formattedEndTime">
+                   - {{ formattedDateTime.formattedEndTime }}
+                 </span>
           </div>
         </div>
-      <!-- Show the selected image if available -->
+
+        <!---------------- Event Image -------------->
       <div class="preview-box">
         <img
             v-if="eventDetails.imageUrl"
@@ -234,17 +312,60 @@ function viewInvitation() {
             alt="Selected Preview Image"
             class="preview-image"
         />
-        <p v-else>No image selected</p>
+        <p v-else class="no-image-text"
+           :style="{
+                fontFamily: eventDetails.fontStyle?.fontFamily,
+                fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
+                fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
+                textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
+                color: eventDetails.fontStyle?.color
+                }"
+        >No image selected</p>
       </div>
-      <!-- Notes Section -->
+
+        <div class="event-location-preview">
+          <!-- Location Name -->
+          <div v-if="props.eventDetails.locationName" class="no-image-text"
+               :style="{
+                fontFamily: eventDetails.fontStyle?.fontFamily,
+                fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
+                fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
+                textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
+                color: eventDetails.fontStyle?.color
+                }"
+          >
+             {{ props.eventDetails.locationName }}
+          </div>
+
+          <!-- Location Address -->
+          <div v-if="props.eventDetails.locationAddress" class="location-address"
+               :style="{
+                fontFamily: eventDetails.fontStyle?.fontFamily,
+                fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
+                fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
+                textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
+                color: eventDetails.fontStyle?.color
+                }"
+          >
+             {{ props.eventDetails.locationAddress }}
+          </div>
+
+          <!-- Map Preview -->
+          <div v-if="props.eventDetails.mapImageUrl" class="map-preview">
+            <img :src="props.eventDetails.mapImageUrl" alt="Map Preview" />
+          </div>
+        </div>
+
+
+        <!---------------- Notes Section -------------->
       <div v-if="eventDetails.note" class="event-note">
         <p
             :style="{
-      fontFamily: eventDetails.fontStyle?.fontFamily,
-      fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
-      fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
-      textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
-      color: eventDetails.fontStyle?.color
+              fontFamily: eventDetails.fontStyle?.fontFamily,
+              fontWeight: eventDetails.fontStyle?.bold ? 'bold' : 'normal',
+              fontStyle: eventDetails.fontStyle?.italic ? 'italic' : 'normal',
+              textDecoration: eventDetails.fontStyle?.underline ? 'underline' : 'none',
+               color: eventDetails.fontStyle?.color
     }"
         >
           {{ eventDetails.note }}
@@ -252,10 +373,10 @@ function viewInvitation() {
       </div>
       </div>
     </div>
-    <!-- View Button -->
+    <!---------------- View Button -------------->
     <button class="view-button" @click="viewInvitation">View</button>
 
-    <!-- Save Button -->
+    <!---------------- Save Button -------------->
     <button class="save-button" @click="handleSave">Save</button>
   </aside>
 </template>
@@ -265,7 +386,8 @@ function viewInvitation() {
 .event-sidebar {
   margin-top: 90px;
   flex-shrink: 0;
-  min-width: 200px;
+  width: 200px;
+  max-width: 200px;
   box-sizing: border-box;
   background-color: #083D77; /* Same background as the main sidebar */
   display: flex;
@@ -282,26 +404,33 @@ function viewInvitation() {
 
 .preview-container {
   width: 100%;
+  max-width: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 20px 0;
+  gap: 10px; /* Adjust spacing between elements */
+  overflow: hidden; /* Prevent content overflow */
+  padding: 10px; /* Add padding for better spacing */
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
-.event-name-preview {
+.shared-preview-style {
   color: #c8ddf8;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 90%;
+  overflow: hidden;
+  text-align: center;
 }
 
-.date-preview {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.time-preview {
-  font-size: 20px;
+.no-image-text {
+  color: #ffffff;
+  font-size: 16px;
+  text-align: center;
+  margin: 0;
 }
 
 .preview-image {
@@ -314,7 +443,6 @@ function viewInvitation() {
    width: 100%;
    max-height: 150px;
    aspect-ratio: 1;
-   background-color: #add8e6;
    display: flex;
    align-items: center;
    justify-content: center;
@@ -323,8 +451,26 @@ function viewInvitation() {
    object-fit: cover;
  }
 
+.event-location-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.location-address {
+  font-size: 16px;
+  color: #666;
+}
+
 .event-note {
-  font-size: 20px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.map-preview img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 10px;
 }
 
 .view-button {
@@ -369,11 +515,6 @@ function viewInvitation() {
   .event-sidebar {
     min-width: 80px;
     max-width: 80px;
-  }
-
-  .event-name-preview,
-  .event-details-preview {
-    display: none; /* Hide text content on smaller screens */
   }
 
   .preview-box {

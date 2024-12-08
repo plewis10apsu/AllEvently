@@ -15,7 +15,7 @@ const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
 // Ensure `currentUser` has valid data fetched from the API
-const firstName = ref<string>("John"); // Replace with actual dynamic data
+const firstName = ref<string>("Joh"); // Replace with actual dynamic data
 const lastName = ref<string>("Doe");   // Replace with actual dynamic data
 const email = ref<string>("john.doe@example.com"); // Replace with actual dynamic data
 
@@ -228,7 +228,8 @@ const filteredEvents = computed(() => {
 const navItems = [
   { label: 'Account', path: '/account', icon: 'fas fa-user',
     query: { firstName: firstName.value, lastName: lastName.value, email: email.value } },
-  { label: 'Public Events', path: '/public', icon: 'fas fa-users' },
+  { label: 'Public Events', path: '/public', icon: 'fas fa-users',
+    query: { email: <string>email.value } },
   { label: 'Events', path: '/events', icon: 'fas fa-calendar-alt' },
   { label: 'Logout', path: '/', icon: 'fas fa-right-from-bracket' }
 ];
@@ -242,7 +243,7 @@ const navItems = [
     <Sidebar
         :isVisible="isSidebarVisible"
         :width="sidebarWidth"
-        :navItems = "navItems"
+        :NavItems = "navItems"
     />
     <!-- Main content area -->
     <main class="content-area events-content">

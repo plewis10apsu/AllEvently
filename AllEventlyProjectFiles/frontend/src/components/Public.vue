@@ -5,8 +5,61 @@ import Sidebar from "./Sidebar.vue";
 import logo from "@/assets/AllEventlyLogo.png";
 import SearchBar from "@/components/SearchBar.vue";
 import PublicEventCard from './PublicEventCard.vue';
+//import {Event} from "@/types/EventInterface.ts";
+//import { useRoute } from 'vue-router';
+//const route = useRoute();
 
+//const email = ref(route.query.email || 'guest@example.com');
 const isSidebarVisible = ref(true);
+
+//Commented out code I migrated from Events.vue to avoid vercel shutting down for unused code - Spenser
+//const publicEvents = ref<Event[]>([]);
+/*
+const getPublicEvents = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/publicevents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Received data: ", data);  // Debugging the response
+
+      if (Array.isArray(data) && data.length > 0) {
+        // Map through the result to transform it into the Event interface structure
+        publicEvents.value = data.map((item: any) => ({
+          id: item.event_id,              // Mapped from event_id
+          title: item.event_name,         // Mapped from event_name
+          type: item.location,            // Mapped from location (assuming it's the type)
+          venue: item.event_address,      // Mapped from event_address
+          date: item.event_date,          // Mapped from event_date
+          time: item.updated_at,          // Mapped from updated_at (you can adjust as needed)
+          host: item.email,               // Mapped from email
+          imageUrl: '',                   // Placeholder for image URL, can be adjusted if available
+          venueLink: '',                  // Placeholder for venue link, can be adjusted if available
+          venueAddress: item.event_address, // Same as venue (event_address)
+          isHost: item.is_active,         // Assumed to map from is_active
+          isGuest: item.is_published,     // Assumed to map from is_published
+        }));
+        console.log("Public events stored: ", publicEvents.value);
+      } else {
+        console.log("No public events to display.");
+        publicEvents.value = [];
+      }
+    } else {
+      console.log("Error fetching public events.");
+    }
+  } catch (error) {
+    console.error("Error during fetch operation: ", error);
+  }
+};
+*/
 </script>
 
 <template>
