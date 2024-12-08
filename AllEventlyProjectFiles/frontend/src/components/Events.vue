@@ -40,6 +40,7 @@ const getPublicEvents = async () => {
     });
     if (response.ok) {
       const data = await response.json();
+      console.log("Contents of publicEvents: ",data.publicEvents);
       if (!data.publicEvents) {
         console.log("No public events to display.");
       } else {
