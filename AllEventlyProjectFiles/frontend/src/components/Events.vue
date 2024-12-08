@@ -48,7 +48,6 @@ const getPublicEvents = async () => {
       }
     } else {
       console.log("Error fetching public events.");
-      console.log(response.message);
     }
   } catch (error) {
     console.error(error);
