@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { defineProps, PropType } from 'vue';
+import {defineProps, PropType} from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import router from "@/router";
+
 
 type NavItem = {
   label: string;
   path: string;
   icon: string;
   query?: Record<string, string>;
+  routeName?: string;
 };
 
 defineProps({
@@ -20,25 +22,28 @@ defineProps({
     default: () => [
       { label: 'Account', path: '/account', icon: ['fas', 'user'] },
       { label: 'Public Events', path: '/public', icon: ['fas', 'users'] },
-      { label: 'Events', path: '/events', icon: ['fas', 'calendar-alt'] },
+      { label: 'Events', path: '', icon: ['fas', 'calendar-alt'], routeName: 'EventsWithoutId' },
       { label: 'Logout', path: '/', icon: ['fas', 'right-from-bracket'] },
     ],
   },
 });
 
-const navigateTo = (item: NavItem) => {
-  router.push({ path: item.path, query: item.query });
+const navigateTo = (path: string, query: Record<string, string> = {}, routeName?: string) => {
+  if (routeName) {
+    router.push({ name: routeName, query });
+  } else {
+    router.push({ path, query });
+  }
 };
 </script>
 
 <template>
   <aside :class="['sidebar', { 'sidebar-visible': isVisible }]">
     <nav class="preview-container">
-      <button
-          v-for="item in navItems"
-          :key="item.label"
-          @click="navigateTo(item)"
-          class="nav-button"
+      <button v-for="item in navItems"
+              :key="item.label"
+              @click="navigateTo(item.path, { firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' }, item.routeName)"
+              class="nav-button"
       >
         <FontAwesomeIcon :icon="item.icon" class="nav-icon" />
         <span class="nav-label">{{ item.label }}</span>

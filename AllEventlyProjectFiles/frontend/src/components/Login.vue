@@ -13,7 +13,7 @@ const isEmailValid = ref(true);
 const password = ref<string>('');
 const showPassword = ref(false);
 const currentIcon = ref(visibleIcon);
-const userId = ref(null);
+const userId = ref<string | null>(null);
 
 const errorMessageFirstName = ref('');
 const errorMessageLastName = ref('');
@@ -42,6 +42,11 @@ const loginUser = async () => {
       const data = await response.json();
       if (data.userId !== null) {
         userId.value = data.userId;
+        if (userId.value) {
+          localStorage.setItem('userId', userId.value); // Ensure it's a string
+        } else {
+          console.error('userId is null, cannot save to localStorage');
+        }
         await router.push({
           name: 'Events',
           params: {

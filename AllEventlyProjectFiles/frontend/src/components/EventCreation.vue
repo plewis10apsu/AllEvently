@@ -5,16 +5,14 @@ import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
 import SidebarWithPreview from "@/components/SidebarWithPreview.vue";
 import {loadGoogleMapsAPI} from "@/utils/googleMapsLoader.ts";
 
-// Reactive state
+const guestNote = ref<string>("");
 const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const eventName = ref<string>("");
 const eventNameValid = ref<boolean>(true);
 const isSingleEvent = ref<boolean>(true);
-const eventDate = ref<string>("");
+const isAllDayEvent = ref<boolean>(false);
 const eventDisplayStartTime = ref<boolean>(false);
-const eventAllDayEvent = ref<boolean>(false);
 const eventDisplayEndTime = ref<boolean>(false);
-const startTime = ref<string>("");
 const endTime = ref<string>("");
 const timeZone = ref<string>("CDT");
 const timeZones = ref<string[]>(["CDT", "EST", "PST", "MST", "UTC"]);
@@ -37,7 +35,7 @@ const mapImageUrl = ref<string>("");
 let autocomplete: google.maps.places.Autocomplete | null = null;
 const nearbyBounds = {  north: 36.678118, south: 34.982972, east: -81.6469, west: -90.3103, };
 const activeTab = ref<"details" | "settings">("details");
-const selectedLayout = ref<string | null>(null);
+const selectedLayout = ref("layout-default");
 const isPrivate = ref<boolean>(true);
 declare const google: any;
 const filteredGallery = computed(() =>
@@ -48,34 +46,45 @@ const filteredGallery = computed(() =>
     )
 );
 
+const selectedImageUrl = computed(() => {
+  const image = gallery.value.find((img) => img.id === selectedImage.value);
+  return image ? image.src : null;
+});
+
+// Function to select an image
+function selectImage(imageId: number): void {
+  selectedImage.value = imageId;
+}
+
 // Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
 };
 
-const fontStyle = ref<Record<string, any>>({
+const fontStyle = ref<{
+  fontFamily: string;
+  fontSize: number;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  color: string;
+  backgroundColor: string;
+}>({
   fontFamily: "Arial",
-  fontSize: 48,
+  fontSize: 10,
   bold: false,
   italic: false,
   underline: false,
-  color: "#000000",
+  color: "#ffffff",
+  backgroundColor: "#083D77",
 });
 
-function getContrastingBackground(color: string): string {
-  // Remove the '#' if present and parse the RGB values
-  const hex = color.replace("#", "");
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-
-  // Calculate luminance
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  // Return white for dark colors, black for light colors
-  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+function updateFontStyle<K extends keyof typeof fontStyle.value>(
+    property: K,
+    value: typeof fontStyle.value[K]
+) {
+  fontStyle.value[property] = value;
 }
-
 
 function toggleEventType(isSingle: boolean): void {
   isSingleEvent.value = isSingle;
@@ -102,14 +111,12 @@ function toggleRemoveMode() {
   isRemoveMode.value = !isRemoveMode.value;
 }
 
-function updateFontStyle(property: string, value: any) {
-  fontStyle.value[property] = value;
-}
+/*
 
-// Function to select an image
-function selectImage(imageId: number): void {
-  selectedImage.value = imageId;
+function selectLayout(layoutId: string): void {
+  invitation.value.layout = layoutId;
 }
+*/
 
 watch(inputValue, (newValue) => {
   if (newValue.trim() === "") {
@@ -122,31 +129,33 @@ watch(inputValue, (newValue) => {
   }
 });
 
+
 // Image gallery
 const gallery = ref([
-  { id: 1, src:new URL('@/assets/Bike.jpg', import.meta.url).href, theme: "Bike" },
-  { id: 2, src:new URL('@/assets/Christmas.jpg', import.meta.url).href, theme: "Christmas" },
-  { id: 3, src:new URL('@/assets/Confetti.jpg', import.meta.url).href, theme: "Confetti" },
-  { id: 4, src:new URL('@/assets/Default_Invite.jpg', import.meta.url).href, theme: "Default" },
-  { id: 5, src:new URL('@/assets/Dog.jpg', import.meta.url).href, theme: "Dog" },
-  { id: 6, src:new URL('@/assets/Dry_Flower.jpg', import.meta.url).href, theme: "Flower" },
-  { id: 7, src:new URL('@/assets/Easter.jpg', import.meta.url).href, theme: "Easter" },
-  { id: 8, src:new URL('@/assets/Football.jpg', import.meta.url).href, theme: "Football" },
-  { id: 9, src:new URL('@/assets/Fourth.jpg', import.meta.url).href, theme: "Fourth" },
-  { id: 10, src:new URL('@/assets/Gamer.jpg', import.meta.url).href, theme: "Gamer" },
-  { id: 11, src:new URL('@/assets/Haley\'s_Birthday_Event_Page.jpg', import.meta.url).href, theme: "Birthday" },
-  { id: 12, src:new URL('@/assets/Hanukkah.jpg', import.meta.url).href, theme: "Hanukkah" },
-  { id: 13, src:new URL('@/assets/Hike.jpg', import.meta.url).href, theme: "Hike" },
-  { id: 14, src:new URL('@/assets/Joy.jpg', import.meta.url).href, theme: "Joy" },
-  { id: 15, src:new URL('@/assets/Lisa\'s_Baby_Shower_Event_Page.jpg', import.meta.url).href, theme: "Baby Shower" },
-  { id: 16, src:new URL('@/assets/Love.jpg', import.meta.url).href, theme: "Love" },
-  { id: 17, src:new URL('@/assets/Pineapple.jpg', import.meta.url).href, theme: "Pineapple" },
-  { id: 18, src:new URL('@/assets/PinkPurple_Birthday.jpg', import.meta.url).href, theme: "Purple_Birthday" },
-  { id: 19, src:new URL('@/assets/Rose_Invite.jpg', import.meta.url).href, theme: "Rose" },
-  { id: 20, src:new URL('@/assets/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
-  { id: 21, src:new URL('@/assets/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
-  { id: 22, src:new URL('@/assets/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
-  { id: 23, src:new URL('@/assets/Graduation.jpg', import.meta.url).href, theme: "Graduation" },
+  { id: 1, src: new URL('@/assets/Invitations/Bike.jpg', import.meta.url).href, theme: "Bike" },
+  { id: 2, src: new URL('@/assets/Invitations/Christmas.jpg', import.meta.url).href, theme: "Christmas" },
+  { id: 3, src: new URL('@/assets/Invitations/Confetti.jpg', import.meta.url).href, theme: "Confetti" },
+  { id: 4, src: new URL('@/assets/Invitations/Default_Invite.jpg', import.meta.url).href, theme: "Default" },
+  { id: 5, src: new URL('@/assets/Invitations/Dog.jpg', import.meta.url).href, theme: "Dog" },
+  { id: 6, src: new URL('@/assets/Invitations/Dry_Flower.jpg', import.meta.url).href, theme: "Flower" },
+  { id: 7, src: new URL('@/assets/Invitations/Easter.jpg', import.meta.url).href, theme: "Easter" },
+  { id: 8, src: new URL('@/assets/Invitations/Football.jpg', import.meta.url).href, theme: "Football" },
+  { id: 9, src: new URL('@/assets/Invitations/Fourth.jpg', import.meta.url).href, theme: "Fourth" },
+  { id: 10, src: new URL('@/assets/Invitations/Gamer.jpg', import.meta.url).href, theme: "Gamer" },
+  { id: 11, src: new URL('@/assets/Invitations/Haley\'s_Birthday_Event_Page.jpg', import.meta.url).href, theme: "Birthday" },
+  { id: 12, src: new URL('@/assets/Invitations/Hanukkah.jpg', import.meta.url).href, theme: "Hanukkah" },
+  { id: 13, src: new URL('@/assets/Invitations/Hike.jpg', import.meta.url).href, theme: "Hike" },
+  { id: 14, src: new URL('@/assets/Invitations/Joy.jpg', import.meta.url).href, theme: "Joy" },
+  { id: 15, src: new URL('@/assets/Invitations/Lisa\'s_Baby_Shower_Event_Page.jpg', import.meta.url).href, theme: "Baby Shower" },
+  { id: 16, src: new URL('@/assets/Invitations/Love.jpg', import.meta.url).href, theme: "Love" },
+  { id: 17, src: new URL('@/assets/Invitations/Pineapple.jpg', import.meta.url).href, theme: "Pineapple" },
+  { id: 18, src: new URL('@/assets/Invitations/PinkPurple_Birthday.jpg', import.meta.url).href, theme: "Birthday" },
+  { id: 19, src: new URL('@/assets/Invitations/Rose_Invite.jpg', import.meta.url).href, theme: "Rose" },
+  { id: 20, src: new URL('@/assets/Invitations/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
+  { id: 21, src: new URL('@/assets/Invitations/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
+  { id: 22, src: new URL('@/assets/Invitations/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
+  { id: 23, src: new URL('@/assets/Invitations/Graduation.jpg', import.meta.url).href, theme: "Graduation" },
+  { id: 24, src: new URL('@/assets/Invitations/Birthday_Confetti.jpg', import.meta.url).href, theme: "Birthday" },
   // Add more images with themes as needed
 ]);
 
@@ -189,6 +198,8 @@ const initializeAutocomplete = (): void => {
 
     if (place?.formatted_address) {
       inputValue.value = place.formatted_address;
+      invitation.value.locationAddress = place.formatted_address;
+      console.log("Full Address Updated:", invitation.value.locationAddress);
     } else {
       console.error("Formatted address is missing from the selected place.");
     }
@@ -215,6 +226,51 @@ onUnmounted(() => {
 });
 
 // Add save logic here, such as sending the data to an API or storing it locally
+function saveEventDetails() {
+  alert("Event details saved!");
+  console.log("Saving details:", invitation.value);
+}
+
+// Reactive state
+const invitation = ref({
+  eventName: "",
+  date: "",
+  time: "",
+  locationName: "", // Venue Name
+  locationAddress: "", // Address
+  imageId: null,
+  layout: null,
+  fontStyle: {
+    fontFamily: "Arial",
+    fontSize: 10,
+    bold: false,
+    italic: false,
+    underline: false,
+    color: "#fbfbfb",
+    backgroundColor: "#083D77"
+  },
+});
+
+const sidebarEventDetails = computed(() => ({
+  name: invitation.value.eventName,
+  date: invitation.value.date,
+  time: isAllDayEvent.value ? "" : invitation.value.time,
+  endTime: isAllDayEvent.value ? "" : endTime.value,
+  imageUrl: selectedImageUrl.value,
+  fontStyle: {
+    fontFamily: fontStyle.value.fontFamily,
+    fontSize: fontStyle.value.fontSize,
+    bold: fontStyle.value.bold,
+    italic: fontStyle.value.italic,
+    underline: fontStyle.value.underline,
+    color: fontStyle.value.color,
+    backgroundColor: fontStyle.value.backgroundColor,
+  },
+  note: guestNote.value,
+  locationName: invitation.value.locationName,
+  locationAddress: invitation.value.locationAddress,
+  mapImageUrl: mapImageUrl.value,
+}));
 
 //commenting these out since they are used in the async function and vercel is whining
 /*
@@ -288,7 +344,11 @@ const createEvent = async () => {
     <SidebarWithPreview
       :isVisible="isSidebarVisible"
       :width="sidebarWidth"
-      :eventDetails="{ name: eventName, date: eventDate, time: startTime }"
+      :eventDetails="sidebarEventDetails"
+      :isAllDayEvent="isAllDayEvent"
+      :displayStartTime="eventDisplayStartTime"
+      :displayEndTime="eventDisplayEndTime"
+      @save="saveEventDetails"
     />
     <!-- Main content area -->
     <main class="content-area event-creation-content">
@@ -319,19 +379,20 @@ const createEvent = async () => {
             <input
               id="event-name"
               type="text"
-              v-model="eventName"
+              v-model="invitation.eventName"
               @blur="validateEventName"
               :class="{ 'input-error': !eventNameValid }"
               placeholder="Enter event name"
               required
             />
-            <p v-if="!eventNameValid" class="error-message">
+            <p v-if="!invitation.eventName" class="error-message">
               Event name is required.
             </p>
-            <label for="event-name">Note for Guests</label>
+            <label for="event-note">Note for Guests</label>
             <input
               id="event-note"
               type="text"
+              v-model="guestNote"
               placeholder="Optional: Note for Guests"
               required
             />
@@ -339,6 +400,7 @@ const createEvent = async () => {
 
           <fieldset>
             <legend>Date and Location</legend>
+
             <!-- Event Type Selection -->
             <div class="event-type">
               <button
@@ -359,19 +421,19 @@ const createEvent = async () => {
             <div class="event-date-time-row">
               <div>
                 <label for="event-date">Date</label>
-                <input id="event-date" type="date" v-model="eventDate" required/>
+                <input id="event-date" type="date" v-model="invitation.date" required/>
               </div>
               <div>
                 <label for="start-time">Start Time</label>
-                <input id="start-time" type="time" v-model="startTime" required/>
+                <input id="start-time" type="time" v-model="invitation.time" :disabled="isAllDayEvent"/>
               </div>
               <div>
                 <label for="end-time">End Time</label>
-                <input id="end-time" type="time" v-model="endTime" required/>
+                <input id="end-time" type="time" v-model="endTime" :disabled="isAllDayEvent"/>
               </div>
               <div>
                 <label for="time-zone">Time Zone</label>
-                <select id="time-zone" v-model="timeZone">
+                <select id="time-zone" v-model="timeZone" :disabled="isAllDayEvent">
                   <option v-for="tz in timeZones" :key="tz" :value="tz">{{ tz }}</option>
                 </select>
               </div>
@@ -379,9 +441,10 @@ const createEvent = async () => {
 
             <!-- Checkboxes -->
             <div class="checkbox-row">
+              <!-- All-day Event Checkbox -->
               <div>
                 <label for="all-day-event">All-day event</label>
-                <input id="all-day-event" class="checkbox" type="checkbox" v-model="eventAllDayEvent"/>
+                <input id="all-day-event" class="checkbox" type="checkbox" v-model="isAllDayEvent"/>
               </div>
               <div>
                 <label for="display-start-time">Display Start Time</label>
@@ -401,7 +464,7 @@ const createEvent = async () => {
                   <input
                       id="event-address"
                       type="text"
-                      v-model="inputValue"
+                      v-model="invitation.locationAddress"
                       placeholder="Enter address"
                       required
                       style="width: 100%;"
@@ -409,7 +472,10 @@ const createEvent = async () => {
                 </div>
                 <div>
                   <label for="event-venue">Event Venue Name</label>
-                  <input id="event-venue" type="text" placeholder="Enter venue name"/>
+                  <input id="event-venue"
+                         type="text"
+                         v-model="invitation.locationName"
+                         placeholder="Enter venue name"/>
                 </div>
               </div>
 
@@ -455,13 +521,11 @@ const createEvent = async () => {
             <legend>Choose a Layout</legend>
             <div class="layout-grid">
               <button
-                  v-for="n in 6"
-                  :key="n"
                   class="layout-button"
-                  :class="{ selected: selectedLayout === `layout-${n}` }"
-                  @click="selectedLayout = `layout-${n}`"
+                  :class="{ selected: selectedLayout === 'layout-default' }"
+                  @click="selectedLayout = 'layout-default'"
               >
-                <span class="layout-placeholder"></span>
+                Default Layout
               </button>
             </div>
           </fieldset>
@@ -470,33 +534,33 @@ const createEvent = async () => {
             <legend>Customize the Font</legend>
             <div class="font-customization">
               <select v-model="fontStyle.fontFamily">
-                <option value="'Allura', cursive">Allura</option>
+                <option value="Allura, cursive">Allura</option>
                 <option value="Arial">Arial</option>
-                <option value="'Dancing Script', cursive">Dancing Script</option>
+                <option value="Dancing Script, cursive">Dancing Script</option>
                 <option value="Courier New">Courier New</option>
-                <option value="'Great Vibes', cursive">Great Vibes</option>
+                <option value="Great Vibes, cursive">Great Vibes</option>
                 <option value="Georgia">Georgia</option>
-                <option value="'Lato', sans-serif">Lato</option>
+                <option value="Lato, sans-serif">Lato</option>
                 <option value="Lucida Console">Lucida Console</option>
-                <option value="'Montserrat', sans-serif">Montserrat</option>
-                <option value="'Open Sans', sans-serif">Open Sans</option>
-                <option value="'Pacifico', cursive">Pacifico</option>
-                <option value="'Poppins', sans-serif">Poppins</option>
-                <option value="'Roboto', sans-serif">Roboto</option>
-                <option value="'Satisfy', cursive">Satisfy</option>
+                <option value="Montserrat, sans-serif">Montserrat</option>
+                <option value="Open Sans, sans-serif">Open Sans</option>
+                <option value="Pacifico, cursive">Pacifico</option>
+                <option value="Poppins, sans-serif">Poppins</option>
+                <option value="Roboto, sans-serif">Roboto</option>
+                <option value="Satisfy, cursive">Satisfy</option>
                 <option value="Tahoma">Tahoma</option>
                 <option value="Times New Roman">Times New Roman</option>
                 <option value="Verdana">Verdana</option>
-
-                <!-- Add more fonts here -->
               </select>
+
               <input
                   type="number"
-                  v-model="fontStyle.fontSize"
-                  min="10"
-                  max="72"
+                  v-model.string="fontStyle.fontSize"
+                  :min="10"
+                  :max="72"
                   placeholder="Font Size"
               />
+
               <button
                   :class="{ active: fontStyle.bold }"
                   @click="updateFontStyle('bold', !fontStyle.bold)"
@@ -515,26 +579,44 @@ const createEvent = async () => {
               >
                 U
               </button>
+
+              <div>
+                <label for="text-color">Text Color</label>
+                <input
+                    id="text-color"
+                    type="color"
+                    v-model="fontStyle.color"
+                    title="Text Color"
+                />
+              </div>
+            </div>
+            <div>
+              <label for="background-color">Background Color</label>
               <input
+                  id="background-color"
                   type="color"
-                  v-model="fontStyle.color"
-                  title="Text Color"
+                  v-model="fontStyle.backgroundColor"
+                  title="Background Color"
               />
             </div>
-            <div class="font-preview" :style="{
-    fontFamily: fontStyle.fontFamily,
-    fontSize: fontStyle.fontSize + 'px',
-    fontWeight: fontStyle.bold ? 'bold' : 'normal',
-    fontStyle: fontStyle.italic ? 'italic' : 'normal',
-    textDecoration: fontStyle.underline ? 'underline' : 'none',
-    color: fontStyle.color,
-    backgroundColor: getContrastingBackground(fontStyle.color),
-    padding: '10px', // Optional for better readability
-     borderRadius: '5px' // Optional for styling
-  }">
+            <div
+                class="font-preview"
+                :style="{
+      fontFamily: fontStyle.fontFamily,
+      fontSize: fontStyle.fontSize + 'px',
+      fontWeight: fontStyle.bold ? 'bold' : 'normal',
+      fontStyle: fontStyle.italic ? 'italic' : 'normal',
+      textDecoration: fontStyle.underline ? 'underline' : 'none',
+      color: fontStyle.color,
+      backgroundColor: fontStyle.backgroundColor,
+      padding: '10px',
+      borderRadius: '5px',
+    }"
+            >
               Sample Text Preview
             </div>
           </fieldset>
+
 
         </section>
 
@@ -735,6 +817,11 @@ legend {
 
 .checkbox-row label {
   min-width: 125px;
+}
+
+.time-zone-input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
 }
 
 .event-location-row {

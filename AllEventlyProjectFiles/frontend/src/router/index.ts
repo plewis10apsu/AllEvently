@@ -27,6 +27,11 @@ const routes = [
         component: UpdatePassword
     },
     {
+        path: '/events',
+        name: 'EventsWithoutId',
+        component: Events,
+    },
+    {
         path: '/events/:userId',
         name: 'Events',
         component: Events,

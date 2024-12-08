@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watch } from 'vue';
 //import axios from 'axios';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Event } from '@/types/EventInterface';
@@ -8,6 +9,7 @@ import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
 import { useRoute } from 'vue-router';
+import router from "@/router";
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
@@ -15,16 +17,64 @@ const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
 // Ensure `currentUser` has valid data fetched from the API
-const firstName = ref<string>("John"); // Replace with actual dynamic data
+const firstName = ref<string>("Joh"); // Replace with actual dynamic data
 const lastName = ref<string>("Doe");   // Replace with actual dynamic data
 const email = ref<string>("john.doe@example.com"); // Replace with actual dynamic data
 
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
+const publicEvents = ref<Event[]>([]);
 //defining the router that will be used to obtain the user's id from Login.vue
 const route = useRoute();
 //the id itself
-const userId =  ref(route.params.userId);
+const userId = ref<string | null>(localStorage.getItem('userId'));
+watch(userId, (newVal, oldVal) => {
+  console.log('userId changed:', { oldVal, newVal });
+});
+const getPublicEvents = async () => {
+  try {
+    console.log('Fetching public events...');
+    const response = await fetch('https://all-evently-backend.vercel.app/api/publicevents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Received data: ", data);  // Debugging the response
+
+      if (Array.isArray(data) && data.length > 0) {
+        publicEvents.value = data.map((item: any) => ({
+          id: item.event_id,
+          title: item.event_name,
+          type: item.location,
+          venue: item.event_address,
+          date: item.event_date,
+          time: item.updated_at,
+          host: item.email,
+          imageUrl: '',
+          venueLink: '',
+          venueAddress: item.event_address,
+          isHost: item.is_active,
+          isGuest: item.is_published,
+        }));
+        console.log("Public events stored: ", publicEvents.value);
+      } else {
+        console.log("No public events to display.");
+        publicEvents.value = [];
+      }
+    } else {
+      console.error("Error fetching public events. Status:", response.status);
+    }
+  } catch (error) {
+    console.error("Error during fetch operation: ", error);
+  }
+};
 
 /*
 const getHostedEvents = async () => {
@@ -56,6 +106,7 @@ const getHostedEvents = async () => {
 */
 const getCurrentUser = async () => {
   try {
+    console.log('Fetching current user with userId:', userId.value); // Log the userId
     const response = await fetch('https://all-evently-backend.vercel.app/api/currentuser', {
       method: 'POST',
       headers: {
@@ -69,8 +120,7 @@ const getCurrentUser = async () => {
       const data = await response.json();
       if (!data.user){
         alert(data.user);
-      }
-      else {
+      } else {
         const userData = data.user.split(",");
         email.value = userData[0];
         firstName.value = userData[1];
@@ -102,10 +152,32 @@ const currentUser = ref<string>(''); // Empty string initially
 
 // Fetch user data on component mount
 onMounted(async () => {
-  await getCurrentUser();
+  console.log('onMounted triggered for Events.vue');
+  if (!userId.value) {
+    console.error('No userId found. Redirecting to login.');
+    await router.push({ name: 'Login' }); // Redirect to login
+    return;
+  }
+
+  if (publicEvents.value.length === 0) { // Avoid redundant API calls
+    await getCurrentUser();
+    await getPublicEvents();
+  } else {
+    console.log('Public events already fetched, skipping API call.');
+  }
+
   updateSidebarWidth();
 });
 
+watch(route, (newRoute, oldRoute) => {
+  console.log("Route changed:", { oldRoute, newRoute });
+
+  // Refetch data if navigating back to the Events page
+  if (newRoute.name === 'Events' && publicEvents.value.length === 0) {
+    console.log('Refetching events due to route change.');
+    getPublicEvents();
+  }
+});
 
 //Commenting out hard-coded events and testing it with data from the server request
 // Event list
@@ -186,7 +258,14 @@ const navItems = [
   { label: 'Events', path: '/events', icon: 'fas fa-calendar-alt' },
   { label: 'Logout', path: '/', icon: 'fas fa-right-from-bracket' }
 ];
+watch(route, (newRoute, oldRoute) => {
+  console.log("Route changed:", { oldRoute, newRoute });
 
+  if (newRoute.name === 'Events' && publicEvents.value.length === 0) {
+    console.log('Refetching events due to route change.');
+    getPublicEvents();
+  }
+});
 
 </script>
 
@@ -196,7 +275,7 @@ const navItems = [
     <Sidebar
         :isVisible="isSidebarVisible"
         :width="sidebarWidth"
-        :navItems = "navItems"
+        :NavItems = "navItems"
     />
     <!-- Main content area -->
     <main class="content-area events-content">
