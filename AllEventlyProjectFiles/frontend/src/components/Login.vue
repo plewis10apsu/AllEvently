@@ -20,6 +20,8 @@ const errorMessageLastName = ref('');
 const errorMessageEmail = ref('');
 const errorMessagePassword = ref('');
 
+
+
 // Async function to log user in
 const loginUser = async () => {
   try {

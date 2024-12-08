@@ -19,12 +19,12 @@ const userFirstName = ref<string>("");
 const userLastName = ref<string>("");
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
-
+const publicEvents = ref<Event[]>([]);
 //defining the router that will be used to obtain the user's id from Login.vue
 const router = useRouter();
 //the id itself
 const userId =  ref(router.currentRoute.value.params.userId);
-
+/*
 const fetchEvents = async () => {
   try {
     const response = await fetch('https://all-evently-backend.vercel.app/api/events', {
@@ -49,8 +49,33 @@ const fetchEvents = async () => {
     console.log(error);
   }
 };
-
-console.log(fetchEvents);
+*/
+const getPublicEvents = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: userEmail.value,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (!data.publicEvents || data.publicEvents.length === 0) {
+        console.log("No public events to display.");
+      } else {
+        publicEvents.value = data.publicEvents;
+        console.log(publicEvents.value);
+      }
+    } else {
+      console.log("Error fetching public events.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 
 const getCurrentUser = async () => {
@@ -120,6 +145,7 @@ onMounted(() => {
   //fetchCurrentUser();
   getCurrentUser();
   updateSidebarWidth();
+  getPublicEvents();
 });
 
 
@@ -165,8 +191,6 @@ const events = ref<Event[]>([
   }
 ]);
 */
-
-console.log(fetchEvents);
 
 // Processed events with dynamic isHost and isGuest
 const processedEvents = computed(() =>
