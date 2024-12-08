@@ -48,20 +48,20 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
     if (req.method === 'POST') {
         try {
             const body = await parseJsonBody(req);
-            if (! body.id){
+            if (! body.userId){
                 res.statusCode = 401;
                 res.end(JSON.stringify({message: "Error. User not found"}));
                 return;
             }
-            const result = await pool.query('GET_USER ($1);', [body.id] );
+            const result = await pool.query('GET_USER ($1);', [body.userId] );
             if (result.rows.length == 0) {
                 res.statusCode = 401;
                 res.end(JSON.stringify({message: "Error. User not found"}));
                 return;
             }
-            const user = result.rows[0];
+            const userEmail: string = result.rows[0].get_user;
             res.statusCode = 201;
-            res.end(JSON.stringify({message: 'User found', user: user}));
+            res.end(JSON.stringify({message: 'User found', userEmail: userEmail}));
             return;
         } catch (error) {
             console.error(error);

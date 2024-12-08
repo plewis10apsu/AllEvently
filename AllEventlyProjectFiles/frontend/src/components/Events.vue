@@ -7,14 +7,22 @@ import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
+import { useRouter } from 'vue-router';
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
 const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
+const userEmail = ref<String>("");
+
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
+
+//defining the router that will be used to obtain the user's id from Login.vue
+const router = useRouter();
+//the id itself
+const userId =  ref(router.currentRoute.value.params.userId);
 
 const fetchEvents = async () => {
   try {
@@ -52,18 +60,25 @@ const getCurrentUser = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: currentUser.value
+        userId: userId.value
       }),
     });
     if (response.ok) {
       const data = await response.json();
-      const user = data.user;
-      currentUser.value = user.first_name;
+      console.log("Response data: "+data);
+      if (!data.userEmail){
+        alert(data.userEmail);
+      }
+      else {
+        userEmail.value = data.userEmail;
+        console.log("User email address: "+data.userEmail);
+      }
     } else {
       console.error('Error fetching current user');
     }
 
   } catch (error) {
+    console.log("Error message: ")
     console.log(error);
   }
 }

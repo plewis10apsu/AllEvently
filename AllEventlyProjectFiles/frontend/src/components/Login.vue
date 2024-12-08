@@ -40,7 +40,12 @@ const loginUser = async () => {
       const data = await response.json();
       if (data.userId !== null) {
         userId.value = data.userId;
-        await router.push('/events');
+        await router.push({
+          name: 'Events',
+          params: {
+            userId: userId.value,
+          },
+        });
       } else {
         console.log(data.message);
       }
