@@ -7,6 +7,7 @@ type NavItem = {
   label: string;
   path: string;
   icon: string;
+  query?: Record<string, string>;
 };
 
 defineProps({
@@ -25,15 +26,20 @@ defineProps({
   },
 });
 
-const navigateTo = (path: string) => {
-  router.push(path);
+const navigateTo = (item: NavItem) => {
+  router.push({ path: item.path, query: item.query });
 };
 </script>
 
 <template>
   <aside :class="['sidebar', { 'sidebar-visible': isVisible }]">
     <nav class="preview-container">
-      <button v-for="item in navItems" :key="item.label" @click="navigateTo(item.path)" class="nav-button">
+      <button
+          v-for="item in navItems"
+          :key="item.label"
+          @click="navigateTo(item)"
+          class="nav-button"
+      >
         <FontAwesomeIcon :icon="item.icon" class="nav-icon" />
         <span class="nav-label">{{ item.label }}</span>
       </button>

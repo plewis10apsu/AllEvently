@@ -13,6 +13,11 @@ const filterOption = ref('Upcoming Events');
 const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
+// Ensure `currentUser` has valid data fetched from the API
+const firstName = ref("John"); // Replace with actual dynamic data
+const lastName = ref("Doe");   // Replace with actual dynamic data
+const email = ref("john.doe@example.com"); // Replace with actual dynamic data
+
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
 
@@ -97,9 +102,9 @@ const fetchCurrentUser = async () => {
 };
 */
 // Fetch user data on component mount
-onMounted(() => {
+onMounted(async () => {
   //fetchCurrentUser();
-  getCurrentUser();
+  await getCurrentUser();
   updateSidebarWidth();
 });
 
@@ -177,6 +182,13 @@ const filteredEvents = computed(() => {
   }
   return processedEvents.value;
 });
+const navItems = [
+  { label: 'Account', path: '/account', icon: 'fas fa-user',
+    query: { firstName: firstName.value, lastName: lastName.value, email: email.value } },
+  { label: 'Public Events', path: '/public', icon: 'fas fa-users' },
+  { label: 'Events', path: '/events', icon: 'fas fa-calendar-alt' },
+  { label: 'Logout', path: '/', icon: 'fas fa-right-from-bracket' }
+];
 
 
 </script>
@@ -184,7 +196,11 @@ const filteredEvents = computed(() => {
 <template>
   <div class="page-layout events-page">
     <TopPanel :logo="logo" />
-    <Sidebar :isVisible="isSidebarVisible" :width="sidebarWidth" />
+    <Sidebar
+        :isVisible="isSidebarVisible"
+        :width="sidebarWidth"
+        :navItems = "navItems"
+    />
     <!-- Main content area -->
     <main class="content-area events-content">
       <div>
