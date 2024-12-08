@@ -9,6 +9,7 @@ type NavItem = {
   path: string;
   icon: string;
   query?: Record<string, string>;
+  routeName?: string;
 };
 
 defineProps({
@@ -21,14 +22,18 @@ defineProps({
     default: () => [
       { label: 'Account', path: '/account', icon: ['fas', 'user'] },
       { label: 'Public Events', path: '/public', icon: ['fas', 'users'] },
-      { label: 'Events', path: `/events`, icon: ['fas', 'calendar-alt'] },
+      { label: 'Events', path: '', icon: ['fas', 'calendar-alt'], routeName: 'EventsWithoutId' },
       { label: 'Logout', path: '/', icon: ['fas', 'right-from-bracket'] },
     ],
   },
 });
 
-const navigateTo = (path: string, query: Record<string, string> = {}) => {
-  router.push({ path, query });
+const navigateTo = (path: string, query: Record<string, string> = {}, routeName?: string) => {
+  if (routeName) {
+    router.push({ name: routeName, query });
+  } else {
+    router.push({ path, query });
+  }
 };
 </script>
 
@@ -37,7 +42,7 @@ const navigateTo = (path: string, query: Record<string, string> = {}) => {
     <nav class="preview-container">
       <button v-for="item in navItems"
               :key="item.label"
-              @click="navigateTo(item.path, { firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' })"
+              @click="navigateTo(item.path, { firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' }, item.routeName)"
               class="nav-button"
       >
         <FontAwesomeIcon :icon="item.icon" class="nav-icon" />

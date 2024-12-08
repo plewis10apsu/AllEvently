@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watch } from 'vue';
 //import axios from 'axios';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Event } from '@/types/EventInterface';
@@ -8,6 +9,7 @@ import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
 import { useRoute } from 'vue-router';
+import router from "@/router";
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
@@ -25,10 +27,13 @@ const publicEvents = ref<Event[]>([]);
 //defining the router that will be used to obtain the user's id from Login.vue
 const route = useRoute();
 //the id itself
-const userId =  ref(route.params.userId);
-
+const userId = ref<string | null>(localStorage.getItem('userId'));
+watch(userId, (newVal, oldVal) => {
+  console.log('userId changed:', { oldVal, newVal });
+});
 const getPublicEvents = async () => {
   try {
+    console.log('Fetching public events...');
     const response = await fetch('https://all-evently-backend.vercel.app/api/publicevents', {
       method: 'POST',
       headers: {
@@ -44,20 +49,19 @@ const getPublicEvents = async () => {
       console.log("Received data: ", data);  // Debugging the response
 
       if (Array.isArray(data) && data.length > 0) {
-        // Map through the result to transform it into the Event interface structure
         publicEvents.value = data.map((item: any) => ({
-          id: item.event_id,              // Mapped from event_id
-          title: item.event_name,         // Mapped from event_name
-          type: item.location,            // Mapped from location (assuming it's the type)
-          venue: item.event_address,      // Mapped from event_address
-          date: item.event_date,          // Mapped from event_date
-          time: item.updated_at,          // Mapped from updated_at (you can adjust as needed)
-          host: item.email,               // Mapped from email
-          imageUrl: '',                   // Placeholder for image URL, can be adjusted if available
-          venueLink: '',                  // Placeholder for venue link, can be adjusted if available
-          venueAddress: item.event_address, // Same as venue (event_address)
-          isHost: item.is_active,         // Assumed to map from is_active
-          isGuest: item.is_published,     // Assumed to map from is_published
+          id: item.event_id,
+          title: item.event_name,
+          type: item.location,
+          venue: item.event_address,
+          date: item.event_date,
+          time: item.updated_at,
+          host: item.email,
+          imageUrl: '',
+          venueLink: '',
+          venueAddress: item.event_address,
+          isHost: item.is_active,
+          isGuest: item.is_published,
         }));
         console.log("Public events stored: ", publicEvents.value);
       } else {
@@ -65,7 +69,7 @@ const getPublicEvents = async () => {
         publicEvents.value = [];
       }
     } else {
-      console.log("Error fetching public events.");
+      console.error("Error fetching public events. Status:", response.status);
     }
   } catch (error) {
     console.error("Error during fetch operation: ", error);
@@ -102,6 +106,7 @@ const getHostedEvents = async () => {
 */
 const getCurrentUser = async () => {
   try {
+    console.log('Fetching current user with userId:', userId.value); // Log the userId
     const response = await fetch('https://all-evently-backend.vercel.app/api/currentuser', {
       method: 'POST',
       headers: {
@@ -115,8 +120,7 @@ const getCurrentUser = async () => {
       const data = await response.json();
       if (!data.user){
         alert(data.user);
-      }
-      else {
+      } else {
         const userData = data.user.split(",");
         email.value = userData[0];
         firstName.value = userData[1];
@@ -148,11 +152,32 @@ const currentUser = ref<string>(''); // Empty string initially
 
 // Fetch user data on component mount
 onMounted(async () => {
-  await getCurrentUser();
-  await getPublicEvents();
+  console.log('onMounted triggered for Events.vue');
+  if (!userId.value) {
+    console.error('No userId found. Redirecting to login.');
+    await router.push({ name: 'Login' }); // Redirect to login
+    return;
+  }
+
+  if (publicEvents.value.length === 0) { // Avoid redundant API calls
+    await getCurrentUser();
+    await getPublicEvents();
+  } else {
+    console.log('Public events already fetched, skipping API call.');
+  }
+
   updateSidebarWidth();
 });
 
+watch(route, (newRoute, oldRoute) => {
+  console.log("Route changed:", { oldRoute, newRoute });
+
+  // Refetch data if navigating back to the Events page
+  if (newRoute.name === 'Events' && publicEvents.value.length === 0) {
+    console.log('Refetching events due to route change.');
+    getPublicEvents();
+  }
+});
 
 //Commenting out hard-coded events and testing it with data from the server request
 // Event list
@@ -233,7 +258,14 @@ const navItems = [
   { label: 'Events', path: '/events', icon: 'fas fa-calendar-alt' },
   { label: 'Logout', path: '/', icon: 'fas fa-right-from-bracket' }
 ];
+watch(route, (newRoute, oldRoute) => {
+  console.log("Route changed:", { oldRoute, newRoute });
 
+  if (newRoute.name === 'Events' && publicEvents.value.length === 0) {
+    console.log('Refetching events due to route change.');
+    getPublicEvents();
+  }
+});
 
 </script>
 
