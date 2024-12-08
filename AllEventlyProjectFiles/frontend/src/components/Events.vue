@@ -29,7 +29,7 @@ const userId =  ref(route.params.userId);
 
 const getPublicEvents = async () => {
   try {
-    const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/publicevents', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
