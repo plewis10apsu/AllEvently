@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import { useRoute } from 'vue-router';
 import TopPanel from "@/components/TopPanel.vue";
 import Sidebar from "./Sidebar.vue";
 import logo from "@/assets/AllEventlyLogo.png";
 
 const isSidebarVisible = ref(true);
-const firstName = ref("Jane");
-const lastName = ref("Smith");
+
+const route = useRoute();
+const firstName = ref(route.query.firstName || 'Jane');
+const lastName = ref(route.query.lastName || 'Smith');
+const email = ref(route.query.email || 'guest@example.com');
 
 function resetPassword() {
   // Logic for resetting password can be added here
@@ -21,26 +25,27 @@ function saveChanges() {
 </script>
 
 <template>
-
   <div class="page-layout account-page">
     <TopPanel :logo="logo" />
-      <Sidebar :isVisible="isSidebarVisible"/>
-      <!-- Main content area -->
-      <main class="content-area account-content">
-        <div class="content-header">
-          <h1 class="main-title">Account Settings</h1>
-        </div>
-        <div class="form-container">
-          <label for="first-name">First Name:</label>
-          <input id="first-name" type="text" v-model="firstName" />
+    <Sidebar :isVisible="isSidebarVisible" />
+    <main class="content-area account-content">
+      <div class="content-header">
+        <h1 class="main-title">Account Settings</h1>
+      </div>
+      <div class="form-container">
+        <label for="first-name">First Name:</label>
+        <input id="first-name" type="text" v-model="firstName" />
 
-          <label for="last-name">Last Name:</label>
-          <input id="last-name" type="text" v-model="lastName" />
+        <label for="last-name">Last Name:</label>
+        <input id="last-name" type="text" v-model="lastName" />
 
-          <button @click="resetPassword" class="action-button">Reset Password</button>
-          <button @click="saveChanges" class="save-button">Save</button>
-        </div>
-      </main>
+        <label for="email">Email:</label>
+        <input id="email" type="email" v-model="email" />
+
+        <button @click="resetPassword" class="action-button">Reset Password</button>
+        <button @click="saveChanges" class="save-button">Save</button>
+      </div>
+    </main>
   </div>
 
 </template>
