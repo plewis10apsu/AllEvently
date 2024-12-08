@@ -1,5 +1,11 @@
 —Function headers
 
+-get all chat messages for an event
+Get_Event_Messages (Event_Num INT)
+
+-get all guests for an event
+Get_Event_Guests (Event_Num INT);
+
 —returns all public events
 GET_PUBLIC_EVENTS ();
 
