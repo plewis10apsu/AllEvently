@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
+import { useRouter } from 'vue-router';
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
@@ -17,10 +18,20 @@ const sidebarWidth = ref(200);
 const firstName = ref("John"); // Replace with actual dynamic data
 const lastName = ref("Doe");   // Replace with actual dynamic data
 const email = ref("john.doe@example.com"); // Replace with actual dynamic data
+//This was a MERGE conflict, but I kept the below changes from the server for reference -PEGGY (My changes the 3 lines above)
+const userEmail = ref<String>("");
+const userFirstName = ref<string>("");
+const userLastName = ref<string>("");
+
 
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
-
+const publicEvents = ref<Event[]>([]);
+//defining the router that will be used to obtain the user's id from Login.vue
+const router = useRouter();
+//the id itself
+const userId =  ref(router.currentRoute.value.params.userId);
+/*
 const fetchEvents = async () => {
   try {
     const response = await fetch('https://all-evently-backend.vercel.app/api/events', {
@@ -45,8 +56,33 @@ const fetchEvents = async () => {
     console.log(error);
   }
 };
-
-console.log(fetchEvents);
+*/
+const getPublicEvents = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: userEmail.value,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (!data.publicEvents || data.publicEvents.length === 0) {
+        console.log("No public events to display.");
+      } else {
+        publicEvents.value = data.publicEvents;
+        console.log(publicEvents.value);
+      }
+    } else {
+      console.log("Error fetching public events.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 
 const getCurrentUser = async () => {
@@ -57,18 +93,28 @@ const getCurrentUser = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: currentUser.value
+        userId: userId.value
       }),
     });
     if (response.ok) {
       const data = await response.json();
-      const user = data.user;
-      currentUser.value = user.first_name;
+      if (!data.user){
+        alert(data.user);
+      }
+      else {
+        const userData = data.user.split(",");
+        userEmail.value = userData[0];
+        userFirstName.value = userData[1];
+        userLastName.value = userData[2];
+        userEmail.value = userEmail.value.replace(/\(/g, "");
+        userLastName.value = userLastName.value.replace(/\)/g, "");
+      }
     } else {
       console.error('Error fetching current user');
     }
 
   } catch (error) {
+    console.log("Error message: ")
     console.log(error);
   }
 }
@@ -106,6 +152,7 @@ onMounted(async () => {
   //fetchCurrentUser();
   await getCurrentUser();
   updateSidebarWidth();
+  getPublicEvents();
 });
 
 
@@ -151,8 +198,6 @@ const events = ref<Event[]>([
   }
 ]);
 */
-
-console.log(fetchEvents);
 
 // Processed events with dynamic isHost and isGuest
 const processedEvents = computed(() =>

@@ -1,3 +1,5 @@
+DROP FUNCTION IF EXISTS GET_EVENT_MESSAGES;
+DROP FUNCTION IF EXISTS GET_EVENT_GUESTS;
 DROP FUNCTION IF EXISTS GET_USER;
 DROP FUNCTION IF EXISTS GET_PUBLIC_EVENTS;
 DROP FUNCTION IF EXISTS GET_HOSTED_EVENTS;
@@ -75,8 +77,8 @@ CREATE TABLE IF NOT EXISTS Events (
     host_name text NOT NULL,
     event_name text DEFAULT 'My Event',
     event_location text NOT NULL,
-    event_start_date DATE DEFAULT (CURRENT_DATE) + INTERVAL '1 DAY',
-    event_end_date DATE,
+    event_start_date TIMESTAMP DEFAULT (CURRENT_DATE) + INTERVAL '1 DAY',
+    event_end_date TIMESTAMP,
     event_time_zone text DEFAULT 'UTC',
     invitation_layout text DEFAULT 'Center',
     background_image INT DEFAULT 1,
@@ -86,7 +88,7 @@ CREATE TABLE IF NOT EXISTS Events (
     is_public BOOLEAN DEFAULT FALSE,
     reoccurs BOOLEAN DEFAULT FALSE,
     reoccur_freq INT,
-    end_reoccur DATE,
+    end_reoccur TIMESTAMP,
     request_child_num BOOLEAN DEFAULT FALSE,
     limit_additional_guests BOOLEAN DEFAULT FALSE,
     max_additional_guests INT DEFAULT 0,
@@ -102,7 +104,7 @@ CREATE TABLE IF NOT EXISTS Chat_Messages (
     event_id INT NOT NULL,
     sender_email text NOT NULL,
     contents text NOT NULL,
-    sent_date DATE DEFAULT (CURRENT_DATE),
+    sent_date TIMESTAMP DEFAULT (CURRENT_DATE),
     accepted BOOLEAN,
     PRIMARY KEY (message_id),
     FOREIGN KEY (event_id) REFERENCES EVENTS (event_id),
@@ -308,44 +310,54 @@ BEGIN
 	
 END $$ LANGUAGE plpgsql;
 
+--Get Event Guests
+CREATE OR REPLACE FUNCTION Get_Event_Guests (Event_Num INT)
+RETURNS SETOF GUESTS AS $$
+BEGIN
+
+    RETURN QUERY SELECT * FROM Guests
+    WHERE Event_Id = Event_Num;
+	
+END $$ LANGUAGE plpgsql;
+
+--Get Event Messages
+CREATE OR REPLACE FUNCTION Get_Event_Messages (Event_Num INT)
+RETURNS SETOF CHAT_MESSAGES AS $$
+BEGIN
+
+    RETURN QUERY SELECT * FROM Chat_Messages
+    WHERE Event_Id = Event_Num;
+	
+END $$ LANGUAGE plpgsql;
 
 
 -----------Test--------------------------
 ---Create users
-SELECT CREATE_ACCOUNT('ben@gmail.com', 'password', 'ben', 'bruyns');
-SELECT CREATE_ACCOUNT('peggy@gmail.com', 'asswordp', 'peggy', 'lewis');
-SELECT CREATE_ACCOUNT('spensor@gmail.com', 'sswordap', 'spensor', 'morey');
-SELECT AUTHENTICATE_USER('ben@gmail.com', 'password');
-
---Create images
-INSERT INTO IMAGES (image_path)
-VALUES ('pig');
-
-select * from images;
+--SELECT CREATE_ACCOUNT('ben@gmail.com', 'password', 'ben', 'bruyns');
+--SELECT CREATE_ACCOUNT('peggy@gmail.com', 'asswordp', 'peggy', 'lewis');
+--SELECT CREATE_ACCOUNT('spensor@gmail.com', 'sswordap', 'spensor', 'morey');
+--SELECT AUTHENTICATE_USER('ben@gmail.com', 'password');
 
 ---Create events
 --Default event with minimum parameters
-INSERT INTO EVENTS (event_host, host_name, event_location)
-VALUES ('ben@gmail.com', 'benjamin', 'here');
-INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date)
-VALUES ('peggy@gmail.com', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
-INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
-VALUES ('spensor@gmail.com', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
+--INSERT INTO EVENTS (event_host, host_name, event_location)
+--VALUES ('ben@gmail.com', 'benjamin', 'here');
+--INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date)
+--VALUES ('peggy@gmail.com', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
+--INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
+--VALUES ('spensor@gmail.com', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
 
 
 --Create Guest
-INSERT INTO GUESTS (guest_email, event_id)
-VALUES ('ben@gmail.com', 2);
+--INSERT INTO GUESTS (guest_email, event_id)
+--VALUES ('ben@gmail.com', 2);
 
 --Create Chat Message
-INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
-VALUES (2, 'ben@gmail.com', 'Hello World');
-INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
-VALUES (2, 'peggy@gmail.com', 'Hello Ben');
+--INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
+--VALUES (2, 'ben@gmail.com', 'Hello World');
+--INSERT INTO CHAT_MESSAGES (event_id, sender_email, contents)
+--VALUES (2, 'peggy@gmail.com', 'Hello Ben');
 
-select * from people p join accounts a on p.email = a.account_email;
-
-
-
+--select * from people p join accounts a on p.email = a.account_email;
 
 

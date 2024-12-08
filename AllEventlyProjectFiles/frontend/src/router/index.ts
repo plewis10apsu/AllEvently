@@ -27,9 +27,10 @@ const routes = [
         component: UpdatePassword
     },
     {
-        path: '/events',
+        path: '/events/:userId',
         name: 'Events',
-        component: Events
+        component: Events,
+        props: true,
     },
     {
         path: '/event-creation',
@@ -56,7 +57,8 @@ const routes = [
     {
         path: '/account',
         name: 'Account',
-        component: Account
+        component: Account,
+        props: true,
     },
     {
         path: '/public',

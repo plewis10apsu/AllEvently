@@ -8,7 +8,7 @@ const pool = new Pool({
     connectionString: process.env.POSTGRES_URL,
 });
 
-// Helper function to parse JSON body
+// Helper function to parse JSON body - written by ChatGPT
 const parseJsonBody = (req: IncomingMessage) =>
     new Promise<any>((resolve, reject) => {
         let body = '';
@@ -48,26 +48,22 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
     if (req.method === 'POST') {
         try {
             const body = await parseJsonBody(req);
-            if (!body.userId){
-                res.statusCode = 401;
-                res.end(JSON.stringify({message: "Error. User not found"}));
+            //using email sent from frontend
+            if(!body.email){
+                res.statusCode = 402;
+                res.end(JSON.stringify({message: 'All fields are required.'}));
                 return;
             }
-            const result = await pool.query('SELECT GET_USER ($1);', [body.userId] );
-            if (result.rows.length == 0) {
-                res.statusCode = 401;
-                res.end(JSON.stringify({message: "Error. User not found"}));
-                return;
-            }
-            const user: string = result.rows[0].get_user;
-
+            const result = await pool.query('SELECT GET_ATTENDING_EVENTS($1);', [body.email]);
+            const attendedEvents = result.rows[0].get_attending_events;
             res.statusCode = 201;
-            res.end(JSON.stringify({message: 'User found', user: user}));
+            res.end(JSON.stringify(attendedEvents));
             return;
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error('Error fetching attending events:', err);
             res.statusCode = 500;
-            res.end(JSON.stringify({message : 'Error logging in'}));
+            res.end(JSON.stringify({message: 'Internal server error.'}));
+            console.log(err);
             return;
         }
     } else {
@@ -77,5 +73,4 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         return;
     }
 };
-
 export default allowCors(handler);

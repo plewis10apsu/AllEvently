@@ -20,6 +20,8 @@ const errorMessageLastName = ref('');
 const errorMessageEmail = ref('');
 const errorMessagePassword = ref('');
 
+
+
 // Async function to log user in
 const loginUser = async () => {
   try {
@@ -40,7 +42,12 @@ const loginUser = async () => {
       const data = await response.json();
       if (data.userId !== null) {
         userId.value = data.userId;
-        await router.push('/events');
+        await router.push({
+          name: 'Events',
+          params: {
+            userId: userId.value,
+          },
+        });
       } else {
         console.log(data.message);
       }
