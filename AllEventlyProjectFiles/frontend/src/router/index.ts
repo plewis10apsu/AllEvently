@@ -63,7 +63,8 @@ const routes = [
     {
         path: '/public',
         name: 'Public',
-        component: Public
+        component: Public,
+        props: true,
     }
 ];
 
