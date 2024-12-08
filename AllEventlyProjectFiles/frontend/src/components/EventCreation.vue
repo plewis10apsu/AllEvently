@@ -3,8 +3,10 @@ import {ref, onUnmounted, onMounted, watch, computed} from "vue";
 import logo from "@/assets/AllEventlyLogo.png";
 import TopPanelWithBack from "@/components/TopPanelWithBack.vue";
 import SidebarWithPreview from "@/components/SidebarWithPreview.vue";
+import {loadGoogleMapsAPI} from "@/utils/googleMapsLoader.ts";
 
 // Reactive state
+const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const eventName = ref<string>("");
 const eventNameValid = ref<boolean>(true);
 const isSingleEvent = ref<boolean>(true);
@@ -26,9 +28,193 @@ const isSidebarVisible = ref<boolean>(true);
 const sidebarWidth = ref<number>(200);
 const address = ref<string>("");
 const inputValue = ref<string>("");
+const links = ref<string[]>([]); // List of links
+const newLink = ref<string>(""); // New link input
+const isRemoveMode = ref(false); // Toggle remove mode
+const searchQuery = ref("");
+const selectedImage = ref<number | null>(null);
 const mapImageUrl = ref<string>("");
-const autocomplete: any = ref(null);
-const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+let autocomplete: google.maps.places.Autocomplete | null = null;
+const nearbyBounds = {  north: 36.678118, south: 34.982972, east: -81.6469, west: -90.3103, };
+const activeTab = ref<"details" | "settings">("details");
+const selectedLayout = ref<string | null>(null);
+const isPrivate = ref<boolean>(true);
+declare const google: any;
+const filteredGallery = computed(() =>
+    gallery.value.filter(
+        (image) =>
+            image.theme.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            searchQuery.value.trim() === ""
+    )
+);
+
+// Adjust sidebar width dynamically based on screen size
+const updateSidebarWidth = () => {
+  sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
+};
+
+const fontStyle = ref<Record<string, any>>({
+  fontFamily: "Arial",
+  fontSize: 48,
+  bold: false,
+  italic: false,
+  underline: false,
+  color: "#000000",
+});
+
+function getContrastingBackground(color: string): string {
+  // Remove the '#' if present and parse the RGB values
+  const hex = color.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  // Return white for dark colors, black for light colors
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+}
+
+
+function toggleEventType(isSingle: boolean): void {
+  isSingleEvent.value = isSingle;
+}
+
+function validateEventName(): void {
+  eventNameValid.value = eventName.value.trim().length > 0;
+}
+
+function addLink(link: string) {
+  if (link.trim() !== "") {
+    links.value.push(link);
+    newLink.value = ""; // Clear the input after adding
+  }
+}
+
+// Function to remove a link by index
+function removeLink(index: number) {
+  links.value.splice(index, 1);
+}
+
+// Toggle remove mode
+function toggleRemoveMode() {
+  isRemoveMode.value = !isRemoveMode.value;
+}
+
+function updateFontStyle(property: string, value: any) {
+  fontStyle.value[property] = value;
+}
+
+// Function to select an image
+function selectImage(imageId: number): void {
+  selectedImage.value = imageId;
+}
+
+watch(inputValue, (newValue) => {
+  if (newValue.trim() === "") {
+    address.value = ""; // Clear the selected address if input is empty
+    mapImageUrl.value = "";
+  }
+
+  if (autocomplete && newValue.trim() !== "") {
+    autocomplete.setBounds(nearbyBounds);
+  }
+});
+
+// Image gallery
+const gallery = ref([
+  { id: 1, src:new URL('@/assets/Bike.jpg', import.meta.url).href, theme: "Bike" },
+  { id: 2, src:new URL('@/assets/Christmas.jpg', import.meta.url).href, theme: "Christmas" },
+  { id: 3, src:new URL('@/assets/Confetti.jpg', import.meta.url).href, theme: "Confetti" },
+  { id: 4, src:new URL('@/assets/Default_Invite.jpg', import.meta.url).href, theme: "Default" },
+  { id: 5, src:new URL('@/assets/Dog.jpg', import.meta.url).href, theme: "Dog" },
+  { id: 6, src:new URL('@/assets/Dry_Flower.jpg', import.meta.url).href, theme: "Flower" },
+  { id: 7, src:new URL('@/assets/Easter.jpg', import.meta.url).href, theme: "Easter" },
+  { id: 8, src:new URL('@/assets/Football.jpg', import.meta.url).href, theme: "Football" },
+  { id: 9, src:new URL('@/assets/Fourth.jpg', import.meta.url).href, theme: "Fourth" },
+  { id: 10, src:new URL('@/assets/Gamer.jpg', import.meta.url).href, theme: "Gamer" },
+  { id: 11, src:new URL('@/assets/Haley\'s_Birthday_Event_Page.jpg', import.meta.url).href, theme: "Birthday" },
+  { id: 12, src:new URL('@/assets/Hanukkah.jpg', import.meta.url).href, theme: "Hanukkah" },
+  { id: 13, src:new URL('@/assets/Hike.jpg', import.meta.url).href, theme: "Hike" },
+  { id: 14, src:new URL('@/assets/Joy.jpg', import.meta.url).href, theme: "Joy" },
+  { id: 15, src:new URL('@/assets/Lisa\'s_Baby_Shower_Event_Page.jpg', import.meta.url).href, theme: "Baby Shower" },
+  { id: 16, src:new URL('@/assets/Love.jpg', import.meta.url).href, theme: "Love" },
+  { id: 17, src:new URL('@/assets/Pineapple.jpg', import.meta.url).href, theme: "Pineapple" },
+  { id: 18, src:new URL('@/assets/PinkPurple_Birthday.jpg', import.meta.url).href, theme: "Purple_Birthday" },
+  { id: 19, src:new URL('@/assets/Rose_Invite.jpg', import.meta.url).href, theme: "Rose" },
+  { id: 20, src:new URL('@/assets/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
+  { id: 21, src:new URL('@/assets/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
+  { id: 22, src:new URL('@/assets/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
+  { id: 23, src:new URL('@/assets/Graduation.jpg', import.meta.url).href, theme: "Graduation" },
+  // Add more images with themes as needed
+]);
+
+// Initialize functionality on mount
+onMounted(async () => {
+  updateSidebarWidth();
+  window.addEventListener("resize", updateSidebarWidth);
+
+  try {
+    await loadGoogleMapsAPI(googleMapsApiKey);
+    console.log("Google Maps API loaded successfully.");
+    initializeAutocomplete();
+  } catch {
+    console.error(Error);
+  }
+});
+
+const initializeAutocomplete = (): void => {
+  if (!window.google || !google.maps || !google.maps.places) {
+    console.error("Google Maps API is not fully loaded.");
+    return;
+  }
+
+  console.log("Initializing Google Maps Autocomplete...");
+
+  const input = document.getElementById("event-address") as HTMLInputElement | null;
+  if (!input) {
+    console.error("Address input field is not found.");
+    return;
+  }
+
+  autocomplete = new google.maps.places.Autocomplete(input, {
+    fields: ["formatted_address", "geometry"],
+  });
+
+  if (autocomplete) {
+  autocomplete.addListener("place_changed", () => {
+    const place = autocomplete?.getPlace();
+    console.log("Selected place:", place);
+
+    if (place?.formatted_address) {
+      inputValue.value = place.formatted_address;
+    } else {
+      console.error("Formatted address is missing from the selected place.");
+    }
+
+    if (place?.geometry?.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+
+      mapImageUrl.value = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=${googleMapsApiKey}`;
+      console.log("Static Map URL:", mapImageUrl.value);
+    } else {
+      console.error("Place geometry is missing or invalid.");
+      mapImageUrl.value = ""; // Clear the map preview if invalid
+    }
+  });
+  } else {
+    console.error("Autocomplete is not initialized.");
+  }
+};
+
+// Cleanup on unmount
+onUnmounted(() => {
+  window.removeEventListener("resize", updateSidebarWidth);
+});
+
+// Add save logic here, such as sending the data to an API or storing it locally
 
 //commenting these out since they are used in the async function and vercel is whining
 /*
@@ -36,82 +222,6 @@ const eventLocation = ref<string>("");
 const isPublic = ref<Boolean>(true);
 const hostEmail = ref<String>("");
 */
-
-// Tab navigation
-const activeTab = ref<"details" | "settings">("details");
-
-declare const google: any;
-
-// Initialize Google Places Autocomplete
-const initializeAutocomplete = () => {
-  if (!window.google) {
-    console.error("Google Maps API is not loaded");
-    return;
-  }
-
-  const input = document.getElementById("event-address") as HTMLInputElement;
-  if (!input) {
-    console.error("Address input field is not found");
-    return;
-  }
-
-  // Initialize Autocomplete
-  autocomplete.value = new google.maps.places.Autocomplete(input, {
-    fields: ["formatted_address", "geometry"],
-  });
-
-
-  // Listener for when a place is selected
-  google.maps.event.addListener(autocomplete.value, "place_changed", () => {
-    const place = autocomplete.value.getPlace();
-    if (place?.formatted_address && place?.geometry) {
-      address.value = place.formatted_address;
-      inputValue.value = place.formatted_address; // Update input value
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      mapImageUrl.value = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=${googleMapsApiKey}`;
-    } else {
-      console.error("No valid place selected");
-      // Reset the input if no place is selected
-      inputValue.value = "";
-    }
-  });
-
-  // Update the v-model value directly when typing
-  input.addEventListener("input", (event) => {
-    inputValue.value = (event.target as HTMLInputElement).value;
-  });
-};
-
-watch(inputValue, (newValue) => {
-  if (newValue.trim() === "") {
-    address.value = ""; // Clear the selected address if input is empty
-    mapImageUrl.value = "";
-  }
-});
-
-// Initialize functionality on mount
-onMounted(() => {
-  initializeAutocomplete();
-  updateSidebarWidth();
-  window.addEventListener("resize", updateSidebarWidth);
-});
-
-// Cleanup on unmount
-onUnmounted(() => {
-  window.removeEventListener("resize", updateSidebarWidth);
-});
-
-// Adjust sidebar width dynamically based on screen size
-const updateSidebarWidth = () => {
-  sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
-};
-
-window.addEventListener("resize", updateSidebarWidth);
-onUnmounted(() => {
-  window.removeEventListener("resize", updateSidebarWidth);
-});
-
 /*// Computed properties
 const isFormValid = computed((): boolean => {
   return (
@@ -150,15 +260,6 @@ const createEvent = async () => {
   }
 };
 */
-// Methods
-function toggleEventType(isSingle: boolean): void {
-  isSingleEvent.value = isSingle;
-}
-
-function validateEventName(): void {
-  eventNameValid.value = eventName.value.trim().length > 0;
-}
-
 /*function submitEvent(): void {
   if (isFormValid.value) {
     console.log("Event submitted with the following details:", {
@@ -179,97 +280,6 @@ function validateEventName(): void {
     alert("Please fill in all required fields.");
   }
 }*/
-
-// Reactive state
-const links = ref<string[]>([]); // List of links
-const newLink = ref<string>(""); // New link input
-const isRemoveMode = ref(false); // Toggle remove mode
-
-
-// Function to add a new link
-function addLink(link: string) {
-  if (link.trim() !== "") {
-    links.value.push(link);
-    newLink.value = ""; // Clear the input after adding
-  }
-}
-
-// Function to remove a link by index
-function removeLink(index: number) {
-  links.value.splice(index, 1);
-}
-
-// Toggle remove mode
-function toggleRemoveMode() {
-  isRemoveMode.value = !isRemoveMode.value;
-}
-
-
-// Reactive states for new sections
-const selectedLayout = ref<string | null>(null);
-
-const fontStyle = ref<Record<string, any>>({
-  fontFamily: "Arial",
-  fontSize: 48,
-  bold: false,
-  italic: false,
-  underline: false,
-  color: "#000000",
-});
-
-function updateFontStyle(property: string, value: any) {
-  fontStyle.value[property] = value;
-}
-
-// Image gallery
-const gallery = ref([
-  { id: 1, src:new URL('@/assets/Bike.jpg', import.meta.url).href, theme: "Bike" },
-  { id: 2, src:new URL('@/assets/Christmas.jpg', import.meta.url).href, theme: "Christmas" },
-  { id: 3, src:new URL('@/assets/Confetti.jpg', import.meta.url).href, theme: "Confetti" },
-  { id: 4, src:new URL('@/assets/Default_Invite.jpg', import.meta.url).href, theme: "Default" },
-  { id: 5, src:new URL('@/assets/Dog.jpg', import.meta.url).href, theme: "Dog" },
-  { id: 6, src:new URL('@/assets/Dry_Flower.jpg', import.meta.url).href, theme: "Flower" },
-  { id: 7, src:new URL('@/assets/Easter.jpg', import.meta.url).href, theme: "Easter" },
-  { id: 8, src:new URL('@/assets/Football.jpg', import.meta.url).href, theme: "Football" },
-  { id: 9, src:new URL('@/assets/Fourth.jpg', import.meta.url).href, theme: "Fourth" },
-  { id: 10, src:new URL('@/assets/Gamer.jpg', import.meta.url).href, theme: "Gamer" },
-  { id: 11, src:new URL('@/assets/Haley\'s_Birthday_Event_Page.jpg', import.meta.url).href, theme: "Birthday" },
-  { id: 12, src:new URL('@/assets/Hanukkah.jpg', import.meta.url).href, theme: "Hanukkah" },
-  { id: 13, src:new URL('@/assets/Hike.jpg', import.meta.url).href, theme: "Hike" },
-  { id: 14, src:new URL('@/assets/Joy.jpg', import.meta.url).href, theme: "Joy" },
-  { id: 15, src:new URL('@/assets/Lisa\'s_Baby_Shower_Event_Page.jpg', import.meta.url).href, theme: "Baby Shower" },
-  { id: 16, src:new URL('@/assets/Love.jpg', import.meta.url).href, theme: "Love" },
-  { id: 17, src:new URL('@/assets/Pineapple.jpg', import.meta.url).href, theme: "Pineapple" },
-  { id: 18, src:new URL('@/assets/PinkPurple_Birthday.jpg', import.meta.url).href, theme: "Purple_Birthday" },
-  { id: 19, src:new URL('@/assets/Rose_Invite.jpg', import.meta.url).href, theme: "Rose" },
-  { id: 20, src:new URL('@/assets/Soccer.jpg', import.meta.url).href, theme: "Soccer" },
-  { id: 21, src:new URL('@/assets/Thanksgiving.jpg', import.meta.url).href, theme: "Thanksgiving" },
-  { id: 22, src:new URL('@/assets/Wedding.jpg', import.meta.url).href, theme: "Wedding" },
-  // Add more images with themes as needed
-]);
-
-// Search query
-const searchQuery = ref("");
-
-// Selected image
-const selectedImage = ref<number | null>(null);
-
-// Filtered gallery based on search query
-const filteredGallery = computed(() =>
-    gallery.value.filter(
-        (image) =>
-            image.theme.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            searchQuery.value.trim() === ""
-    )
-);
-
-// Function to select an image
-function selectImage(imageId: number): void {
-  selectedImage.value = imageId;
-}
-
-// Add save logic here, such as sending the data to an API or storing it locally
-
 </script>
 
 <template>
@@ -394,6 +404,7 @@ function selectImage(imageId: number): void {
                       v-model="inputValue"
                       placeholder="Enter address"
                       required
+                      style="width: 100%;"
                   />
                 </div>
                 <div>
@@ -459,10 +470,25 @@ function selectImage(imageId: number): void {
             <legend>Customize the Font</legend>
             <div class="font-customization">
               <select v-model="fontStyle.fontFamily">
+                <option value="'Allura', cursive">Allura</option>
                 <option value="Arial">Arial</option>
+                <option value="'Dancing Script', cursive">Dancing Script</option>
+                <option value="Courier New">Courier New</option>
+                <option value="'Great Vibes', cursive">Great Vibes</option>
+                <option value="Georgia">Georgia</option>
+                <option value="'Lato', sans-serif">Lato</option>
+                <option value="Lucida Console">Lucida Console</option>
+                <option value="'Montserrat', sans-serif">Montserrat</option>
+                <option value="'Open Sans', sans-serif">Open Sans</option>
+                <option value="'Pacifico', cursive">Pacifico</option>
+                <option value="'Poppins', sans-serif">Poppins</option>
+                <option value="'Roboto', sans-serif">Roboto</option>
+                <option value="'Satisfy', cursive">Satisfy</option>
+                <option value="Tahoma">Tahoma</option>
                 <option value="Times New Roman">Times New Roman</option>
                 <option value="Verdana">Verdana</option>
-                <!-- Add more font families as needed -->
+
+                <!-- Add more fonts here -->
               </select>
               <input
                   type="number"
@@ -502,6 +528,9 @@ function selectImage(imageId: number): void {
     fontStyle: fontStyle.italic ? 'italic' : 'normal',
     textDecoration: fontStyle.underline ? 'underline' : 'none',
     color: fontStyle.color,
+    backgroundColor: getContrastingBackground(fontStyle.color),
+    padding: '10px', // Optional for better readability
+     borderRadius: '5px' // Optional for styling
   }">
               Sample Text Preview
             </div>
@@ -512,78 +541,108 @@ function selectImage(imageId: number): void {
         <!-- Event Settings Section -->
         <section v-if="activeTab === 'settings'" class="event-settings">
           <section class="guest-settings">
-            <h2>Guest Settings</h2>
-            <div class="toggle-setting">
-              <label>Request Child Count</label>
-              <input type="checkbox" v-model="requestChildCount"/>
-            </div>
-            <div class="toggle-setting">
-              <label>Limit Additional Guests</label>
-              <input type="checkbox" v-model="limitGuests"/>
-            </div>
-            <div class="toggle-setting">
-              <label>Allow Guests to RSVP</label>
-              <input type="checkbox" v-model="allowRSVP"/>
-            </div>
-          </section>
-
-          <section class="host-settings">
-            <h2>Host Settings</h2>
-            <label for="host-first-name">Hosted By</label>
-            <input
-              id="host-first-name"
-              class="event-input"
-              v-model="hostFirstName"
-              placeholder="Insert Host First Name"
-            />
-            <input
-              id="host-last-name"
-              class="event-input"
-              v-model="hostLastName"
-              placeholder="Insert Host Last Name"
-            />
-            <div class="toggle-setting">
-              <label>Get Notified of RSVPs</label>
-              <input type="checkbox" v-model="notifyRSVPs"/>
-            </div>
-
-
-            <section class="event-links">
-              <h2>Links</h2>
-
-              <!-- Input and Add Link Button -->
-              <div class="add-link-section">
-                <input
-                    type="text"
-                    v-model="newLink"
-                    placeholder="Enter link URL"
-                    class="link-input"
-                />
-                <button class="add-link-button" @click="addLink(newLink)">
-                  Add a Link to Your Invite
-                </button>
-                <button class="remove-mode-button" @click="toggleRemoveMode">
-                  Remove
+            <fieldset>
+              <legend>Guest Settings</legend>
+              <div class="toggle-setting">
+                <label for="request-child-count">Request Child Count</label>
+                <button :class="{'active-toggle': requestChildCount}" @click="requestChildCount = !requestChildCount">
+                  {{ requestChildCount ? 'ON' : 'OFF' }}
                 </button>
               </div>
-
-              <!-- List of Links -->
-              <ul v-if="links.length > 0" class="links-list">
-                <li v-for="(link, index) in links" :key="index" class="link-item">
-                  <span>{{ link }}</span>
-                  <button
-                      v-if="isRemoveMode"
-                      class="remove-link-button"
-                      @click="removeLink(index)"
-                  >
-                    -
-                  </button>
-                </li>
-              </ul>
-            </section>
-
+              <div class="toggle-setting">
+                <label for="limit-additional-guests">Limit Additional Guests</label>
+                <button :class="{'active-toggle': limitGuests}" @click="limitGuests = !limitGuests">
+                  {{ limitGuests ? 'ON' : 'OFF' }}
+                </button>
+              </div>
+              <div class="toggle-setting">
+                <label for="allow-rsvp">Allow Guests to RSVP</label>
+                <button :class="{'active-toggle': allowRSVP}" @click="allowRSVP = !allowRSVP">
+                  {{ allowRSVP ? 'ON' : 'OFF' }}
+                </button>
+              </div>
+            </fieldset>
 
           </section>
+        <section>
+          <fieldset>
+            <legend>Host Settings</legend>
+            <div class="host-setting">
+              <label for="host-first-name">Host First Name</label>
+              <input
+                  id="host-first-name"
+                  class="event-input"
+                  v-model="hostFirstName"
+                  placeholder="Insert Host First Name"
+              />
+            </div>
+            <div class="host-setting">
+              <label for="host-last-name">Host Last Name</label>
+              <input
+                  id="host-last-name"
+                  class="event-input"
+                  v-model="hostLastName"
+                  placeholder="Insert Host Last Name"
+              />
+            </div>
+            <div class="toggle-setting">
+              <label for="notify-rsvps">Get Notified of RSVPs</label>
+              <button
+                  :class="{'active-toggle': notifyRSVPs}"
+                  @click="notifyRSVPs = !notifyRSVPs"
+              >
+                {{ notifyRSVPs ? 'ON' : 'OFF' }}
+              </button>
+            </div>
+            <div class="toggle-setting">
+              <label for="event-public-private">Event is Public or Private</label>
+              <button
+                  class="toggle-button"
+                  :class="{'active-toggle': isPrivate}"
+                  @click="isPrivate = !isPrivate"
+              >
+                {{ isPrivate ? 'Private' : 'Public' }}
+              </button>
+            </div>
+          </fieldset>
+        </section>
+
+          <fieldset class="event-links">
+            <legend>Links</legend>
+            <div class="add-link-section">
+              <input
+                  type="text"
+                  v-model="newLink"
+                  placeholder="Enter link URL"
+                  class="link-input"
+              />
+              <button class="add-link-button" @click="addLink(newLink)">
+                Add Link
+              </button>
+              <button
+                  v-if="links.length > 0"
+                  class="remove-mode-button"
+                  @click="toggleRemoveMode"
+              >
+                {{ isRemoveMode ? "Done" : "Remove Mode" }}
+              </button>
+            </div>
+
+            <ul v-if="links.length > 0" class="links-list">
+              <li v-for="(link, index) in links" :key="index" class="link-item">
+                <a :href="link" target="_blank" class="link-url">{{ link }}</a>
+                <button
+                    v-if="isRemoveMode"
+                    class="remove-link-button"
+                    @click="removeLink(index)"
+                >
+                  ×
+                </button>
+              </li>
+            </ul>
+            <p v-else class="no-links-message">No links added yet.</p>
+          </fieldset>
+
         </section>
       </div>
     </main>
@@ -743,21 +802,46 @@ button:hover {
 }
 
 .event-links {
-  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+.event-links legend {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FF6B35;
+  padding: 0 10px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #FF6B35;
+  display: inline-block;
+}
+
+/* Input and Button Alignment */
 .add-link-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 10px; /* Space between input and buttons */
+  width: 100%; /* Ensure the section spans the fieldset */
 }
 
 .link-input {
-  flex: 1;
-  padding: 8px;
+  flex: 1; /* Input spans remaining space */
+  padding: 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.link-input:focus {
+  border-color: #E63946;
+  outline: none;
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.4);
 }
 
 .add-link-button,
@@ -767,9 +851,10 @@ button:hover {
   background-color: #ff6b35;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
+  white-space: nowrap; /* Prevent button text from wrapping */
 }
 
 .add-link-button:hover,
@@ -778,24 +863,39 @@ button:hover {
   transform: scale(1.05);
 }
 
+/* Links List */
 .links-list {
   margin-top: 15px;
   list-style: none;
   padding: 0;
+  width: 100%; /* Ensure the list spans the fieldset */
 }
 
 .link-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  justify-content: space-between; /* Space between link and remove button */
+  padding: 8px 0; /* Add space between items */
+  border-bottom: 1px solid #eee; /* Divider between items */
 }
 
-.link-item span {
-  flex: 1;
-  font-size: 1rem;
+.link-item:last-child {
+  border-bottom: none; /* Remove divider for the last item */
 }
 
+.link-url {
+  flex: 1; /* Ensures the link spans available space */
+  color: #007bff;
+  text-decoration: none;
+  word-break: break-word; /* Break long URLs to fit in smaller screens */
+  margin-right: 10px; /* Add space between the link and remove button */
+}
+
+.link-url:hover {
+  text-decoration: underline;
+}
+
+/* Remove Button */
 .remove-link-button {
   background-color: #ff6b35;
   color: white;
@@ -808,12 +908,21 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .remove-link-button:hover {
   background-color: #d9432c;
+  transform: scale(1.1);
 }
 
+/* Empty Links Message */
+.no-links-message {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 10px;
+  text-align: center;
+}
 
 .image-gallery {
   display: grid;
@@ -843,6 +952,67 @@ button:hover {
   object-fit: cover; /* Ensure the image scales and crops to fit the container */
 }
 
+/* Layout for Host First Name and Last Name */
+.host-setting {
+  display: flex;
+  flex-direction: column; /* Stack label and input vertically */
+  margin-bottom: 15px; /* Space between fields */
+}
+
+.host-setting label {
+  margin-bottom: 5px; /* Space between label and input */
+  font-weight: bold;
+}
+
+.host-setting input {
+  width: 100%; /* Input spans the full width */
+  max-width: 400px; /* Optional: Limit input width */
+  padding: 8px; /* Add padding for better usability */
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.host-setting input:focus {
+  border-color: #E63946; /* Add focus styling */
+  outline: none;
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.4);
+}
+
+.toggle-setting {
+  display: flex; /* Enables flexbox layout */
+  justify-content: space-between; /* Space between label and button */
+  align-items: center; /* Aligns label and button vertically */
+  margin-bottom: 10px;
+  width: 100%; /* Ensure the container spans the full width */
+}
+
+.toggle-setting label {
+  flex: 1; /* Makes the label take up available space */
+  margin-bottom: 0; /* Removes extra space below the label */
+  font-weight: bold;
+  text-align: left; /* Aligns label text to the left */
+  padding-right: 10px; /* Optional spacing */
+}
+
+.toggle-setting button {
+  flex: 0; /* Ensures button does not stretch */
+  min-width: 120px; /* Consistent button width */
+  padding: 5px 15px; /* Adjust padding for better sizing */
+  font-size: 16px; /* Ensure readable text */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f1b8a3; /* Default button background */
+  text-align: center;
+  transition: background-color 0.3s;
+}
+
+.toggle-setting button.active-toggle {
+  background-color: #ff6b35; /* Active state background */
+  color: white;
+}
 
 @media screen and (max-width: 768px) {
   .tabs button {

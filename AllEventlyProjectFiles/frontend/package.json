@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@pinegrow/vite-plugin": "^3.0.60",
+    "@types/googlemaps": "^3.43.3",
     "@types/node": "^22.8.4",
     "@vitejs/plugin-vue": "^5.1.4",
     "typescript": "^5.5.3",
