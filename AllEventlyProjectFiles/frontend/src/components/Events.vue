@@ -40,7 +40,7 @@ const getPublicEvents = async () => {
     });
     if (response.ok) {
       const data = await response.json();
-      if (!data.publicEvents || data.publicEvents.length === 0) {
+      if (!data.publicEvents) {
         console.log("No public events to display.");
       } else {
         publicEvents.value = data.publicEvents;
@@ -53,7 +53,34 @@ const getPublicEvents = async () => {
     console.error(error);
   }
 }
-
+/*
+const getHostedEvents = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (!data.hostedEvents || data.hostedEvents.length === 0) {
+        console.log("No hosted events to display.");
+      } else {
+        hostedEvents.value = data.hostedEvents;
+        console.log(hostedEvents.value);
+      }
+    } else {
+      console.log("Error fetching hosted events.");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+*/
 const getCurrentUser = async () => {
   try {
     const response = await fetch('https://all-evently-backend.vercel.app/api/currentuser', {
