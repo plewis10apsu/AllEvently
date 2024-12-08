@@ -37,15 +37,34 @@ const nearbyBounds = {  north: 36.678118, south: 34.982972, east: -81.6469, west
 const activeTab = ref<"details" | "settings">("details");
 const selectedLayout = ref("layout-default");
 const isPrivate = ref<boolean>(true);
+const maxAdditionalGuests = ref<number>(0);
+const hostEmail = ref<string>("johndoe@gmail.com");
+
+const recurringSettings = ref({
+  unit: "week", // Frequency unit: day, week, month
+  interval: 1, // Number of intervals
+  selectedDays: [] as string[], // Selected days for weekly recurrence
+  monthOption: "specific-day", // Monthly recurrence option
+  specificDay: 1, // Specific day of the month for monthly recurrence
+  nthWeek: "1st", // Nth occurrence for monthly recurrence (1st, 2nd, etc.)
+  selectedDay: "Monday", // Day of the week for nth occurrence
+  ends: "never", // End condition: never, on a date, or after occurrences
+  endDate: "", // End date for recurrence
+  occurrences: 1, // Number of occurrences if "after" is selected
+});
+
+const recurring = computed(() => !isSingleEvent.value);
+
+const recurFrequency = ref<number>(1); // Interval frequency (e.g., every 1 week)
+const recurEndDate = ref<string>(""); // End date for recurring events
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 //added some additional necessary variables for database entry - Spenser
 //commenting them out for now
 /*
-const hostEmail = ref<string>("johndoe@gmail.com");
-const recurring = ref<boolean>(false);
-const recurFrequency = ref<number>(0);
-const recurEndDate = ref<string>("");
-const maxAdditionalGuests = ref<number>(0);
+
+
+
 */
 declare const google: any;
 const filteredGallery = computed(() =>
@@ -111,12 +130,17 @@ function addLink(link: string) {
   }
 }
 
-// Function to remove a link by index
+function toggleLimitGuests() {
+  limitGuests.value = !limitGuests.value;
+  if (!limitGuests.value) {
+    maxAdditionalGuests.value = 0; // Reset dropdown value when toggled off
+  }
+}
+
 function removeLink(index: number) {
   links.value.splice(index, 1);
 }
 
-// Toggle remove mode
 function toggleRemoveMode() {
   isRemoveMode.value = !isRemoveMode.value;
 }
@@ -281,8 +305,33 @@ onUnmounted(() => {
 
 // Add save logic here, such as sending the data to an API or storing it locally
 function saveEventDetails() {
+  console.log("Saving event details:", {
+    hostFirstName: hostFirstName.value,
+    hostLastName: hostLastName.value,
+    hostEmail: hostEmail.value,
+    recurring: !isSingleEvent.value,
+    frequency: recurringSettings.value.interval,
+    unit: recurringSettings.value.unit,
+    weeklyDays: recurringSettings.value.unit === "week" ? recurringSettings.value.selectedDays : [],
+    monthlyOption: recurringSettings.value.unit === "month" ? recurringSettings.value.monthOption : null,
+    specificDay:
+        recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "specific-day"
+            ? recurringSettings.value.specificDay
+            : null,
+    nthWeek:
+        recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
+            ? recurringSettings.value.nthWeek
+            : null,
+    selectedDay:
+        recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
+            ? recurringSettings.value.selectedDay
+            : null,
+    endCondition: recurringSettings.value.ends,
+    endDate: recurringSettings.value.ends === "on" ? recurEndDate.value : null,
+    occurrences: recurringSettings.value.ends === "after" ? recurringSettings.value.occurrences : null,
+    // Add other fields as needed
+  });
   alert("Event details saved!");
-  console.log("Saving details:", invitation.value);
 }
 
 // Reactive state
@@ -510,6 +559,120 @@ const createEvent = async () => {
               </div>
             </div>
 
+            <!-- Recurring Event Details -->
+            <div v-if="recurring" class="recurring-event-details">
+              <fieldset>
+                <legend>Repeats</legend>
+                <div class="repeat-options">
+                  <label for="repeat-interval">Every</label>
+                  <input
+                      id="repeat-interval"
+                      type="number"
+                      min="1"
+                      v-model="recurFrequency"
+                  />
+                  <select id="repeat-unit" v-model="recurringSettings.unit">
+                    <option value="day">Day</option>
+                    <option value="week">Week</option>
+                    <option value="month">Month</option>
+                  </select>
+                </div>
+                <!-- Weekly Recurrence: Day Selection -->
+                <div v-if="recurringSettings.unit === 'week'" class="repeat-days">
+                  <p>Select Day(s):</p>
+                  <div class="day-checkboxes">
+                    <label v-for="(day, index) in daysOfWeek" :key="index">
+                      <input
+                          type="checkbox"
+                          :value="day"
+                          v-model="recurringSettings.selectedDays"
+                      />
+                      {{ day }}
+                    </label>
+                  </div>
+                </div>
+                <!-- Monthly Recurrence: Weekday Selection -->
+                <div v-if="recurringSettings.unit === 'month'" class="repeat-monthly">
+                  <p>Repeat on:</p>
+                  <select v-model="recurringSettings.monthOption">
+                    <option value="specific-day">Specific Day</option>
+                    <option value="nth-weekday">Nth Weekday</option>
+                  </select>
+                  <div v-if="recurringSettings.monthOption === 'specific-day'">
+                    <label for="specific-day">Day of the Month</label>
+                    <input
+                        id="specific-day"
+                        type="number"
+                        min="1"
+                        max="31"
+                        v-model="recurringSettings.specificDay"
+                    />
+                  </div>
+                  <div v-else>
+                    <label for="nth-weekday">
+                      <select v-model="recurringSettings.nthWeek">
+                        <option value="1st">1st</option>
+                        <option value="2nd">2nd</option>
+                        <option value="3rd">3rd</option>
+                        <option value="4th">4th</option>
+                        <option value="last">Last</option>
+                      </select>
+                      <select v-model="recurringSettings.selectedDay">
+                        <option v-for="day in daysOfWeek" :key="day" :value="day">
+                          {{ day }}
+                        </option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Ends</legend>
+                <div>
+                  <label>
+                    <input
+                        type="radio"
+                        value="never"
+                        v-model="recurringSettings.ends"
+                    />
+                    Never
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                        type="radio"
+                        value="on"
+                        v-model="recurringSettings.ends"
+                    />
+                    On
+                    <input
+                        type="date"
+                        v-model="recurEndDate"
+                        :disabled="recurringSettings.ends !== 'on'"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <input
+                        type="radio"
+                        value="after"
+                        v-model="recurringSettings.ends"
+                    />
+                    After
+                    <input
+                        type="number"
+                        min="1"
+                        v-model="recurringSettings.occurrences"
+                        :disabled="recurringSettings.ends !== 'after'"
+                    />
+                    times
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
             <!-- Location Inputs -->
             <div class="event-location">
               <div class="event-location-row">
@@ -687,9 +850,17 @@ const createEvent = async () => {
               </div>
               <div class="toggle-setting">
                 <label for="limit-additional-guests">Limit Additional Guests</label>
-                <button :class="{'active-toggle': limitGuests}" @click="limitGuests = !limitGuests">
+                <button :class="{'active-toggle': limitGuests}" @click="toggleLimitGuests">
                   {{ limitGuests ? 'ON' : 'OFF' }}
                 </button>
+              </div>
+
+              <!-- Dropdown appears only if limitGuests is true -->
+              <div v-if="limitGuests" class="guest-limit-dropdown">
+                <label for="max-additional-guests">Maximum Additional Guests</label>
+                <select id="max-additional-guests" v-model="maxAdditionalGuests">
+                  <option v-for="num in 10" :key="num" :value="num">{{ num }}</option>
+                </select>
               </div>
               <div class="toggle-setting">
                 <label for="allow-rsvp">Allow Guests to RSVP</label>
@@ -721,6 +892,19 @@ const createEvent = async () => {
                   placeholder="Insert Host Last Name"
               />
             </div>
+
+            <!-- New Host Email Field -->
+            <div class="host-setting">
+              <label for="host-email">Host Email</label>
+              <input
+                  id="host-email"
+                  class="event-input"
+                  v-model="hostEmail"
+                  placeholder="Insert Host Email"
+                  type="email"
+              />
+            </div>
+
             <div class="toggle-setting">
               <label for="notify-rsvps">Get Notified of RSVPs</label>
               <button
@@ -878,6 +1062,51 @@ legend {
   cursor: not-allowed;
 }
 
+.recurring-event-details {
+  margin-top: 15px;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.repeat-options,
+.repeat-days,
+.repeat-monthly {
+  margin-bottom: 15px;
+}
+
+.day-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.day-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+fieldset legend {
+  font-size: 1.2rem;
+  color: #ff6b35;
+  font-weight: bold;
+}
+
+input[type="number"], input[type="date"], select {
+  width: auto;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+
 .event-location-row {
   display: flex;
   flex-wrap: wrap;
@@ -940,6 +1169,52 @@ button {
 button:hover {
   background-color: #D9432C;
   transform: scale(1.05);
+}
+
+.guest-limit-dropdown {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.guest-limit-dropdown select {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.guest-limit-dropdown label {
+  font-weight: bold;
+}
+
+.host-setting {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.host-setting label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.host-setting input {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.host-setting input:focus {
+  border-color: #E63946;
+  outline: none;
+  box-shadow: 0 0 8px rgba(230, 57, 70, 0.4);
 }
 
 .event-links {
