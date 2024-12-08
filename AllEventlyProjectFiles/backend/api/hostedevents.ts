@@ -55,7 +55,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 return;
             }
             const result = await pool.query('SELECT GET_HOSTED_EVENTS($1);', [body.email]);
-            const hostedEvents = result.rows[0].get_hosted_events;
+            const hostedEvents = result.rows.map(row => row.get_hosted_events);
             res.statusCode = 201;
             res.end(JSON.stringify(hostedEvents));
             return;

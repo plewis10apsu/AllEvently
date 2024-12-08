@@ -55,8 +55,36 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 return;
             }
             const result = await pool.query('SELECT GET_PUBLIC_EVENTS();');
-            const publicEvents = result.rows[0].get_public_events;
-            res.statusCode = 201;
+
+            // Map through the results and parse the event string into a structured object
+            const publicEvents = result.rows.map(row => {
+                const eventString = row.get_public_events; // This is the raw string from the function
+                const eventFields = eventString.match(/\(([^)]+)\)/)[1].split(',');
+
+                return {
+                    event_id: eventFields[0],
+                    email: eventFields[1],
+                    event_name: eventFields[2],
+                    event_address: eventFields[3],
+                    event_date: eventFields[4],
+                    created_at: eventFields[5],
+                    updated_at: eventFields[6],
+                    timezone: eventFields[7],
+                    location: eventFields[8],
+                    is_active: eventFields[9] === 't',
+                    primary_color: eventFields[10],
+                    secondary_color: eventFields[11],
+                    font: eventFields[12],
+                    is_published: eventFields[13] === 't'
+                };
+            });
+
+// Send the cleaned and structured events back to the frontend
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(publicEvents));
+
+            res.statusCode = 200;
             res.end(JSON.stringify(publicEvents));
             return;
         } catch (err) {
