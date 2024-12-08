@@ -57,6 +57,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             const result = await pool.query('SELECT GET_PUBLIC_EVENTS();');
             const publicEvents = result.rows;
             console.log(typeof(result));
+            console.log(publicEvents);
             res.statusCode = 200;
             res.end(JSON.stringify(publicEvents));
             return;
