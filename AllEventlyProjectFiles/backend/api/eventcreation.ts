@@ -44,54 +44,82 @@ const allowCors = (fn: (req: IncomingMessage, res: ServerResponse) => Promise<vo
         return await fn(req, res);
     };
 
+const prepareQueryData = (body: Record<string, any>, columns: string[]) => {
+    const providedColumns: string[] = [];
+    const values: any[] = [];
+    const placeholders: string[] = [];
+
+    columns.forEach((column, index) => {
+        if (body[column] !== undefined) {
+            providedColumns.push(column);
+            values.push(body[column]); // Add actual value
+            placeholders.push(`$${values.length}`); // Add placeholder
+        } else {
+            providedColumns.push(column);
+            placeholders.push('DEFAULT'); // Use DEFAULT for missing fields
+        }
+    });
+
+    return { providedColumns, values, placeholders };
+};
+
+const validateInput = (body: Record<string, any>, requiredFields: string[]) => {
+    const missingFields = requiredFields.filter(field => body[field] === undefined || body[field] === null);
+
+    if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+};
+
+const requiredFields = [
+    'hostEmail',
+    'hostFirstName',
+    'hostLastName',
+    'address',
+];
+
 const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     if (req.method === 'POST') {
         try {
             const body = await parseJsonBody(req);
-            const {
-                host_email,
-                host_first_name,
-                host_last_name,
-                event_name,
-                event_location,
-                event_end_date,
-                is_public
-            } = body;
+            validateInput(body, requiredFields);
+            const hostFullName = `${body.hostFirstName} ${body.hostLastName}`;
+            const columns = [
+                'hostEmail',
+                'hostFullName',
+                'eventName',
+                'address',
+                'date',
+                'startTime',
+                'endTime',
+                'timeZone',
+                'selectedLayout',
+                'selectedImage',
+                'backGroundColor',
+                'fontColor',
+                'font',
+                'isPrivate',
+                'recurring',
+                'recurrenceFrequency',
+                'recurrenceEndDate',
+                'requestChildCount',
+                'limitGuests',
+                'maxAdditionalGuests',
+                'notifyRSVPs',
+            ];
+            const { providedColumns, values, placeholders } = prepareQueryData(
+                { ...body, hostFullName }, // Add hostFullName to the body for query preparation
+                columns
+            );
+            const query = `
+                INSERT INTO Events (${providedColumns.join(', ')})
+                VALUES (${placeholders.join(', ')})`;
 
-// Validate all required fields
-            if (!host_email || !host_first_name || !host_last_name || !event_name || !event_location || event_end_date === undefined || is_public === undefined) {
-                res.statusCode = 400;
-                res.end(JSON.stringify({message: "All fields are required."}));
-                return;
-            }
-
-// Combine first and last name to create host_name
-            const host_name: string = `${host_first_name} ${host_last_name}`;
-
-            try {
-                // Construct the query and parameters
-                const query = `
-        INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
-        VALUES ($1, $2, $3, $4, $5, $6);
-    `;
-                const values = [host_email, host_name, event_name, event_location, event_end_date, is_public];
-
-                // Execute the query
-                await pool.query(query, values);
-
-                // Send a success response
-                res.statusCode = 201;
-                res.end(JSON.stringify({message: "Event created successfully."}));
-            } catch (error) {
-                console.error("Database error:", error);
-
-                // Handle database errors
-                res.statusCode = 500;
-                res.end(JSON.stringify({message: "Failed to create event. Please try again later."}));
-            }
-
+            await pool.query(query, values);
+            res.statusCode = 201;
+            res.end(JSON.stringify({ message: 'Event successfully created.'} ));
         } catch (error) {
-            res.statusCode = 501;
+            res.statusCode = 500;
             res.end(JSON.stringify({message: "Server error creating event. Please try again."}));
             return;
         }
@@ -102,5 +130,4 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         return;
     }
 };
-
 export default allowCors(handler);

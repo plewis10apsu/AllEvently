@@ -37,6 +37,16 @@ const nearbyBounds = {  north: 36.678118, south: 34.982972, east: -81.6469, west
 const activeTab = ref<"details" | "settings">("details");
 const selectedLayout = ref("layout-default");
 const isPrivate = ref<boolean>(true);
+
+//added some additional necessary variables for database entry - Spenser
+//commenting them out for now
+/*
+const hostEmail = ref<string>("johndoe@gmail.com");
+const recurring = ref<boolean>(false);
+const recurFrequency = ref<number>(0);
+const recurEndDate = ref<string>("");
+const maxAdditionalGuests = ref<number>(0);
+*/
 declare const google: any;
 const filteredGallery = computed(() =>
     gallery.value.filter(
@@ -110,7 +120,51 @@ function removeLink(index: number) {
 function toggleRemoveMode() {
   isRemoveMode.value = !isRemoveMode.value;
 }
-
+/*
+const createEvent = async () => {
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        hostEmail: hostEmail.value,
+        hostFirstName: hostFirstName.value,
+        hostLastName: hostLastName.value,
+        eventName: eventName.value,
+        address: address.value,
+        date: invitation.date,
+        startTime: invitation.startTime,
+        endTime: endTime.value,
+        timeZone: timeZone.value,
+        selectedLayout: selectedLayout.value,
+        selectedImage: selectedImage.value,
+        backGroundColor: fontStyle.backGroundColor,
+        fontColor: fontStyle.fontColor,
+        font: fontStyle.font,
+        isPrivate: isPrivate.value,
+        recurring: recurring.value,
+        recurrenceFrequency: recurFrequency.value,
+        recurrenceEndDate: recurEndDate.value,
+        requestChildCount: requestChildCount.value,
+        limitGuests: limitGuests.value,
+        maxAdditionalGuests: maxAdditionalGuests.value,
+        notifyRSVPs: notifyRSVPs.value
+      }),
+    });
+    if (response.ok) {
+      //change later
+      console.log("Event successfully created!");
+      alert("Event successfully created!");
+    } else {
+      alert("Error creating event.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Error creating event.");
+  }
+};
 /*
 
 function selectLayout(layoutId: string): void {
