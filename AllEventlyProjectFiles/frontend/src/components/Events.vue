@@ -38,22 +38,40 @@ const getPublicEvents = async () => {
         email: email.value,
       }),
     });
+
     if (response.ok) {
       const data = await response.json();
-      console.log("Contents of publicEvents: ",data.publicEvents);
-      if (!data.publicEvents) {
-        console.log("No public events to display.");
+      console.log("Received data: ", data);  // Debugging the response
+
+      if (Array.isArray(data) && data.length > 0) {
+        // Map through the result to transform it into the Event interface structure
+        publicEvents.value = data.map((item: any) => ({
+          id: item.event_id,              // Mapped from event_id
+          title: item.event_name,         // Mapped from event_name
+          type: item.location,            // Mapped from location (assuming it's the type)
+          venue: item.event_address,      // Mapped from event_address
+          date: item.event_date,          // Mapped from event_date
+          time: item.updated_at,          // Mapped from updated_at (you can adjust as needed)
+          host: item.email,               // Mapped from email
+          imageUrl: '',                   // Placeholder for image URL, can be adjusted if available
+          venueLink: '',                  // Placeholder for venue link, can be adjusted if available
+          venueAddress: item.event_address, // Same as venue (event_address)
+          isHost: item.is_active,         // Assumed to map from is_active
+          isGuest: item.is_published,     // Assumed to map from is_published
+        }));
+        console.log("Public events stored: ", publicEvents.value);
       } else {
-        publicEvents.value = data.publicEvents;
-        console.log(publicEvents.value);
+        console.log("No public events to display.");
+        publicEvents.value = [];
       }
     } else {
       console.log("Error fetching public events.");
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error during fetch operation: ", error);
   }
-}
+};
+
 /*
 const getHostedEvents = async () => {
   try {
