@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
@@ -15,48 +15,18 @@ const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
 
 // Ensure `currentUser` has valid data fetched from the API
-const firstName = ref("John"); // Replace with actual dynamic data
-const lastName = ref("Doe");   // Replace with actual dynamic data
-const email = ref("john.doe@example.com"); // Replace with actual dynamic data
-//This was a MERGE conflict, but I kept the below changes from the server for reference -PEGGY (My changes the 3 lines above)
-const userEmail = ref<String>("");
-const userFirstName = ref<string>("");
-const userLastName = ref<string>("");
-
+const firstName = ref<string>("John"); // Replace with actual dynamic data
+const lastName = ref<string>("Doe");   // Replace with actual dynamic data
+const email = ref<string>("john.doe@example.com"); // Replace with actual dynamic data
 
 // Empty ref for events to be populated later
 const events = ref<Event[]>([]);
 const publicEvents = ref<Event[]>([]);
 //defining the router that will be used to obtain the user's id from Login.vue
-const router = useRouter();
+const route = useRoute();
 //the id itself
-const userId =  ref(router.currentRoute.value.params.userId);
-/*
-const fetchEvents = async () => {
-  try {
-    const response = await fetch('https://all-evently-backend.vercel.app/api/events', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: currentUser.value
-      }),
-    });
-    if (response.ok) {
-      //const data = await response.json();
-      events.value = await response.json();
-      alert("Got the events successfully!");
-    } else {
-      console.error('Error fetching events:', response.statusText);
-      alert("Failed to fetch events");
-    }
+const userId =  ref(route.params.userId);
 
-  } catch (error) {
-    console.log(error);
-  }
-};
-*/
 const getPublicEvents = async () => {
   try {
     const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
@@ -65,7 +35,7 @@ const getPublicEvents = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: userEmail.value,
+        email: email.value,
       }),
     });
     if (response.ok) {
@@ -83,7 +53,6 @@ const getPublicEvents = async () => {
     console.error(error);
   }
 }
-
 
 const getCurrentUser = async () => {
   try {
@@ -103,11 +72,11 @@ const getCurrentUser = async () => {
       }
       else {
         const userData = data.user.split(",");
-        userEmail.value = userData[0];
-        userFirstName.value = userData[1];
-        userLastName.value = userData[2];
-        userEmail.value = userEmail.value.replace(/\(/g, "");
-        userLastName.value = userLastName.value.replace(/\)/g, "");
+        email.value = userData[0];
+        firstName.value = userData[1];
+        lastName.value = userData[2];
+        email.value = email.value.replace(/\(/g, "");
+        lastName.value = lastName.value.replace(/\)/g, "");
       }
     } else {
       console.error('Error fetching current user');
@@ -130,29 +99,12 @@ onUnmounted(() => {
 });
 
 const currentUser = ref<string>(''); // Empty string initially
-/*
-// Fetch current username from the API
-const fetchCurrentUser = async () => {
-  try {
-    const response = await axios.get<{ names: string[] }>('http://localhost:4000/api/pet-names');
-    if (response.data.names.length > 0) {
-      currentUser.value = response.data.names[0]; // Use the first name
-    } else {
-      currentUser.value = 'Guest';
-    }
-    console.log('Fetched Current User:', currentUser.value);
-  } catch (error) {
-    console.error('Error fetching pet names:', error);
-    currentUser.value = 'Guest';
-  }
-};
-*/
+
 // Fetch user data on component mount
 onMounted(async () => {
-  //fetchCurrentUser();
   await getCurrentUser();
+  await getPublicEvents();
   updateSidebarWidth();
-  getPublicEvents();
 });
 
 
