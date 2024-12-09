@@ -36,9 +36,9 @@ const navigateTo = (path: string, query: Record<string, string> = {}, routeName?
   }
 };
 
-const firstName = ref<string>(localStorage.getItem('firstName') || "John");
-const lastName = ref<string>(localStorage.getItem('lastName') || "Doe");
-const email = ref<string>(localStorage.getItem('email') || "john.doe@example.com");
+const firstName = ref<string>(localStorage.getItem('firstName') || " ");
+const lastName = ref<string>(localStorage.getItem('lastName') || " ");
+const email = ref<string>(localStorage.getItem('email') || " ");
 
 </script>
 

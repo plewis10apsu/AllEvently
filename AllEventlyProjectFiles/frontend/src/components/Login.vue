@@ -118,9 +118,6 @@ const handleSignup = async () => {
       if (response.ok) {
         const data = await response.json();
         alert(data.message);
-        const stringemail: string = email.value;
-        const stringpw: string = password.value;
-        alert("Account details:\nemail: "+stringemail+"\nPassword: "+stringpw);
       // The case of a negative database response
       } else {
         response.json().then(data => {
