@@ -230,11 +230,6 @@ function viewInvitation() {
           ? `<div class="event-note">${details.note}</div>`
           : ""
   }
-
-        <!-- QR Code Placeholder -->
-        <div class="qr-code-placeholder">
-          QR Code
-        </div>
       </div>
     </body>
     </html>

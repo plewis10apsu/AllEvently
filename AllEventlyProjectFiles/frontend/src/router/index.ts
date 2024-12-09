@@ -54,7 +54,7 @@ const routes = [
         props: true,
     },
     {
-        path: '/chat/:eventId',
+        path: '/chat',
         name: 'Chat',
         component: Chat,
         props: true, // Allows route params to be passed as props
