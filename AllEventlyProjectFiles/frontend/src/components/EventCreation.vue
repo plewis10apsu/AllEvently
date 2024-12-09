@@ -38,7 +38,7 @@ const activeTab = ref<"details" | "settings">("details");
 const selectedLayout = ref("layout-default");
 const isPrivate = ref<boolean>(true);
 const maxAdditionalGuests = ref<number>(0);
-const hostEmail = ref<string>("johndoe@gmail.com");
+const hostEmail = ref<string>("enter-host-email@gmail.com");
 
 const recurringSettings = ref({
   unit: "week", // Frequency unit: day, week, month
@@ -52,7 +52,6 @@ const recurringSettings = ref({
   endDate: "", // End date for recurrence
   occurrences: 1, // Number of occurrences if "after" is selected
 });
-
 const recurring = computed(() => !isSingleEvent.value);
 const recurFrequency = ref<number>(1); // Interval frequency (e.g., every 1 week)
 const recurEndDate = ref<string>(""); // End date for recurring events
@@ -60,6 +59,13 @@ const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 
 declare const google: any;
 
+function selectImage(imageId: number): void {
+  selectedImage.value = imageId;
+}
+const selectedImageUrl = computed(() => {
+  const image = gallery.value.find((img) => img.id === selectedImage.value);
+  return image ? image.src : null;
+});
 const filteredGallery = computed(() =>
     gallery.value.filter(
         (image) =>
@@ -68,16 +74,6 @@ const filteredGallery = computed(() =>
     )
 );
 
-const selectedImageUrl = computed(() => {
-  const image = gallery.value.find((img) => img.id === selectedImage.value);
-  return image ? image.src : null;
-});
-
-function selectImage(imageId: number): void {
-  selectedImage.value = imageId;
-}
-
-// Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
 };
@@ -252,60 +248,27 @@ onUnmounted(() => {
 
 const createEvent = async () => {
   console.log("Event Data to Send:", {
-    hostEmail: hostEmail.value,
-    hostFirstName: hostFirstName.value,
-    hostLastName: hostLastName.value,
-    eventName: eventName.value,
-    address: invitation.value.locationAddress,
-    date: invitation.value.date,
-    startTime: invitation.value.startTime,
-    endTime: endTime.value,
-    timeZone: timeZone.value,
-    selectedLayout: selectedLayout.value,
-    selectedImage: selectedImage.value,
-    backGroundColor: fontStyle.value.backgroundColor,
-    fontColor: fontStyle.value.color,
-    font: fontStyle.value.fontFamily,
-    isPrivate: isPrivate.value,
-    recurring: recurring.value,
-    recurrenceFrequency: recurFrequency.value,
-    recurrenceEndDate: recurEndDate.value,
-    requestChildCount: requestChildCount.value,
-    limitGuests: limitGuests.value,
-    maxAdditionalGuests: maxAdditionalGuests.value,
-    notifyRSVPs: notifyRSVPs.value,
+    event_host: hostEmail.value,
+    host_name: `${hostFirstName.value || "DefaultFirstName"} ${hostLastName.value || "DefaultLastName"}`,
+    event_name: eventName.value || "Untitled Event",
+    event_location: invitation.value.locationAddress || "No Address Provided",
+    event_start_date: `${invitation.value.date || new Date().toISOString().split("T")[0]}T${invitation.value.startTime || "00:00"}`,
+    event_end_date: endTime.value ? `${invitation.value.date || new Date().toISOString().split("T")[0]}T${endTime.value}` : null,
+    event_time_zone: timeZone.value || "UTC",
+    invitation_layout: selectedLayout.value || "Center",
+    background_image: selectedImage.value || 1,
+    font_background_color: fontStyle.value.backgroundColor || "#000000",
+    font_color: fontStyle.value.color || "#FFFFFF",
+    font: fontStyle.value.fontFamily || "italic bold 20px arial,serif",
+    is_public: !isPrivate.value, // Flip for private/public
+    reoccurs: recurring.value || false,
+    reoccur_freq: recurFrequency.value || null,
+    end_reoccur: recurEndDate.value || null,
+    request_child_num: requestChildCount.value || false,
+    limit_additional_guests: limitGuests.value || false,
+    max_additional_guests: maxAdditionalGuests.value || 0,
+    notify_host: notifyRSVPs.value || true,
   });
-  if (!hostFirstName.value) hostFirstName.value = "DefaultFirstName";
-  if (!hostLastName.value) hostLastName.value = "DefaultLastName";
-  if (!eventName.value) eventName.value = "Untitled Event";
-  if (!invitation.value.locationAddress) invitation.value.locationAddress = "No Address Provided";
-  if (!invitation.value.date) invitation.value.date = new Date().toISOString().split("T")[0]; // Default to today's date
-  if (!invitation.value.startTime) invitation.value.startTime = "00:00"; // Default to midnight
-  console.log("Event Data to Send **SECOND**:", {
-    hostEmail: hostEmail.value,
-    hostFirstName: hostFirstName.value,
-    hostLastName: hostLastName.value,
-    eventName: eventName.value,
-    address: invitation.value.locationAddress,
-    date: invitation.value.date,
-    startTime: invitation.value.startTime,
-    endTime: endTime.value,
-    timeZone: timeZone.value,
-    selectedLayout: selectedLayout.value,
-    selectedImage: selectedImage.value,
-    backGroundColor: fontStyle.value.backgroundColor,
-    fontColor: fontStyle.value.color,
-    font: fontStyle.value.fontFamily,
-    isPrivate: isPrivate.value,
-    recurring: recurring.value,
-    recurrenceFrequency: recurFrequency.value,
-    recurrenceEndDate: recurEndDate.value,
-    requestChildCount: requestChildCount.value,
-    limitGuests: limitGuests.value,
-    maxAdditionalGuests: maxAdditionalGuests.value,
-    notifyRSVPs: notifyRSVPs.value,
-  });
-
 
   try {
     const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
@@ -314,78 +277,52 @@ const createEvent = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        hostEmail: hostEmail.value,
-        hostFirstName: hostFirstName.value,
-        hostLastName: hostLastName.value,
-        eventName: eventName.value,
-        address: address.value,
-        date: invitation.value.date,
-        startTime: invitation.value.startTime,
-        endTime: endTime.value,
-        timeZone: timeZone.value,
-        selectedLayout: selectedLayout.value,
-        selectedImage: selectedImage.value,
-        backGroundColor: fontStyle.value.backgroundColor,
-        fontColor: fontStyle.value.color,
-        font: fontStyle.value.fontFamily,
-        isPrivate: isPrivate.value,
-        recurring: recurring.value,
-        recurrenceFrequency: recurFrequency.value,
-        recurrenceEndDate: recurEndDate.value,
-        requestChildCount: requestChildCount.value,
-        limitGuests: limitGuests.value,
-        maxAdditionalGuests: maxAdditionalGuests.value,
-        notifyRSVPs: notifyRSVPs.value
+        event_host: hostEmail.value,
+        host_name: `${hostFirstName.value || "DefaultFirstName"} ${hostLastName.value || "DefaultLastName"}`,
+        event_name: eventName.value || "Untitled Event",
+        event_location: invitation.value.locationAddress || "No Address Provided",
+        event_start_date: `${invitation.value.date || new Date().toISOString().split("T")[0]}T${invitation.value.startTime || "00:00"}`,
+        event_end_date: endTime.value
+            ? `${invitation.value.date || new Date().toISOString().split("T")[0]}T${endTime.value}`
+            : undefined,
+        event_time_zone: timeZone.value || "UTC",
+        invitation_layout: selectedLayout.value || "Center",
+        background_image: selectedImage.value || 1,
+        font_background_color: fontStyle.value.backgroundColor || "#000000",
+        font_color: fontStyle.value.color || "#FFFFFF",
+        font: fontStyle.value.fontFamily || "italic bold 20px arial,serif",
+        is_public: !isPrivate.value,
+        reoccurs: recurring.value || false,
+        reoccur_freq: recurFrequency.value || null,
+        end_reoccur: recurEndDate.value || null,
+        request_child_num: requestChildCount.value || false,
+        limit_additional_guests: limitGuests.value || false,
+        max_additional_guests: maxAdditionalGuests.value || 0,
+        notify_host: notifyRSVPs.value || true,
       }),
     });
+
+    const responseText = await response.text(); // Retrieve the text response for debugging
     console.log("Response Status:", response.status);
-    const responseText = await response.text(); // Parse response as text for debugging
     console.log("Response Text:", responseText);
+
     if (response.ok) {
-      //change later
       console.log("Event successfully created!");
       alert("Event successfully created!");
     } else {
-      alert("Error creating event in createEvent1.");
+      console.error("Server Error:", response.status, responseText);
+      alert(`Error creating event. Status: ${response.status}`);
     }
   } catch (error) {
-    console.error(error);
-    alert("Error creating event in createEvent2.");
+    console.error("Network or Client Error:", error);
+    alert("Error creating event. Check console for details.");
   }
 };
 
 async function saveEventDetails() {
-  console.log("Save event triggered!");
-  console.log("Saving event details:", {
-    //hostFirstName: hostFirstName.value,
-    //hostLastName: hostLastName.value,
-    //hostEmail: hostEmail.value,
-    //recurring: !isSingleEvent.value,
-    //frequency: recurringSettings.value.interval,
-    //unit: recurringSettings.value.unit,
-    //weeklyDays: recurringSettings.value.unit === "week" ? recurringSettings.value.selectedDays : [],
-    //monthlyOption: recurringSettings.value.unit === "month" ? recurringSettings.value.monthOption : null,
-    //specificDay:
-        //recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "specific-day"
-            //? recurringSettings.value.specificDay
-            //: null,
-    //nthWeek:
-        //recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
-           // ? recurringSettings.value.nthWeek
-            //: null,
-    //selectedDay:
-        //recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
-           // ? recurringSettings.value.selectedDay
-            //: null,
-    //endCondition: recurringSettings.value.ends,
-    //endDate: recurringSettings.value.ends === "on" ? recurEndDate.value : null,
-    //occurrences: recurringSettings.value.ends === "after" ? recurringSettings.value.occurrences : null,
-    // Add other fields as needed
-  });
   try {
     // Call the `createEvent` function
     await createEvent();
-    console.log("Event successfully saved!");
   } catch (error) {
     console.error("Error while saving event:", error);
   }

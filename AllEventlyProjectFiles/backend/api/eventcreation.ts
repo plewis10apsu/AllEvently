@@ -115,6 +115,9 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
                 INSERT INTO Events (${providedColumns.join(', ')})
                 VALUES (${placeholders.join(', ')})`;
 
+            console.log("Executing Query: ", query);
+            console.log("With Values: ", values);
+
             await pool.query(query, values);
             res.statusCode = 201;
             res.end(JSON.stringify({ message: 'Event successfully created.'} ));
