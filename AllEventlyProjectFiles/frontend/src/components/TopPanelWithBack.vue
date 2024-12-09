@@ -5,7 +5,7 @@ import { faArrowLeft  } from '@fortawesome/free-solid-svg-icons';
 import router from "@/router";
 
 function navigateToEvents() {
-  router.push({ name: 'Events' });
+  router.push({ name: 'EventsWithoutId' });
 }
 
 </script>
