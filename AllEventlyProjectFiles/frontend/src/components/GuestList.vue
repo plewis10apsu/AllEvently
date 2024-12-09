@@ -31,7 +31,8 @@ export default {
         attending: 1,
         waiting: 1,
         regrets: 0
-      }
+      },
+      invitationLink: "",
     };
   },
   computed: {
@@ -96,9 +97,35 @@ export default {
       this.counts.attending = this.guests.filter(guest => guest.status === 'Attending').length;
       this.counts.waiting = this.guests.filter(guest => guest.status === 'Waiting').length;
       this.counts.regrets = this.guests.filter(guest => guest.status === 'Regrets').length;
+    },
+    async sendInvitations() {
+      if (!this.guests || this.guests.length === 0) {
+        console.error("Guest list is empty or undefined.");
+        return;
+      }
+      try {
+        const response = await fetch('https://all-evently-backend.vercel.app/api/sendinvitations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            guestList: this.guests,
+            invitationLink: this.invitationLink
+          }),
+        });
+        if (response.ok) {
+          alert('Emails successfully sent.');
+        } else {
+          console.error('Error sending emails.');
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };
+
 </script>
 
 <template>
@@ -174,6 +201,7 @@ export default {
           <button @click="deleteGuest">Delete</button>
           <button @click="saveGuest">Save</button>
         </div>
+        <button @click="sendInvitations">Send Invitations</button>
       </div>
     </div>
   </div>
