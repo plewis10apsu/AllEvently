@@ -82,7 +82,7 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
         try {
             const body = await parseJsonBody(req);
             validateInput(body, requiredFields);
-            const hostFullName = `${body.hostFirstName} ${body.hostLastName}`;
+            const hostFullName = `${body.host_name}`;
             const columns = [
                 'event_host',            // hostEmail
                 'host_name',             // hostFullName
