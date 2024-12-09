@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {defineProps, PropType} from 'vue';
+import {defineProps, PropType, ref} from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import router from "@/router";
 
@@ -35,6 +35,11 @@ const navigateTo = (path: string, query: Record<string, string> = {}, routeName?
     router.push({ path, query });
   }
 };
+
+const firstName = ref<string>(localStorage.getItem('firstName') || "John");
+const lastName = ref<string>(localStorage.getItem('lastName') || "Doe");
+const email = ref<string>(localStorage.getItem('email') || "john.doe@example.com");
+
 </script>
 
 <template>
@@ -42,7 +47,7 @@ const navigateTo = (path: string, query: Record<string, string> = {}, routeName?
     <nav class="preview-container">
       <button v-for="item in navItems"
               :key="item.label"
-              @click="navigateTo(item.path, { firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com' }, item.routeName)"
+              @click="navigateTo(item.path, { firstName: firstName, lastName: lastName, email: email }, item.routeName)"
               class="nav-button"
       >
         <FontAwesomeIcon :icon="item.icon" class="nav-icon" />
