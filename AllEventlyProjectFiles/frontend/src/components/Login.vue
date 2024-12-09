@@ -57,6 +57,7 @@ const loginUser = async () => {
         console.log(data.message);
       }
     } else {
+      alert('The password or email is invalid. Please try again.');
       // Negative message from database validation message
       response.json().then((data) => {
         console.error('Error response from server:', data);
