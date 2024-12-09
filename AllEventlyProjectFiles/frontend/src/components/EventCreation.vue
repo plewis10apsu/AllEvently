@@ -54,19 +54,12 @@ const recurringSettings = ref({
 });
 
 const recurring = computed(() => !isSingleEvent.value);
-
 const recurFrequency = ref<number>(1); // Interval frequency (e.g., every 1 week)
 const recurEndDate = ref<string>(""); // End date for recurring events
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-//added some additional necessary variables for database entry - Spenser
-//commenting them out for now
-/*
-
-
-
-*/
 declare const google: any;
+
 const filteredGallery = computed(() =>
     gallery.value.filter(
         (image) =>
@@ -80,7 +73,6 @@ const selectedImageUrl = computed(() => {
   return image ? image.src : null;
 });
 
-// Function to select an image
 function selectImage(imageId: number): void {
   selectedImage.value = imageId;
 }
@@ -144,51 +136,7 @@ function removeLink(index: number) {
 function toggleRemoveMode() {
   isRemoveMode.value = !isRemoveMode.value;
 }
-/*
-const createEvent = async () => {
-  try {
-    const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        hostEmail: hostEmail.value,
-        hostFirstName: hostFirstName.value,
-        hostLastName: hostLastName.value,
-        eventName: eventName.value,
-        address: address.value,
-        date: invitation.date,
-        startTime: invitation.startTime,
-        endTime: endTime.value,
-        timeZone: timeZone.value,
-        selectedLayout: selectedLayout.value,
-        selectedImage: selectedImage.value,
-        backGroundColor: fontStyle.backGroundColor,
-        fontColor: fontStyle.fontColor,
-        font: fontStyle.font,
-        isPrivate: isPrivate.value,
-        recurring: recurring.value,
-        recurrenceFrequency: recurFrequency.value,
-        recurrenceEndDate: recurEndDate.value,
-        requestChildCount: requestChildCount.value,
-        limitGuests: limitGuests.value,
-        maxAdditionalGuests: maxAdditionalGuests.value,
-        notifyRSVPs: notifyRSVPs.value
-      }),
-    });
-    if (response.ok) {
-      //change later
-      console.log("Event successfully created!");
-      alert("Event successfully created!");
-    } else {
-      alert("Error creating event.");
-    }
-  } catch (error) {
-    console.error(error);
-    alert("Error creating event.");
-  }
-};
+
 /*
 
 function selectLayout(layoutId: string): void {
@@ -206,7 +154,6 @@ watch(inputValue, (newValue) => {
     autocomplete.setBounds(nearbyBounds);
   }
 });
-
 
 // Image gallery
 const gallery = ref([
@@ -303,41 +250,151 @@ onUnmounted(() => {
   window.removeEventListener("resize", updateSidebarWidth);
 });
 
-// Add save logic here, such as sending the data to an API or storing it locally
-function saveEventDetails() {
-  console.log("Saving event details:", {
+const createEvent = async () => {
+  console.log("Event Data to Send:", {
+    hostEmail: hostEmail.value,
     hostFirstName: hostFirstName.value,
     hostLastName: hostLastName.value,
+    eventName: eventName.value,
+    address: invitation.value.locationAddress,
+    date: invitation.value.date,
+    startTime: invitation.value.startTime,
+    endTime: endTime.value,
+    timeZone: timeZone.value,
+    selectedLayout: selectedLayout.value,
+    selectedImage: selectedImage.value,
+    backGroundColor: fontStyle.value.backgroundColor,
+    fontColor: fontStyle.value.color,
+    font: fontStyle.value.fontFamily,
+    isPrivate: isPrivate.value,
+    recurring: recurring.value,
+    recurrenceFrequency: recurFrequency.value,
+    recurrenceEndDate: recurEndDate.value,
+    requestChildCount: requestChildCount.value,
+    limitGuests: limitGuests.value,
+    maxAdditionalGuests: maxAdditionalGuests.value,
+    notifyRSVPs: notifyRSVPs.value,
+  });
+  if (!hostFirstName.value) hostFirstName.value = "DefaultFirstName";
+  if (!hostLastName.value) hostLastName.value = "DefaultLastName";
+  if (!eventName.value) eventName.value = "Untitled Event";
+  if (!invitation.value.locationAddress) invitation.value.locationAddress = "No Address Provided";
+  if (!invitation.value.date) invitation.value.date = new Date().toISOString().split("T")[0]; // Default to today's date
+  if (!invitation.value.startTime) invitation.value.startTime = "00:00"; // Default to midnight
+  console.log("Event Data to Send **SECOND**:", {
     hostEmail: hostEmail.value,
-    recurring: !isSingleEvent.value,
-    frequency: recurringSettings.value.interval,
-    unit: recurringSettings.value.unit,
-    weeklyDays: recurringSettings.value.unit === "week" ? recurringSettings.value.selectedDays : [],
-    monthlyOption: recurringSettings.value.unit === "month" ? recurringSettings.value.monthOption : null,
-    specificDay:
-        recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "specific-day"
-            ? recurringSettings.value.specificDay
-            : null,
-    nthWeek:
-        recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
-            ? recurringSettings.value.nthWeek
-            : null,
-    selectedDay:
-        recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
-            ? recurringSettings.value.selectedDay
-            : null,
-    endCondition: recurringSettings.value.ends,
-    endDate: recurringSettings.value.ends === "on" ? recurEndDate.value : null,
-    occurrences: recurringSettings.value.ends === "after" ? recurringSettings.value.occurrences : null,
+    hostFirstName: hostFirstName.value,
+    hostLastName: hostLastName.value,
+    eventName: eventName.value,
+    address: invitation.value.locationAddress,
+    date: invitation.value.date,
+    startTime: invitation.value.startTime,
+    endTime: endTime.value,
+    timeZone: timeZone.value,
+    selectedLayout: selectedLayout.value,
+    selectedImage: selectedImage.value,
+    backGroundColor: fontStyle.value.backgroundColor,
+    fontColor: fontStyle.value.color,
+    font: fontStyle.value.fontFamily,
+    isPrivate: isPrivate.value,
+    recurring: recurring.value,
+    recurrenceFrequency: recurFrequency.value,
+    recurrenceEndDate: recurEndDate.value,
+    requestChildCount: requestChildCount.value,
+    limitGuests: limitGuests.value,
+    maxAdditionalGuests: maxAdditionalGuests.value,
+    notifyRSVPs: notifyRSVPs.value,
+  });
+
+
+  try {
+    const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        hostEmail: hostEmail.value,
+        hostFirstName: hostFirstName.value,
+        hostLastName: hostLastName.value,
+        eventName: eventName.value,
+        address: address.value,
+        date: invitation.value.date,
+        startTime: invitation.value.startTime,
+        endTime: endTime.value,
+        timeZone: timeZone.value,
+        selectedLayout: selectedLayout.value,
+        selectedImage: selectedImage.value,
+        backGroundColor: fontStyle.value.backgroundColor,
+        fontColor: fontStyle.value.color,
+        font: fontStyle.value.fontFamily,
+        isPrivate: isPrivate.value,
+        recurring: recurring.value,
+        recurrenceFrequency: recurFrequency.value,
+        recurrenceEndDate: recurEndDate.value,
+        requestChildCount: requestChildCount.value,
+        limitGuests: limitGuests.value,
+        maxAdditionalGuests: maxAdditionalGuests.value,
+        notifyRSVPs: notifyRSVPs.value
+      }),
+    });
+    console.log("Response Status:", response.status);
+    const responseText = await response.text(); // Parse response as text for debugging
+    console.log("Response Text:", responseText);
+    if (response.ok) {
+      //change later
+      console.log("Event successfully created!");
+      alert("Event successfully created!");
+    } else {
+      alert("Error creating event in createEvent1.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Error creating event in createEvent2.");
+  }
+};
+
+async function saveEventDetails() {
+  console.log("Save event triggered!");
+  console.log("Saving event details:", {
+    //hostFirstName: hostFirstName.value,
+    //hostLastName: hostLastName.value,
+    //hostEmail: hostEmail.value,
+    //recurring: !isSingleEvent.value,
+    //frequency: recurringSettings.value.interval,
+    //unit: recurringSettings.value.unit,
+    //weeklyDays: recurringSettings.value.unit === "week" ? recurringSettings.value.selectedDays : [],
+    //monthlyOption: recurringSettings.value.unit === "month" ? recurringSettings.value.monthOption : null,
+    //specificDay:
+        //recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "specific-day"
+            //? recurringSettings.value.specificDay
+            //: null,
+    //nthWeek:
+        //recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
+           // ? recurringSettings.value.nthWeek
+            //: null,
+    //selectedDay:
+        //recurringSettings.value.unit === "month" && recurringSettings.value.monthOption === "nth-weekday"
+           // ? recurringSettings.value.selectedDay
+            //: null,
+    //endCondition: recurringSettings.value.ends,
+    //endDate: recurringSettings.value.ends === "on" ? recurEndDate.value : null,
+    //occurrences: recurringSettings.value.ends === "after" ? recurringSettings.value.occurrences : null,
     // Add other fields as needed
   });
-  alert("Event details saved!");
+  try {
+    // Call the `createEvent` function
+    await createEvent();
+    console.log("Event successfully saved!");
+  } catch (error) {
+    console.error("Error while saving event:", error);
+  }
 }
 
-// Reactive state
 const invitation = ref({
   eventName: "",
   date: "",
+  startTime: "", // Add this property
   time: "",
   locationName: "", // Venue Name
   locationAddress: "", // Address
@@ -350,7 +407,7 @@ const invitation = ref({
     italic: false,
     underline: false,
     color: "#fbfbfb",
-    backgroundColor: "#083D77"
+    backgroundColor: "#083D77",
   },
 });
 
@@ -375,70 +432,6 @@ const sidebarEventDetails = computed(() => ({
   mapImageUrl: mapImageUrl.value,
 }));
 
-//commenting these out since they are used in the async function and vercel is whining
-/*
-const eventLocation = ref<string>("");
-const isPublic = ref<Boolean>(true);
-const hostEmail = ref<String>("");
-*/
-/*// Computed properties
-const isFormValid = computed((): boolean => {
-  return (
-    eventName.value.trim() !== "" &&
-    eventDate.value !== "" &&
-    startTime.value !== "" &&
-    endTime.value !== ""
-  );
-});*/
-/*
-//commented out for now to avoid vercel complaints
-const createEvent = async () => {
-  try {
-    const response = await fetch('https://all-evently-backend.vercel.app/api/eventcreation', {
-      method : 'POST',
-      headers : {
-        'Content-Type': 'application/json',
-      },
-      body : JSON.stringify({
-        hostEmail : hostEmail.value,
-        hostFirstName : hostFirstName.value,
-        hostLastName : hostLastName.value,
-        eventName : eventName.value,
-        eventLocation : eventLocation.value,
-        isPublic : isPublic.value
-      })
-    });
-    if (response.ok) {
-      const data = await response.json();
-      alert("Successfully created event: "+data.eventName);
-    } else {
-      console.error("Error creating event. Please try again.");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-*/
-/*function submitEvent(): void {
-  if (isFormValid.value) {
-    console.log("Event submitted with the following details:", {
-      eventName: eventName.value,
-      eventDate: eventDate.value,
-      startTime: startTime.value,
-      endTime: endTime.value,
-      timeZone: timeZone.value,
-      requestChildCount: requestChildCount.value,
-      limitGuests: limitGuests.value,
-      allowRSVP: allowRSVP.value,
-      hostFirstName: hostFirstName.value,
-      hostLastName: hostLastName.value,
-      notifyRSVPs: notifyRSVPs.value,
-    });
-    alert("Event successfully created!");
-  } else {
-    alert("Please fill in all required fields.");
-  }
-}*/
 </script>
 
 <template>
