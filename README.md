@@ -21,6 +21,7 @@
     - [Appendix – Message Documentation (Inside Design Document)](./Documents/Design%20Document%20(AllEvently).pdf)
     - [Appendix – Entity Relationship Diagram](Documents/Database/AllEventlyERD.pdf)
 4. [Progress Update Document PDF](./Documents/Progress%20Update%20Document%20(AllEvently).pdf)
+5. [Poster PDF](./Documents/Poster%20Document%20(AllEvently).pdf)
    
 ### Slides/PowerPoint
 1. [Requirements Slides PDF](./Documents/Requirements%20Slides%20(AllEvently).pdf)
