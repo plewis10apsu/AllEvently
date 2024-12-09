@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { watch } from 'vue';
-//import axios from 'axios';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Event } from '@/types/EventInterface';
 import TopPanel from "@/components/TopPanel.vue";
@@ -8,29 +6,55 @@ import Sidebar from "./Sidebar.vue";
 import logo from '@/assets/AllEventlyLogo.png';
 import SearchBar from "@/components/SearchBar.vue";
 import EventCard from './EventCard.vue';
-import { useRoute } from 'vue-router';
 import router from "@/router";
 
 const activeTab = ref('attending');
 const filterOption = ref('Upcoming Events');
 const isSidebarVisible = ref(true);
 const sidebarWidth = ref(200);
+const userId = ref<string | null>(localStorage.getItem('userId'));
+const hostedEvents = ref<Event[]>([]);
+const publicEvents = ref<Event[]>([]);
 
 // Ensure `currentUser` has valid data fetched from the API
 const firstName = ref<string>("Joh"); // Replace with actual dynamic data
 const lastName = ref<string>("Doe");   // Replace with actual dynamic data
 const email = ref<string>("john.doe@example.com"); // Replace with actual dynamic data
 
-// Empty ref for events to be populated later
-const events = ref<Event[]>([]);
-const publicEvents = ref<Event[]>([]);
-//defining the router that will be used to obtain the user's id from Login.vue
-const route = useRoute();
-//the id itself
-const userId = ref<string | null>(localStorage.getItem('userId'));
-watch(userId, (newVal, oldVal) => {
-  console.log('userId changed:', { oldVal, newVal });
-});
+const getCurrentUser = async () => {
+  try {
+    console.log('Fetching current user with userId:', userId.value); // Log the userId
+    const response = await fetch('https://all-evently-backend.vercel.app/api/currentuser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: userId.value
+      }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (!data.user){
+        alert(data.user);
+      } else {
+        const userData = data.user.split(",");
+        email.value = userData[0];
+        firstName.value = userData[1];
+        lastName.value = userData[2];
+        email.value = email.value.replace(/\(/g, "");
+        lastName.value = lastName.value.replace(/\)/g, "");
+      }
+    } else {
+      console.error('Error fetching current user');
+    }
+
+  } catch (error) {
+    console.log("Error message: ")
+    console.log(error);
+  }
+}
+
 const getPublicEvents = async () => {
   try {
     console.log('Fetching public events...');
@@ -76,89 +100,58 @@ const getPublicEvents = async () => {
   }
 };
 
-/*
 const getHostedEvents = async () => {
   try {
+    console.log('Fetching hosted events...');
     const response = await fetch('https://all-evently-backend.vercel.app/api/hostedevents', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: email.value,
+        email: email.value, // Use the user's email to fetch hosted events
       }),
     });
+
     if (response.ok) {
       const data = await response.json();
-      if (!data.hostedEvents || data.hostedEvents.length === 0) {
+      console.log("Hosted events received: ", data);
+
+      if (Array.isArray(data) && data.length > 0) {
+        hostedEvents.value = data.map((item: any) => ({
+          id: item.event_id,
+          title: item.event_name,
+          type: item.location, // Adjust field mapping based on your backend response
+          venue: item.event_address,
+          date: item.event_date,
+          time: item.updated_at,
+          host: item.email,
+          imageUrl: '', // Placeholder
+          venueLink: '', // Placeholder
+          venueAddress: item.event_address,
+          isHost: true, // Hosted events are always hosted by the current user
+          isGuest: false,
+        }));
+        console.log("Hosted events stored: ", hostedEvents.value);
+      } else {
         console.log("No hosted events to display.");
-      } else {
-        hostedEvents.value = data.hostedEvents;
-        console.log(hostedEvents.value);
+        hostedEvents.value = []; // Clear out hosted events if none are returned
       }
     } else {
-      console.log("Error fetching hosted events.");
+      console.error('Error fetching hosted events:', response.status);
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error during fetch operation:", error);
   }
-}
-*/
-const getCurrentUser = async () => {
-  try {
-    console.log('Fetching current user with userId:', userId.value); // Log the userId
-    const response = await fetch('https://all-evently-backend.vercel.app/api/currentuser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: userId.value
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (!data.user){
-        alert(data.user);
-      } else {
-        const userData = data.user.split(",");
-        email.value = userData[0];
-        firstName.value = userData[1];
-        lastName.value = userData[2];
-        email.value = email.value.replace(/\(/g, "");
-        lastName.value = lastName.value.replace(/\)/g, "");
-        localStorage.removeItem('userId');
-        localStorage.setItem('userId', userId.value);
-        localStorage.removeItem('firstName');
-        localStorage.removeItem('lastName');
-        localStorage.removeItem('email');
-        localStorage.setItem('firstName', firstName.value);
-        localStorage.setItem('lastName', lastName.value);
-        localStorage.setItem('email', email.value);
-      }
-    } else {
-      console.error('Error fetching current user');
-    }
+};
 
-  } catch (error) {
-    console.log("Error message: ")
-    console.log(error);
-  }
-}
-
-// Adjust sidebar width dynamically based on screen size
 const updateSidebarWidth = () => {
   sidebarWidth.value = window.innerWidth <= 809 ? 80 : 200;
 };
-
 window.addEventListener('resize', updateSidebarWidth);
-onUnmounted(() => {
-  window.removeEventListener('resize', updateSidebarWidth);
-});
 
 const currentUser = ref<string>(''); // Empty string initially
 
-// Fetch user data on component mount
 onMounted(async () => {
   console.log('onMounted triggered for Events.vue');
   if (!userId.value) {
@@ -167,9 +160,10 @@ onMounted(async () => {
     return;
   }
 
-  if (publicEvents.value.length === 0) { // Avoid redundant API calls
-    await getCurrentUser();
-    await getPublicEvents();
+  if (publicEvents.value.length === 0 && hostedEvents.value.length === 0) {
+    await getCurrentUser();   // Fetch user details
+    await getPublicEvents();  // Fetch public events
+    await getHostedEvents();  // Fetch hosted events
   } else {
     console.log('Public events already fetched, skipping API call.');
   }
@@ -177,14 +171,8 @@ onMounted(async () => {
   updateSidebarWidth();
 });
 
-watch(route, (newRoute, oldRoute) => {
-  console.log("Route changed:", { oldRoute, newRoute });
-
-  // Refetch data if navigating back to the Events page
-  if (newRoute.name === 'Events' && publicEvents.value.length === 0) {
-    console.log('Refetching events due to route change.');
-    getPublicEvents();
-  }
+onUnmounted(() => {
+  window.removeEventListener('resize', updateSidebarWidth);
 });
 
 //Commenting out hard-coded events and testing it with data from the server request
@@ -232,32 +220,23 @@ const events = ref<Event[]>([
 
 // Processed events with dynamic isHost and isGuest
 const processedEvents = computed(() =>
-  events.value.map(event => ({
+  hostedEvents.value.map(event => ({
     ...event,
     isHost: event.host === currentUser.value,
     isGuest: event.host !== currentUser.value,
   }))
 );
 
-console.log(
-    processedEvents.value.map(event => ({
-      title: event.title,
-      host: event.host,
-      isHost: event.isHost,
-      isGuest: event.isGuest,
-    }))
-);
-
-
 // Filtered events based on the active tab
 const filteredEvents = computed(() => {
   if (activeTab.value === 'hosting') {
-    return processedEvents.value.filter(event => event.isHost);
+    return hostedEvents.value; // Show hosted events
   } else if (activeTab.value === 'attending') {
     return processedEvents.value.filter(event => event.isGuest);
   }
   return processedEvents.value;
 });
+
 const navItems = [
   { label: 'Account', path: '/account', icon: 'fas fa-user',
     query: { firstName: firstName.value, lastName: lastName.value, email: email.value } },
@@ -266,14 +245,6 @@ const navItems = [
   { label: 'Events', path: '/events', icon: 'fas fa-calendar-alt' },
   { label: 'Logout', path: '/', icon: 'fas fa-right-from-bracket' }
 ];
-watch(route, (newRoute, oldRoute) => {
-  console.log("Route changed:", { oldRoute, newRoute });
-
-  if (newRoute.name === 'Events' && publicEvents.value.length === 0) {
-    console.log('Refetching events due to route change.');
-    getPublicEvents();
-  }
-});
 
 </script>
 
