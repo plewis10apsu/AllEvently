@@ -85,28 +85,28 @@ const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void>
             validateInput(body, requiredFields);
             const hostFullName = `${body.hostFirstName} ${body.hostLastName}`;
             const columns = [
-                'hostEmail',
-                'hostFullName',
-                'eventName',
-                'address',
-                'date',
-                'startTime',
-                'endTime',
-                'timeZone',
-                'selectedLayout',
-                'selectedImage',
-                'backGroundColor',
-                'fontColor',
-                'font',
-                'isPrivate',
-                'recurring',
-                'recurrenceFrequency',
-                'recurrenceEndDate',
-                'requestChildCount',
-                'limitGuests',
-                'maxAdditionalGuests',
-                'notifyRSVPs',
+                'event_host',            // hostEmail
+                'host_name',             // hostFullName
+                'event_name',            // eventName
+                'event_location',        // address
+                'event_start_date',      // date + startTime
+                'event_end_date',        // date + endTime
+                'event_time_zone',       // timeZone
+                'invitation_layout',     // selectedLayout
+                'background_image',      // selectedImage
+                'font_background_color', // backGroundColor
+                'font_color',            // fontColor
+                'font',                  // font
+                'is_public',             // isPrivate flipped
+                'reoccurs',              // recurring
+                'reoccur_freq',          // recurrenceFrequency
+                'end_reoccur',           // recurrenceEndDate
+                'request_child_num',     // requestChildCount
+                'limit_additional_guests',// limitGuests
+                'max_additional_guests', // maxAdditionalGuests
+                'notify_host',           // notifyRSVPs
             ];
+
             const { providedColumns, values, placeholders } = prepareQueryData(
                 { ...body, hostFullName }, // Add hostFullName to the body for query preparation
                 columns
