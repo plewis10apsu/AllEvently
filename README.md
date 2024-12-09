@@ -132,7 +132,7 @@ For queries, feedback, or collaboration opportunities, contact us at [Open Issue
 4. [Progress Update Document PDF](./Documents/Progress%20Update%20Document%20(AllEvently).pdf)
 5. [Poster PDF](./Documents/Poster%20Document%20(AllEvently).pdf)
 
---  
+---  
 ### Slides/PowerPoints
 1. [Requirements Slides PDF](./Documents/Requirements%20Slides%20(AllEvently).pdf)
 2. [Design Document Slides PDF](./Documents/AllEvently%20Design%20(Slides).pdf)
