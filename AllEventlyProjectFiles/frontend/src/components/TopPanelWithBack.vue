@@ -3,9 +3,18 @@ import logo from '@/assets/AllEventlyLogo.png';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faArrowLeft  } from '@fortawesome/free-solid-svg-icons';
 import router from "@/router";
+import {ref} from "vue";
+
+const userId = ref<string | null>(localStorage.getItem('userId') || null);
+
 
 function navigateToEvents() {
-  router.push({ name: 'EventsWithoutId' });
+  router.push({
+    name: 'Events',
+    params: {
+      userId: userId.value,
+    },
+  });
 }
 
 </script>
