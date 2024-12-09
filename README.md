@@ -12,6 +12,7 @@
 9. [Contact Information](#contact-information)
 10. [Editable Documents](#editable-documents)
 11. [PDF/PNG Documents](#pdfpng-documents)
+12. [Slides/PowerPoints](#slidespowerpoints)
 
 ---
 
@@ -118,7 +119,8 @@ For queries, feedback, or collaboration opportunities, contact us at [Open Issue
 7. [Progress Update Slides (Editable)](Documents/Progress_Update_Slides.pptx)
 8. [Poster (Editable)](Documents/AllEvently%20Poster.pptx)
 
-### PDF/PNG
+---
+### PDF/PNG Documents
 1. [Proposal Document PDF](./Documents/Proposal%20Document%20(AllEvently).pdf)
 2. [Requirements Document PDF](./Documents/Requirements%20Document%20(AllEvently).pdf)
 3. [Design Document PDF and Appendices](./Documents/Design%20Document%20(AllEvently).pdf)
@@ -129,8 +131,9 @@ For queries, feedback, or collaboration opportunities, contact us at [Open Issue
     - [Appendix – Entity Relationship Diagram](Documents/Database/AllEventlyERD.pdf)
 4. [Progress Update Document PDF](./Documents/Progress%20Update%20Document%20(AllEvently).pdf)
 5. [Poster PDF](./Documents/Poster%20Document%20(AllEvently).pdf)
-   
-### Slides/PowerPoint
+
+--  
+### Slides/PowerPoints
 1. [Requirements Slides PDF](./Documents/Requirements%20Slides%20(AllEvently).pdf)
 2. [Design Document Slides PDF](./Documents/AllEvently%20Design%20(Slides).pdf)
 3. [Progress Update Document Slides PDF](./Documents/AllEvently%20Progress%20Update%20(Slides).pdf)
