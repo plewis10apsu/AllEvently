@@ -72,10 +72,9 @@ const validateInput = (body: Record<string, any>, requiredFields: string[]) => {
 };
 
 const requiredFields = [
-    'hostEmail',
-    'hostFirstName',
-    'hostLastName',
-    'address',
+    'event_host',
+    'host_name',
+    'event_location',
 ];
 
 const handler = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {

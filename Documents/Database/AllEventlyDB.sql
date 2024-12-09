@@ -346,6 +346,9 @@ END $$ LANGUAGE plpgsql;
 --VALUES ('peggy@gmail.com', 'maggy', 'Charle''s Birthday Party', 'here', '2024-11-25');
 --INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
 --VALUES ('spensor@gmail.com', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
+--
+--INSERT INTO EVENTS (event_host, host_name, event_name, event_location, event_end_date, is_public)
+--VALUES ('apeay@my.apsu.edu', 'spency', 'Graduation Party', '420 Oval Dr. Clarksville, TN 37045', '2024-11-25', TRUE);
 
 
 --Create Guest
