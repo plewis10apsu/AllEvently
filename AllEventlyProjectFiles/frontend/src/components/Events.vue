@@ -44,6 +44,12 @@ const getCurrentUser = async () => {
         lastName.value = userData[2];
         email.value = email.value.replace(/\(/g, "");
         lastName.value = lastName.value.replace(/\)/g, "");
+        localStorage.removeItem('firstName');
+        localStorage.removeItem('lastName');
+        localStorage.removeItem('email');
+        localStorage.setItem('firstName', firstName.value);
+        localStorage.setItem('lastName', lastName.value);
+        localStorage.setItem('email', email.value);
       }
     } else {
       console.error('Error fetching current user');
