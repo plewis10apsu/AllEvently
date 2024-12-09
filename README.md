@@ -48,7 +48,7 @@ AllEvently is a web-based platform designed to simplify event management. Users 
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/allevently.git
+   git clone https://github.com/BenStorm2514/AllEvently.git
    cd allevently
    ```
 2. Install dependencies:
