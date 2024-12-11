@@ -106,7 +106,7 @@ This project is licensed under the MIT License.
 ---
 
 ## Contact Information
-For queries, feedback, or collaboration opportunities, contact us at [Open Issues](https://github.com/BenStorm2514/AllEvently/issues).
+For queries, feedback, or collaboration opportunities, contact us at [Open Issues](https://github.com/plewis10apsu/AllEvently/issues).
 
 ---
 ### Editable Documents
